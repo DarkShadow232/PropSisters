@@ -1,0 +1,116 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base colors from provided style */
+    --primary-color: #333333; /* Dark gray to match logo */
+    --primary-dark: #1a1a1a; /* Darker shade of gray */
+    --primary-light: #666666; /* Lighter shade of gray */
+    --primary-rgb: 51, 51, 51; /* RGB values for primary color */
+    --accent-color: #b94a3b; /* Terracotta/rustic red */
+    --accent-light: rgba(185, 74, 59, 0.1); /* Light version of accent color */
+    --secondary-color: #f7f7f7;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --text-white: #ffffff;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    
+    /* Tailwind CSS variables */
+    --background: 0 0% 97%;
+    --foreground: 215 14% 17%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 14% 17%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 14% 17%;
+
+    --primary: 0 0% 20%; /* Dark gray from primary-color */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 97%;
+    --secondary-foreground: 215 14% 17%;
+
+    --muted: 0 0% 97%;
+    --muted-foreground: 215 6% 46%;
+
+    --accent: 6 53% 48%; /* Terracotta/rustic red from accent-color */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 6 53% 48%; /* Accent color for focus rings */
+
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply px-4 md:px-8 lg:px-12 xl:px-24 max-w-[1600px] mx-auto;
+  }
+  
+  .nav-link {
+    @apply relative px-2 py-1 text-foreground/80 hover:text-foreground transition-colors duration-200 after:content-[''] after:absolute after:w-0 after:h-0.5 after:bg-primary after:bottom-0 after:left-0 hover:after:w-full after:transition-all after:duration-300;
+  }
+  
+  .nav-link.active {
+    @apply text-foreground after:w-full;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 py-2 px-4 rounded-md transition-colors duration-200;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 py-2 px-4 rounded-md border border-border transition-colors duration-200;
+  }
+  
+  .btn-outline {
+    @apply bg-transparent text-foreground border border-border hover:bg-secondary py-2 px-4 rounded-md transition-colors duration-200;
+  }
+  
+  .property-card {
+    @apply bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300;
+  }
+  
+  .form-input {
+    @apply w-full px-4 py-2 rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary/50 bg-background;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-foreground/80 mb-1;
+  }
+  
+  .section-title {
+    @apply font-serif text-3xl md:text-4xl font-medium relative inline-block;
+  }
+  
+  .section-title::after {
+    @apply content-[''] absolute w-1/3 h-1 bg-primary bottom-0 left-0;
+  }
+}

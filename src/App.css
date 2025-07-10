@@ -1,0 +1,336 @@
+/* Global styles for the Sisterhood Style Rentals application */
+
+/* Remove default margin from body */
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* Global styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  background-color: #fcfcfc;
+}
+
+/* Improved focus styles for accessibility */
+:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Reveal animations */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered children animations */
+.stagger-children > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.stagger-children.revealed > *:nth-child(1) { transition-delay: 0.1s; }
+.stagger-children.revealed > *:nth-child(2) { transition-delay: 0.2s; }
+.stagger-children.revealed > *:nth-child(3) { transition-delay: 0.3s; }
+.stagger-children.revealed > *:nth-child(4) { transition-delay: 0.4s; }
+.stagger-children.revealed > *:nth-child(5) { transition-delay: 0.5s; }
+.stagger-children.revealed > *:nth-child(6) { transition-delay: 0.6s; }
+
+.stagger-children.revealed > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Animation for page transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply fade-in animation to main content with improved performance */
+main {
+  min-height: calc(100vh - 200px); /* Ensure consistent minimum height */
+}
+
+main > section {
+  animation: fadeIn 0.5s ease-out;
+  will-change: opacity, transform;
+}
+
+/* Animation class for mobile menu */
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Improved image handling */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Button hover effects */
+.btn-primary:hover {
+  box-shadow: 0 0 15px rgba(185, 74, 59, 0.5);
+  animation: pulse-soft 1s ease-in-out;
+}
+
+.btn-secondary:hover, 
+.btn-outline:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Card hover effects */
+.property-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.property-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.2);
+}
+
+/* Image hover zoom effect */
+.img-hover-zoom {
+  overflow: hidden;
+}
+
+.img-hover-zoom img {
+  transition: transform 0.5s ease;
+}
+
+.img-hover-zoom:hover img {
+  transform: scale(1.05);
+}
+
+/* Animated icons */
+.animated-icon {
+  transition: transform 0.3s ease;
+}
+
+.animated-icon:hover {
+  transform: scale(1.2);
+}
+
+/* Fancy link hover effect */
+.fancy-link {
+  position: relative;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.fancy-link::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: #b94a3b;
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.3s ease;
+}
+
+.fancy-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Pulse animation for map markers */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(211, 126, 94, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(211, 126, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(211, 126, 94, 0);
+  }
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+/* Navigation link styles */
+.nav-link {
+  position: relative;
+  font-weight: 500;
+  color: var(--text-dark);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0.75rem 1rem; /* Adjusted padding for better spacing */
+  font-size: 1.08rem;
+  letter-spacing: 0.01em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center; /* Center content horizontally */
+  height: 48px;
+  border-radius: 6px;
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.nav-link:hover {
+  color: #b94a3b;
+  background-color: rgba(185, 74, 59, 0.05); /* Subtle background on hover */
+  transform: translateY(-1px); /* Slight lift effect */
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background-color: #b94a3b;
+  border-radius: 2px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 70%;
+  opacity: 1;
+}
+
+.nav-link.active {
+  color: #b94a3b;
+  font-weight: 600;
+  background-color: rgba(185, 74, 59, 0.08);
+}
+
+/* Navbar container spacing and shadow on scroll */
+.sticky.top-0 {
+  min-height: 88px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 16px 0 rgba(185, 74, 59, 0.07);
+  background: rgba(255, 255, 255, 0.97);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sticky.top-0.shadow-md {
+  box-shadow: 0 4px 24px 0 rgba(185, 74, 59, 0.13);
+  background: rgba(255, 255, 255, 0.98);
+}
+
+/* Container styles for better alignment */
+.container-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  width: 100%;
+  min-height: 72px;
+}
+
+/* Navigation container */
+nav.hidden.md\:flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  margin: 0 2rem; /* Add margin on both sides */
+}
+
+/* Ensure dropdown menu items are properly aligned */
+.dropdown-menu-item {
+  transition: all 0.2s ease;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Mobile navigation improvements */
+@media (max-width: 768px) {
+  .nav-link {
+    padding: 1rem 1.25rem;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  nav.hidden.md\:flex {
+    margin: 0;
+  }
+}
+
+/* Responsive tweaks */
+@media (max-width: 1024px) {
+  .sticky.top-0 {
+    min-height: 72px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .container-custom {
+    gap: 1.25rem;
+  }
+  .md\:flex.items-center.gap-6.lg\:gap-8 > .nav-link {
+    margin-right: 0.5rem;
+  }
+}
+@media (max-width: 768px) {
+  .container-custom {
+    padding: 0 0.5rem;
+  }
+}
+
+/* Page transition container */
+.page-transition-container {
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Improved mobile navigation */
+@media (max-width: 768px) {
+  .container-custom {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .section-title {
+    font-size: 1.75rem;
+  }
+  
+  .property-card {
+    max-width: 100%;
+  }
+}
