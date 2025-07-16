@@ -17,24 +17,11 @@ import { Apartment } from "@/data/rentalData";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { createBooking, checkDateAvailability } from "@/services/bookingService";
+import { processPayment, PaymentRequest } from "@/services/paymentService";
+import PaymentGatewaySelector from "@/components/PaymentGatewaySelector";
 import { Timestamp } from "firebase/firestore";
 
-// PayPal icon component since it's not available in lucide-react
-const PayPalIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M7 11C6.07003 11 5.44758 10.418 5.17765 9.55557C4.96618 8.86031 4.96618 8.02485 5.17765 7.32959C5.44758 6.46739 6.07003 5.88538 7 5.88538H15C17.2091 5.88538 19 7.67628 19 9.88538C19 12.0945 17.2091 13.8854 15 13.8854H12L10 18H7L9 13.8854H7C6.07003 13.8854 5.44758 13.3034 5.17765 12.441C4.96618 11.7457 4.96618 10.9103 5.17765 10.215C5.44758 9.35283 6.07003 8.77082 7 8.77082" />
-  </svg>
-);
+// Removed PayPalIcon component - now handled by PaymentGatewaySelector
 
 const BookingPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -58,7 +45,8 @@ const BookingPage = () => {
     cleaningService: false,
     airportPickup: false,
     earlyCheckIn: false,
-    paymentMethod: "credit-card", // Default payment method
+    paymentMethod: "paymob", // Default to Egyptian gateway
+    paymentSubMethod: "", // For mobile wallets, etc.
     cardName: "",
     cardNumber: "",
     cardExpiry: "",
@@ -66,7 +54,7 @@ const BookingPage = () => {
     billingAddress: "",
     billingCity: "",
     billingZip: "",
-    billingCountry: "United States",
+    billingCountry: "Egypt",
     bankName: "",
     accountNumber: "",
     routingNumber: "",
@@ -131,45 +119,53 @@ const BookingPage = () => {
     });
   };
   
+  // Validation functions for Egyptian payment gateways
+  const isValidEgyptianPhone = (phone: string) => {
+    // Egyptian mobile numbers: +20 followed by 10 digits
+    const cleaned = phone.replace(/[^\d]/g, '');
+    return cleaned.length === 13 && cleaned.startsWith('20') && /^20(10|11|12|15)\d{8}$/.test(cleaned);
+  };
+
+  const isValidEgyptianNationalId = (id: string) => {
+    // Egyptian National ID: 14 digits
+    return id.length === 14 && /^\d{14}$/.test(id);
+  };
+
   // Validate payment information before submission
   const validatePaymentInfo = () => {
-    let isValid = true;
-    const newErrors = { ...errors };
+    const newErrors: { [key: string]: string } = {};
     
-    if (formData.paymentMethod === "credit-card") {
-      // Validate credit card number (16 digits)
-      if (!/^\d{16}$/.test(formData.cardNumber.replace(/\s/g, ''))) {
-        newErrors.cardNumber = "Please enter a valid 16-digit card number";
-        isValid = false;
-      }
-      
-      // Validate expiry date (MM/YY format)
-      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(formData.cardExpiry)) {
-        newErrors.cardExpiry = "Please enter a valid expiry date (MM/YY)";
-        isValid = false;
-      }
-      
-      // Validate CVV (3 or 4 digits)
-      if (!/^\d{3,4}$/.test(formData.cardCVV)) {
-        newErrors.cardCVV = "Please enter a valid CVV code";
-        isValid = false;
-      }
-    } else if (formData.paymentMethod === "bank-transfer") {
-      // Validate account number
-      if (!/^\d{8,17}$/.test(formData.accountNumber)) {
-        newErrors.accountNumber = "Please enter a valid account number";
-        isValid = false;
-      }
-      
-      // Validate routing number
-      if (!/^\d{9}$/.test(formData.routingNumber)) {
-        newErrors.routingNumber = "Please enter a valid 9-digit routing number";
-        isValid = false;
+    // Basic validation for all payment methods
+    if (!formData.paymentMethod) {
+      newErrors.paymentMethod = 'Please select a payment method';
+    }
+    
+    // Validate phone number for mobile wallet payments
+    if (['vodafone-cash', 'orange-money', 'etisalat-cash'].includes(formData.paymentSubMethod)) {
+      if (!formData.phone || !isValidEgyptianPhone(formData.phone)) {
+        newErrors.phone = 'Please enter a valid Egyptian mobile number (+20xxxxxxxxxx)';
       }
     }
     
+    // Validate required guest information
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
+    
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    }
+    
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    }
+    
     setErrors(newErrors);
-    return isValid;
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -221,6 +217,42 @@ const BookingPage = () => {
         return;
       }
       
+      // Process payment first
+      const paymentRequest: PaymentRequest = {
+        amount: calculateTotal(),
+        currency: 'EGP',
+        gateway: formData.paymentMethod,
+        customerInfo: {
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          phone: formData.phone
+        },
+        bookingInfo: {
+          propertyId: rental.id.toString(),
+          checkIn: selectedDates.from,
+          checkOut: selectedDates.to,
+          nights: calculateNights()
+        },
+        paymentMethod: formData.paymentSubMethod
+      };
+      
+      const paymentResult = await processPayment(paymentRequest);
+      
+      if (!paymentResult.success) {
+        toast({
+          title: "Payment Failed",
+          description: paymentResult.error || "Payment processing failed. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // If payment requires redirect (like Paymob, Fawry), redirect user
+      if (paymentResult.redirectUrl) {
+        window.location.href = paymentResult.redirectUrl;
+        return;
+      }
+      
       // Create booking data
       const bookingData = {
         propertyId: id!,
@@ -229,11 +261,13 @@ const BookingPage = () => {
         checkOut: selectedDates.to,
         guests: 1, // You can add a guest selector later
         totalPrice: calculateTotal(),
-        status: 'pending' as const,
+        status: 'confirmed' as const, // Payment successful
         specialRequests: formData.specialRequests,
         cleaningService: formData.cleaningService,
         airportPickup: formData.airportPickup,
-        earlyCheckIn: formData.earlyCheckIn
+        earlyCheckIn: formData.earlyCheckIn,
+        paymentMethod: formData.paymentMethod,
+        transactionId: paymentResult.transactionId
       };
       
       // Save booking to Firebase
@@ -471,288 +505,25 @@ const BookingPage = () => {
                         Payment Method
                       </h2>
                       
+                      <PaymentGatewaySelector
+                        selectedGateway={formData.paymentMethod}
+                        selectedMethod={formData.paymentSubMethod}
+                        onGatewayChange={(gateway) => setFormData({...formData, paymentMethod: gateway})}
+                        onMethodChange={(method) => setFormData({...formData, paymentSubMethod: method})}
+                        amount={calculateTotal()}
+                        currency="EGP"
+                      />
+                      
                       <div className="mb-6">
                         <Tabs 
-                          defaultValue="credit-card" 
+                          defaultValue="paymob" 
                           value={formData.paymentMethod}
                           onValueChange={(value) => setFormData({...formData, paymentMethod: value})}
                           className="w-full"
                         >
-                          <TabsList className="grid w-full grid-cols-3">
-                            <TabsTrigger value="credit-card" className="flex items-center gap-2">
-                              <CreditCard className="h-4 w-4" />
-                              Credit Card
-                            </TabsTrigger>
-                            <TabsTrigger value="paypal" className="flex items-center gap-2">
-                              <PayPalIcon />
-                              PayPal
-                            </TabsTrigger>
-                            <TabsTrigger value="bank-transfer" className="flex items-center gap-2">
-                              <BanknoteIcon className="h-4 w-4" />
-                              Bank Transfer
-                            </TabsTrigger>
-                          </TabsList>
+                          {/* Payment gateway selector replaces old tabs */}
                           
-                          {/* Credit Card Form */}
-                          <TabsContent value="credit-card" className="mt-4">
-                            <Card>
-                              <CardContent className="pt-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  <div className="md:col-span-2 space-y-2">
-                                    <Label htmlFor="cardName">Name on Card</Label>
-                                    <Input
-                                      id="cardName"
-                                      name="cardName"
-                                      value={formData.cardName}
-                                      onChange={handleInputChange}
-                                      placeholder="John Smith"
-                                      required
-                                    />
-                                  </div>
-                                  
-                                  <div className="md:col-span-2 space-y-2">
-                                    <Label htmlFor="cardNumber">Card Number</Label>
-                                    <div className="relative">
-                                      <Input
-                                        id="cardNumber"
-                                        name="cardNumber"
-                                        value={formData.cardNumber}
-                                        onChange={handleInputChange}
-                                        placeholder="1234 5678 9012 3456"
-                                        required
-                                        className={errors.cardNumber ? "border-red-500" : ""}
-                                      />
-                                      {errors.cardNumber && (
-                                        <div className="text-red-500 text-sm mt-1 flex items-center">
-                                          <AlertCircle className="h-3 w-3 mr-1" />
-                                          {errors.cardNumber}
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="space-y-2">
-                                    <Label htmlFor="cardExpiry">Expiry Date</Label>
-                                    <div className="relative">
-                                      <Input
-                                        id="cardExpiry"
-                                        name="cardExpiry"
-                                        value={formData.cardExpiry}
-                                        onChange={handleInputChange}
-                                        placeholder="MM/YY"
-                                        required
-                                        className={errors.cardExpiry ? "border-red-500" : ""}
-                                      />
-                                      {errors.cardExpiry && (
-                                        <div className="text-red-500 text-sm mt-1 flex items-center">
-                                          <AlertCircle className="h-3 w-3 mr-1" />
-                                          {errors.cardExpiry}
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="space-y-2">
-                                    <Label htmlFor="cardCVV">CVV</Label>
-                                    <div className="relative">
-                                      <Input
-                                        id="cardCVV"
-                                        name="cardCVV"
-                                        value={formData.cardCVV}
-                                        onChange={handleInputChange}
-                                        placeholder="123"
-                                        required
-                                        className={errors.cardCVV ? "border-red-500" : ""}
-                                      />
-                                      {errors.cardCVV && (
-                                        <div className="text-red-500 text-sm mt-1 flex items-center">
-                                          <AlertCircle className="h-3 w-3 mr-1" />
-                                          {errors.cardCVV}
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                <div className="mt-6">
-                                  <h3 className="text-sm font-medium mb-3">Billing Address</h3>
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="md:col-span-2 space-y-2">
-                                      <Label htmlFor="billingAddress">Street Address</Label>
-                                      <Input
-                                        id="billingAddress"
-                                        name="billingAddress"
-                                        value={formData.billingAddress}
-                                        onChange={handleInputChange}
-                                        placeholder="123 Main St"
-                                        required
-                                      />
-                                    </div>
-                                    
-                                    <div className="space-y-2">
-                                      <Label htmlFor="billingCity">City</Label>
-                                      <Input
-                                        id="billingCity"
-                                        name="billingCity"
-                                        value={formData.billingCity}
-                                        onChange={handleInputChange}
-                                        placeholder="New York"
-                                        required
-                                      />
-                                    </div>
-                                    
-                                    <div className="space-y-2">
-                                      <Label htmlFor="billingZip">ZIP Code</Label>
-                                      <Input
-                                        id="billingZip"
-                                        name="billingZip"
-                                        value={formData.billingZip}
-                                        onChange={handleInputChange}
-                                        placeholder="10001"
-                                        required
-                                      />
-                                    </div>
-                                    
-                                    <div className="md:col-span-2 space-y-2">
-                                      <Label htmlFor="billingCountry">Country</Label>
-                                      <Select
-                                        value={formData.billingCountry}
-                                        onValueChange={(value) => setFormData({...formData, billingCountry: value})}
-                                      >
-                                        <SelectTrigger>
-                                          <SelectValue placeholder="Select a country" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="United States">United States</SelectItem>
-                                          <SelectItem value="Canada">Canada</SelectItem>
-                                          <SelectItem value="United Kingdom">United Kingdom</SelectItem>
-                                          <SelectItem value="Australia">Australia</SelectItem>
-                                          <SelectItem value="France">France</SelectItem>
-                                          <SelectItem value="Germany">Germany</SelectItem>
-                                          <SelectItem value="Japan">Japan</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                <div className="mt-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                  <p className="text-sm text-blue-800 flex items-start">
-                                    <Shield className="h-4 w-4 mr-2 mt-0.5 text-blue-600" />
-                                    Your payment information is encrypted and secure. We use industry-standard security measures to protect your data.
-                                  </p>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          </TabsContent>
-                          
-                          {/* PayPal Form */}
-                          <TabsContent value="paypal" className="mt-4">
-                            <Card>
-                              <CardContent className="pt-6">
-                                <div className="text-center py-8">
-                                  <PayPalIcon />
-                                  <h3 className="text-lg font-medium mt-4">Pay with PayPal</h3>
-                                  <p className="text-muted-foreground mt-2 mb-6">
-                                    You'll be redirected to PayPal to complete your payment securely.
-                                  </p>
-                                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-left">
-                                    <p className="text-sm text-amber-800 flex items-start">
-                                      <AlertCircle className="h-4 w-4 mr-2 mt-0.5 text-amber-600" />
-                                      This is a demo. No actual payment will be processed. In a real application, clicking the button below would redirect to PayPal.
-                                    </p>
-                                  </div>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          </TabsContent>
-                          
-                          {/* Bank Transfer Form */}
-                          <TabsContent value="bank-transfer" className="mt-4">
-                            <Card>
-                              <CardContent className="pt-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  <div className="md:col-span-2 space-y-2">
-                                    <Label htmlFor="bankName">Bank Name</Label>
-                                    <Input
-                                      id="bankName"
-                                      name="bankName"
-                                      value={formData.bankName}
-                                      onChange={handleInputChange}
-                                      placeholder="Chase Bank"
-                                      required
-                                    />
-                                  </div>
-                                  
-                                  <div className="space-y-2">
-                                    <Label htmlFor="accountNumber">Account Number</Label>
-                                    <div className="relative">
-                                      <Input
-                                        id="accountNumber"
-                                        name="accountNumber"
-                                        value={formData.accountNumber}
-                                        onChange={handleInputChange}
-                                        placeholder="123456789"
-                                        required
-                                        className={errors.accountNumber ? "border-red-500" : ""}
-                                      />
-                                      {errors.accountNumber && (
-                                        <div className="text-red-500 text-sm mt-1 flex items-center">
-                                          <AlertCircle className="h-3 w-3 mr-1" />
-                                          {errors.accountNumber}
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="space-y-2">
-                                    <Label htmlFor="routingNumber">Routing Number</Label>
-                                    <div className="relative">
-                                      <Input
-                                        id="routingNumber"
-                                        name="routingNumber"
-                                        value={formData.routingNumber}
-                                        onChange={handleInputChange}
-                                        placeholder="987654321"
-                                        required
-                                        className={errors.routingNumber ? "border-red-500" : ""}
-                                      />
-                                      {errors.routingNumber && (
-                                        <div className="text-red-500 text-sm mt-1 flex items-center">
-                                          <AlertCircle className="h-3 w-3 mr-1" />
-                                          {errors.routingNumber}
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="space-y-2">
-                                    <Label htmlFor="accountType">Account Type</Label>
-                                    <Select
-                                      value={formData.accountType}
-                                      onValueChange={(value) => setFormData({...formData, accountType: value})}
-                                    >
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Select account type" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="checking">Checking</SelectItem>
-                                        <SelectItem value="savings">Savings</SelectItem>
-                                        <SelectItem value="business">Business</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                </div>
-                                
-                                <div className="mt-6 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                                  <p className="text-sm text-amber-800 flex items-start">
-                                    <AlertCircle className="h-4 w-4 mr-2 mt-0.5 text-amber-600" />
-                                    This is a demo. No actual bank details will be stored or processed. In a real application, your bank information would be securely stored and verified.
-                                  </p>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          </TabsContent>
+                          {/* Old payment tabs removed - replaced by PaymentGatewaySelector component above */}
                         </Tabs>
                       </div>
                       
