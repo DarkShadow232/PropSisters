@@ -51,6 +51,12 @@ type Apartment = {
   availability: boolean;
   // Additional images for the gallery
   images?: string[];
+  googleAddress?: string;
+  googleMapsUrl?: string;
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
 };
 
 type ApartmentDetailModalProps = {
@@ -233,8 +239,8 @@ const ApartmentDetailModal: React.FC<ApartmentDetailModalProps> = ({
             <Card>
               <CardContent className="p-4 space-y-4">
                 <div className="text-center">
-                  <div className="text-2xl font-medium">${apartment.price}</div>
-                  <div className="text-sm text-foreground/70">per night</div>
+                  <div className="text-2xl font-medium">{apartment.price} EGP</div>
+                  <div className="text-sm text-foreground/70">/ night</div>
                 </div>
 
                 <Separator />
@@ -287,7 +293,7 @@ const ApartmentDetailModal: React.FC<ApartmentDetailModalProps> = ({
                     {Object.entries(calculatePriceBreakdown(apartment.price)).map(([duration, price]) => (
                       <div key={duration} className="flex justify-between">
                         <span className="capitalize">{duration} rate:</span>
-                        <span className="font-medium">${Math.round(price)}</span>
+                        <span className="font-medium">{Math.round(price)} EGP</span>
                       </div>
                     ))}
                     <div className="text-xs text-foreground/60 mt-1">
@@ -308,7 +314,7 @@ const ApartmentDetailModal: React.FC<ApartmentDetailModalProps> = ({
                           <span className="font-medium">{option.service}</span>
                           <p className="text-xs text-foreground/70">{option.description}</p>
                         </div>
-                        <span>${option.price}</span>
+                        <span>{option.price} EGP</span>
                       </div>
                     ))}
                   </div>

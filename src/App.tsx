@@ -22,6 +22,7 @@ import SignUpPage from "./pages/SignUpPage";
 import AddPropertyPage from "./pages/AddPropertyPage";
 import PropertySistersClubPage from "./pages/PropertySistersClubPage";
 import UserDashboardPage from "./pages/UserDashboardPage";
+import AdminInitPage from "./pages/AdminInitPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -75,6 +76,7 @@ const App = () => {
                   <UserDashboardPage />
                 </ProtectedRoute>
               } />
+              <Route path="admin/init" element={<AdminInitPage />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

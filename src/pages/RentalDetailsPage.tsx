@@ -54,7 +54,8 @@ import {
   Maximize2,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ExternalLink
 } from "lucide-react";
 import { rentals } from "@/data/rentalData";
 import { Apartment } from "@/data/rentalData";
@@ -349,7 +350,7 @@ const RentalDetailsPage = () => {
               </Button>
               
               <div className="text-2xl font-medium text-[#b94a3b]">
-                ${rental.price}<span className="text-sm font-normal text-foreground/70"> / night</span>
+                {rental.price} EGP<span className="text-sm font-normal text-foreground/70"> / night</span>
               </div>
             </div>
           </div>
@@ -465,7 +466,7 @@ const RentalDetailsPage = () => {
                       <h2 className="text-xl font-medium mb-4">Location</h2>
                       <div className="h-[300px] rounded-lg overflow-hidden bg-secondary/30 relative mb-4 border border-gray-200 shadow-inner">
                         <iframe 
-                          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d110502.76983794854!2d31.18401455!3d30.0595581!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14583fa60b21beeb%3A0x79dfb296e8423bba!2sCairo%2C%20Cairo%20Governorate%2C%20Egypt!5e0!3m2!1sen!2sus!4v1682345678901!5m2!1sen!2sus" 
+                          src={(rental.googleMapsUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d110502.76983794854!2d31.18401455!3d30.0595581!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14583fa60b21beeb%3A0x79dfb296e8423bba!2sCairo%2C%20Cairo%20Governorate%2C%20Egypt!5e0!3m2!1sen!2sus!4v1682345678901!5m2!1sen!2sus") + "&output=embed&iwloc=near"} 
                           width="100%" 
                           height="100%" 
                           style={{ border: 0 }} 
@@ -476,6 +477,19 @@ const RentalDetailsPage = () => {
                           title="Property Location"
                         ></iframe>
                       </div>
+                      
+                      {/* View larger map link */}
+                      <div className="text-center mb-4">
+                        <a 
+                          href={rental.coordinates ? `https://www.google.com/maps/place/${rental.coordinates.latitude},${rental.coordinates.longitude}/@${rental.coordinates.latitude},${rental.coordinates.longitude},17z` : "https://www.google.com/maps/place/Cairo,+Cairo+Governorate,+Egypt"} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm text-[#b94a3b] hover:text-[#9a3f33] inline-flex items-center gap-1 fancy-link"
+                        >
+                          View larger map <ExternalLink size={14} />
+                        </a>
+                      </div>
+                      
                       <p className="text-foreground/70 text-sm">
                         Exact address will be provided after booking confirmation.
                       </p>
@@ -606,9 +620,9 @@ const RentalDetailsPage = () => {
                           <div key={index} className="flex justify-between items-start p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
                             <div>
                               <div className="font-medium">{option.service}</div>
-                              <div className="text-sm text-foreground/70">{option.description}</div>
-                            </div>
-                            <div className="font-medium">${option.price}</div>
+                            <div className="text-sm text-foreground/70">{option.description}</div>
+                          </div>
+                          <div className="font-medium">{option.price} EGP</div>
                           </div>
                         ))}
                       </div>
@@ -703,7 +717,7 @@ const RentalDetailsPage = () => {
                 
                 <div className="mb-4">
                   <div className="text-2xl font-medium text-[#b94a3b] mb-2">
-                    ${rental.price}<span className="text-sm font-normal text-foreground/70"> / night</span>
+                    {rental.price} EGP<span className="text-sm font-normal text-foreground/70"> / night</span>
                   </div>
                   
                   <div className="flex items-center text-sm text-foreground/70">
@@ -779,16 +793,16 @@ const RentalDetailsPage = () => {
                   <div className="p-4 bg-white rounded-lg border border-gray-100">
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span>${rental.price} x {calculateNights()} nights</span>
-                        <span>${rental.price * calculateNights()}</span>
+                        <span>{rental.price} EGP x {calculateNights()} nights</span>
+                        <span>{rental.price * calculateNights()} EGP</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Cleaning fee</span>
-                        <span>$35</span>
+                        <span>1750 EGP</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Service fee</span>
-                        <span>$25</span>
+                        <span>1250 EGP</span>
                       </div>
                     </div>
                     
@@ -796,7 +810,7 @@ const RentalDetailsPage = () => {
                     
                     <div className="flex justify-between font-medium">
                       <span>Total</span>
-                      <span>${calculateTotal() + 60}</span>
+                      <span>{calculateTotal() + 3000} EGP</span>
                     </div>
                   </div>
                   
@@ -837,7 +851,7 @@ const RentalDetailsPage = () => {
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute top-3 right-3 bg-white py-1 px-3 rounded-full text-sm font-medium">
-                      ${property.price} / night
+                      {property.price} EGP / night
                     </div>
                   </div>
                   <CardContent className="p-4">

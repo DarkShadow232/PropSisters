@@ -12,18 +12,13 @@ import {
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAnalytics } from "firebase/analytics";
+import { getFirebaseConfig, validateEnv, ENV } from '@/config/env';
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyA-OX7rqN_1JUYST3mkm4blsL7cdFB90T0",
-  authDomain: "propsisters-7c886.firebaseapp.com",
-  projectId: "propsisters-7c886",
-  storageBucket: "propsisters-7c886.firebasestorage.app",
-  messagingSenderId: "341497966822",
-  appId: "1:341497966822:web:c2bd865392efafa2cc4b27",
-  measurementId: "G-ZJG4CLCG61"
-};
+// Validate environment variables before initializing Firebase
+validateEnv();
+
+// Get Firebase configuration from environment variables
+const firebaseConfig = getFirebaseConfig();
     
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

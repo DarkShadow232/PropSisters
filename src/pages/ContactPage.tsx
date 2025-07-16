@@ -136,7 +136,7 @@ const ContactPage = () => {
                     <div>
                       <h3 className="font-medium mb-1">Email Us</h3>
                       <p className="text-foreground/70">
-                        info@propertysisters.world<br />
+                        Property.sisters.designs@gmail.com<br />
                         support@propertysisters.world
                       </p>
                     </div>
@@ -167,7 +167,7 @@ const ContactPage = () => {
                         <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
                       </svg>
                     </a>
-                    <a href="#" className="w-10 h-10 rounded-full bg-beige-100 flex items-center justify-center hover:bg-primary hover:text-white transition-colors" aria-label="Facebook">
+                    <a href="https://www.facebook.com/portosokhnachalet?rdid=b19TAYvOwyqRU4Cb&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F19wE3bgeQF%2F#" className="w-10 h-10 rounded-full bg-beige-100 flex items-center justify-center hover:bg-primary hover:text-white transition-colors" aria-label="Facebook">
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
                       </svg>

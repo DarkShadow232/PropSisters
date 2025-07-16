@@ -27,8 +27,8 @@ const RentalsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
 
-  // Limit to only 9 apartments
-  const limitedRentals = rentals.slice(0, 9);
+  // Show all 10 apartments
+  const limitedRentals = rentals.slice(0, 10);
   
   // Calculate pagination
   const itemsPerPage = 5;

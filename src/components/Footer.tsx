@@ -47,7 +47,7 @@ const Footer = () => {
                 <Instagram size={18} />
               </a>
               <a 
-                href="#" 
+                href="https://www.facebook.com/portosokhnachalet?rdid=b19TAYvOwyqRU4Cb&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F19wE3bgeQF%2F#" 
                 className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors duration-300" 
                 aria-label="Facebook"
               >
@@ -95,13 +95,13 @@ const Footer = () => {
                 <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-primary">
                   <Mail size={16} />
                 </div>
-                <span className="text-foreground/70">info@propertysisters.world</span>
+                <span className="text-foreground/70">Property.sisters.designs@gmail.com</span>
               </div>
               <div className="flex items-center space-x-3 justify-center md:justify-start">
                 <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-primary">
                   <Phone size={16} />
                 </div>
-                <span className="text-foreground/70">+1 (555) 123-4567</span>
+                <span className="text-foreground/70">+201000474991</span>
               </div>
               <div className="flex items-center space-x-3 justify-center md:justify-start">
                 <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-primary">

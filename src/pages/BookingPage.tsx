@@ -396,7 +396,7 @@ const BookingPage = () => {
                               htmlFor="cleaningService"
                               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
-                              Daily Cleaning Service ($50)
+                              Daily Cleaning Service (50 EGP)
                             </label>
                             <p className="text-sm text-muted-foreground">
                               Professional cleaning service every day during your stay
@@ -417,7 +417,7 @@ const BookingPage = () => {
                               htmlFor="airportPickup"
                               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
-                              Airport Pickup ($35)
+                              Airport Pickup (35 EGP)
                             </label>
                             <p className="text-sm text-muted-foreground">
                               Private transportation from Cairo International Airport
@@ -438,7 +438,7 @@ const BookingPage = () => {
                               htmlFor="earlyCheckIn"
                               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
-                              Early Check-in ($25)
+                              Early Check-in (25 EGP)
                             </label>
                             <p className="text-sm text-muted-foreground">
                               Check in as early as 10:00 AM (normal check-in is 3:00 PM)
@@ -825,28 +825,28 @@ const BookingPage = () => {
                 
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>{calculateNights()} {calculateNights() === 1 ? 'night' : 'nights'} x ${rental.price}</span>
-                    <span>${rental.price * calculateNights()}</span>
+                    <span>{calculateNights()} {calculateNights() === 1 ? 'night' : 'nights'} x {rental.price} EGP</span>
+                    <span>{rental.price * calculateNights()} EGP</span>
                   </div>
                   
                   {formData.cleaningService && (
                     <div className="flex justify-between">
                       <span>Daily Cleaning Service</span>
-                      <span>$50</span>
+                      <span>50 EGP</span>
                     </div>
                   )}
                   
                   {formData.airportPickup && (
                     <div className="flex justify-between">
                       <span>Airport Pickup</span>
-                      <span>$35</span>
+                      <span>35 EGP</span>
                     </div>
                   )}
                   
                   {formData.earlyCheckIn && (
                     <div className="flex justify-between">
                       <span>Early Check-in</span>
-                      <span>$25</span>
+                      <span>25 EGP</span>
                     </div>
                   )}
                 </div>
@@ -855,7 +855,7 @@ const BookingPage = () => {
                 
                 <div className="flex justify-between font-medium text-lg">
                   <span>Total</span>
-                  <span>${calculateTotal()}</span>
+                  <span>{calculateTotal()} EGP</span>
                 </div>
                 
                 <div className="mt-6 p-3 bg-green-50 border border-green-200 rounded-lg">

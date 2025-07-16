@@ -358,7 +358,7 @@ const UserDashboardPage = () => {
                           </div>
                           <div>
                             <p className="text-gray-600">Total Price:</p>
-                            <p className="font-medium text-blue-600">${booking.totalPrice}</p>
+                            <p className="font-medium text-blue-600">{booking.totalPrice} EGP</p>
                           </div>
                         </div>
                         {booking.specialRequests && (
