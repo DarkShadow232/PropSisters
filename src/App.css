@@ -231,17 +231,14 @@ img {
   background-color: rgba(185, 74, 59, 0.08);
 }
 
-/* Navbar container spacing and shadow on scroll */
+/* Navbar container spacing and shadow on scroll - No animations */
 .sticky.top-0 {
   min-height: 88px;
   padding-top: 16px;
   padding-bottom: 16px;
   display: flex;
   align-items: center;
-  box-shadow: 0 2px 16px 0 rgba(185, 74, 59, 0.07);
   background: rgba(255, 255, 255, 0.97);
-  transform: translate3d(0, 0, 0); /* Enable hardware acceleration */
-  will-change: background-color, box-shadow, backdrop-filter;
 }
 
 .sticky.top-0.shadow-md {

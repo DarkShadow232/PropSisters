@@ -14,7 +14,6 @@ import RoleGuard from "./auth/RoleGuard";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const { currentUser } = useAuth();
 
@@ -23,37 +22,8 @@ const Header = () => {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
-  // Add scroll effect with optimized debounce for better performance
-  useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-    let ticking = false;
-    
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const offset = window.scrollY;
-          const shouldBeScrolled = offset > 80; // Increased threshold to prevent rapid toggling
-          
-          if (shouldBeScrolled !== scrolled) {
-            setScrolled(shouldBeScrolled);
-          }
-          
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    // Initial check
-    const initialOffset = window.scrollY;
-    setScrolled(initialOffset > 80);
-    
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [scrolled]);
+  // Removed scroll-based state changes to prevent animation issues
+  // Header will now have a consistent appearance
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -61,15 +31,13 @@ const Header = () => {
 
   return (
     <header 
-      className={`sticky top-0 z-50 transition-[background-color,backdrop-filter,box-shadow,padding] duration-300 ease-out ${scrolled 
-        ? 'bg-white/95 backdrop-blur-sm shadow-md py-2' 
-        : 'bg-white/90 py-4'} border-b border-border/40 w-full`}
+      className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-md py-3 border-b border-border/40 w-full"
     >
       <div className="container-custom">
         <div className="flex items-center w-full">
           {/* Logo on the far left */}
           <div className="flex-shrink-0 mr-8">
-            <Logo size={scrolled ? "small" : "medium"} />
+            <Logo size="medium" />
           </div>
           {/* Navigation and actions side by side */}
           <div className="flex flex-1 items-center justify-between">
