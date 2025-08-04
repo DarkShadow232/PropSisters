@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Eye, EyeOff, Mail, Lock, User, Facebook, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, AlertCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const SignUpPage = () => {
@@ -102,9 +102,6 @@ const SignUpPage = () => {
       <Card className="w-full max-w-md shadow-lg animate-fade-in-up border-border/40">
         <CardHeader className="text-center space-y-1">
           <CardTitle className="font-serif text-2xl font-medium text-primary">Create Account</CardTitle>
-          <CardDescription className="text-foreground/70">
-            Join Sisterhood Style Rentals today
-          </CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
             {error && (
@@ -221,7 +218,7 @@ const SignUpPage = () => {
                 </div>
               </div>
               
-              <div className="mt-6 grid grid-cols-2 gap-3">
+              <div className="mt-6">
                 <Button 
                   variant="outline" 
                   type="button" 
@@ -236,14 +233,6 @@ const SignUpPage = () => {
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                   </svg>
                   {isLoading ? "Connecting..." : "Google"}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  type="button" 
-                  className="w-full flex items-center justify-center gap-2 hover:bg-secondary/50 transition-colors"
-                >
-                  <Facebook className="h-4 w-4 text-blue-600" />
-                  Facebook
                 </Button>
               </div>
             </div>

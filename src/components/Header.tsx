@@ -23,32 +23,37 @@ const Header = () => {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
-  // Add scroll effect with debounce for better performance
+  // Add scroll effect with optimized debounce for better performance
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
+    let ticking = false;
     
     const handleScroll = () => {
-      clearTimeout(timeoutId);
-      
-      timeoutId = setTimeout(() => {
-        const offset = window.scrollY;
-        if (offset > 50) {
-          setScrolled(true);
-        } else {
-          setScrolled(false);
-        }
-      }, 10); // Small timeout for debounce
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const offset = window.scrollY;
+          const shouldBeScrolled = offset > 80; // Increased threshold to prevent rapid toggling
+          
+          if (shouldBeScrolled !== scrolled) {
+            setScrolled(shouldBeScrolled);
+          }
+          
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     // Initial check
-    handleScroll();
+    const initialOffset = window.scrollY;
+    setScrolled(initialOffset > 80);
     
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      clearTimeout(timeoutId);
+      if (timeoutId) clearTimeout(timeoutId);
     };
-  }, []);
+  }, [scrolled]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -56,7 +61,7 @@ const Header = () => {
 
   return (
     <header 
-      className={`sticky top-0 z-50 transition-all duration-300 ${scrolled 
+      className={`sticky top-0 z-50 transition-[background-color,backdrop-filter,box-shadow,padding] duration-300 ease-out ${scrolled 
         ? 'bg-white/95 backdrop-blur-sm shadow-md py-2' 
         : 'bg-white/90 py-4'} border-b border-border/40 w-full`}
     >
@@ -82,22 +87,33 @@ const Header = () => {
                   <ChevronDown size={16} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="center" className="w-56 bg-white shadow-md rounded-md p-1">
-                  <RoleGuard allowedRoles={['user', 'owner', 'admin']}>
+                  {currentUser ? (
+                    <>
+                      <RoleGuard allowedRoles={['user', 'owner', 'admin']}>
+                        <DropdownMenuItem asChild>
+                          <Link to="/finish-request" className="dropdown-menu-item flex items-center gap-2">
+                            <Palette size={16} className="text-[#b94a3b]" />
+                            <span>Interior Design</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      </RoleGuard>
+                      <RoleGuard allowedRoles={['owner', 'admin']}>
+                        <DropdownMenuItem asChild>
+                          <Link to="/add-property" className="dropdown-menu-item flex items-center gap-2">
+                            <Home size={16} className="text-[#b94a3b]" />
+                            <span>Add Your Property</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      </RoleGuard>
+                    </>
+                  ) : (
                     <DropdownMenuItem asChild>
-                      <Link to="/finish-request" className="dropdown-menu-item flex items-center gap-2">
-                        <Palette size={16} className="text-[#b94a3b]" />
-                        <span>Interior Design</span>
+                      <Link to="/sign-in" className="dropdown-menu-item flex items-center gap-2">
+                        <User size={16} className="text-[#b94a3b]" />
+                        <span>Sign In to Access Services</span>
                       </Link>
                     </DropdownMenuItem>
-                  </RoleGuard>
-                  <RoleGuard allowedRoles={['owner', 'admin']}>
-                    <DropdownMenuItem asChild>
-                      <Link to="/add-property" className="dropdown-menu-item flex items-center gap-2">
-                        <Home size={16} className="text-[#b94a3b]" />
-                        <span>Add Your Property</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  </RoleGuard>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
               <NavLink to="/services" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>

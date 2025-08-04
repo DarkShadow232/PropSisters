@@ -203,7 +203,6 @@ img {
 .nav-link:hover {
   color: #b94a3b;
   background-color: rgba(185, 74, 59, 0.05); /* Subtle background on hover */
-  transform: translateY(-1px); /* Slight lift effect */
 }
 
 .nav-link::after {
@@ -241,7 +240,8 @@ img {
   align-items: center;
   box-shadow: 0 2px 16px 0 rgba(185, 74, 59, 0.07);
   background: rgba(255, 255, 255, 0.97);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translate3d(0, 0, 0); /* Enable hardware acceleration */
+  will-change: background-color, box-shadow, backdrop-filter;
 }
 
 .sticky.top-0.shadow-md {
