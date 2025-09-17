@@ -51,11 +51,7 @@ const App = () => {
                   <BookingPage />
                 </ProtectedRoute>
               } />
-              <Route path="finish-request" element={
-                <ProtectedRoute requiredRole="user">
-                  <FinishRequestPage />
-                </ProtectedRoute>
-              } />
+              <Route path="finish-request" element={<FinishRequestPage />} />
               <Route path="services" element={<ServicesPage />} />
               <Route path="about" element={<AboutPage />} />
               <Route path="contact" element={<ContactPage />} />

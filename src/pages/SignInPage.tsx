@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,15 +18,19 @@ const SignInPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
   const { signIn, signInWithGoogle, currentUser, loading } = useAuth();
+
+  // Get the redirect path from location state, or default to dashboard
+  const from = location.state?.from?.pathname || '/dashboard';
 
   // Redirect if user is already signed in
   useEffect(() => {
     if (!loading && currentUser) {
-      // Immediate redirect without delay to prevent flash
-      navigate('/dashboard', { replace: true });
+      // Redirect to the page they came from or dashboard
+      navigate(from, { replace: true });
     }
-  }, [currentUser, loading, navigate]);
+  }, [currentUser, loading, navigate, from]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,7 +42,7 @@ const SignInPage = () => {
       toast.success("Successfully signed in!", {
         description: "Welcome back to Sisterhood Style Rentals!"
       });
-      navigate('/dashboard');
+      navigate(from, { replace: true });
     } catch (error) {
       console.error("Sign in error:", error);
       setError("Failed to sign in. Please check your email and password.");
@@ -56,7 +60,7 @@ const SignInPage = () => {
       toast.success("Successfully signed in with Google!", {
         description: "Welcome to Sisterhood Style Rentals!"
       });
-      navigate('/dashboard');
+      navigate(from, { replace: true });
     } catch (error) {
       console.error("Google sign in error:", error);
       setError("Failed to sign in with Google. Please try again.");

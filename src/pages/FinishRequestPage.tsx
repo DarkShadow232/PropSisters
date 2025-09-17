@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,12 +13,24 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Upload, Building, Brush, Sofa, Home, CheckCircle2, Sparkles, Camera, DollarSign, Palette, FileText, Send, Play } from "lucide-react";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Upload, Building, Brush, Sofa, Home, CheckCircle2, Sparkles, Camera, DollarSign, Palette, FileText, Send, Play, LogIn, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 const FinishRequestPage = () => {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [showSignInDialog, setShowSignInDialog] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -31,6 +45,13 @@ const FinishRequestPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check if user is signed in
+    if (!currentUser) {
+      setShowSignInDialog(true);
+      return;
+    }
+    
     setIsSubmitting(true);
     
     // Simulate API call
@@ -42,6 +63,16 @@ const FinishRequestPage = () => {
       setFiles([]);
       (e.target as HTMLFormElement).reset();
     }, 1500);
+  };
+
+  const handleSignInRedirect = () => {
+    // Save current location to redirect back after sign in
+    navigate('/sign-in', { state: { from: location } });
+  };
+
+  const handleSignUpRedirect = () => {
+    // Save current location to redirect back after sign up
+    navigate('/sign-up', { state: { from: location } });
   };
 
   return (
@@ -365,6 +396,19 @@ const FinishRequestPage = () => {
                     )}
                   </div>
 
+                  {/* Sign In Notice for Guests */}
+                  {!currentUser && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+                      <LogIn className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-sm text-amber-800 font-medium">Sign in required to submit request</p>
+                        <p className="text-xs text-amber-700 mt-1">
+                          You'll need to sign in or create an account to submit your design request. Don't worry, it only takes a moment!
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Submit Button */}
                   <Button 
                     type="submit" 
@@ -372,7 +416,7 @@ const FinishRequestPage = () => {
                     disabled={isSubmitting}
                   >
                     <CheckCircle2 className="h-5 w-5" />
-                    {isSubmitting ? "Submitting Your Request..." : "Submit Your Dream Request"}
+                    {isSubmitting ? "Submitting Your Request..." : currentUser ? "Submit Your Dream Request" : "Sign In & Submit Request"}
                   </Button>
                 </form>
               </div>
@@ -489,6 +533,67 @@ const FinishRequestPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Sign In Dialog */}
+      <Dialog open={showSignInDialog} onOpenChange={setShowSignInDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-serif text-center">Sign In Required</DialogTitle>
+            <DialogDescription className="text-center pt-4">
+              To submit a design request and access our premium interior design services, please sign in to your account or create a new one.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex flex-col gap-4 py-6">
+            <div className="bg-beige-50 rounded-lg p-4">
+              <h4 className="font-medium text-sm mb-2 text-gray-700">Why sign in?</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Track your design requests and progress</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Save your preferences and style choices</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Communicate directly with our designers</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Access exclusive member benefits</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <DialogFooter className="flex flex-col gap-3 sm:flex-col">
+            <Button 
+              onClick={handleSignInRedirect}
+              className="w-full bg-[#b94a3b] hover:bg-[#9a3f33] text-white"
+            >
+              <LogIn className="mr-2 h-4 w-4" />
+              Sign In to Continue
+            </Button>
+            <Button 
+              onClick={handleSignUpRedirect}
+              variant="outline"
+              className="w-full"
+            >
+              <UserPlus className="mr-2 h-4 w-4" />
+              Create New Account
+            </Button>
+            <Button 
+              onClick={() => setShowSignInDialog(false)}
+              variant="ghost"
+              className="w-full text-gray-500"
+            >
+              Continue Browsing
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import ApartmentDetailModal from "@/components/ApartmentDetailModal";
@@ -26,6 +26,7 @@ const RentalsPage = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Show all 10 apartments
   const limitedRentals = rentals.slice(0, 10);
@@ -39,9 +40,22 @@ const RentalsPage = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = limitedRentals.slice(indexOfFirstItem, indexOfLastItem);
 
+  // Sync current page from URL on mount and whenever the URL changes
+  useEffect(() => {
+    const raw = searchParams.get("page");
+    const parsed = Number.parseInt(raw || "1", 10);
+    const clamped = Number.isFinite(parsed) ? Math.min(Math.max(parsed, 1), Math.max(totalPages, 1)) : 1;
+    if (clamped !== currentPage) {
+      setCurrentPage(clamped);
+    }
+  }, [searchParams, totalPages]);
+
+  // Update URL when page changes via UI
   const handlePageChange = (pageNumber: number) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("page", String(pageNumber));
+    setSearchParams(next);
     setCurrentPage(pageNumber);
-    // Scroll to top when page changes
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -67,11 +81,11 @@ const RentalsPage = () => {
 
   return (
     <div className="bg-beige-50 min-h-screen">
-      <div className="container-custom py-12">
-        <h1 className="font-serif text-3xl md:text-4xl font-medium mb-2">Browse Rentals</h1>
-        <p className="text-foreground/70 mb-8">
-          Find your perfect apartment from our curated selection of premium rentals.
-        </p>
+      <div className="container-custom py-10">
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-semibold">Browse Rentals</h1>
+          <p className="text-foreground/70">Find your perfect apartment from our curated selection of premium rentals.</p>
+        </div>
 
         {/* Filters and Search */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-10">

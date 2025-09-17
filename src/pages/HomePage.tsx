@@ -85,9 +85,10 @@ const HomePage = () => {
             <div className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
               <div className="relative overflow-hidden rounded-lg img-hover-zoom h-64">
                 <img 
-                  src="/image/Apartments/Ap6/IMG-20250327-WA0066.jpg" 
+                  src="/image/Apartments/Ap6/IMG-20250327-WA0070.jpg" 
                   alt="Luxury Two-Bedroom Apartment with Two Bathrooms" 
                   className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                  loading="eager"
                 />
                 <div className="absolute top-4 left-4 bg-rustic-600 text-white py-1 px-3 rounded-full text-sm font-medium">
                   Featured
@@ -108,7 +109,7 @@ const HomePage = () => {
                 <Separator className="my-3" />
                 <div className="flex justify-between text-sm">
                   <span className="text-foreground/70">2 Bedrooms</span>
-                  <span className="text-foreground/70">1 Bath</span>
+                  <span className="text-foreground/70">2 Baths</span>
                 </div>
                 <Separator className="my-3" />
                 <Button 
@@ -124,9 +125,10 @@ const HomePage = () => {
             <div className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
               <div className="relative overflow-hidden rounded-lg img-hover-zoom h-64">
                 <img 
-                  src="/image/Apartments/Ap1/IMG-20250327-WA0010.jpg" 
+                  src="/image/Apartments/Ap1/IMG-20250327-WA0009.jpg" 
                   alt="Premium Two-Bedroom Garden View Apartment - Building B6" 
                   className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                  loading="eager"
                 />
                 <div className="absolute top-4 right-4 bg-white py-1 px-3 rounded-full text-sm font-medium">
                   3000 EGP / night
@@ -144,7 +146,7 @@ const HomePage = () => {
                 <Separator className="my-3" />
                 <div className="flex justify-between text-sm">
                   <span className="text-foreground/70">2 Bedrooms</span>
-                  <span className="text-foreground/70">2 Baths</span>
+                  <span className="text-foreground/70">1 Bath</span>
                 </div>
                 <Separator className="my-3" />
                 <Button 
@@ -160,9 +162,10 @@ const HomePage = () => {
             <div className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
               <div className="relative overflow-hidden rounded-lg img-hover-zoom h-64">
                 <img 
-                  src="/image/Apartments/Ap2/IMG-20250327-WA0015.jpg" 
+                  src="/image/Apartments/Ap2/IMG-20250327-WA0020.jpg" 
                   alt="Modern Two-Bedroom Apartment, Fifth Floor" 
                   className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                  loading="eager"
                 />
                 <div className="absolute top-4 right-4 bg-white py-1 px-3 rounded-full text-sm font-medium">
                   3000 EGP / night
@@ -211,7 +214,7 @@ const HomePage = () => {
             <div className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="relative h-64 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3" 
+                  src="/image/DISCOVER EGYPT/Pyramids of Giza.jpg" 
                   alt="Great Pyramid of Giza and Sphinx" 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
@@ -238,7 +241,7 @@ const HomePage = () => {
             <div className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="relative h-64 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1601339434503-8e842e174609?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3" 
+                  src="/image/DISCOVER EGYPT/Khan el-Khalili.jpg" 
                   alt="Khan el-Khalili bazaar with traditional architecture" 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
@@ -265,7 +268,7 @@ const HomePage = () => {
             <div className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
               <div className="relative h-64 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3" 
+                  src="/image/DISCOVER EGYPT/Islamic Cairo.jpg" 
                   alt="Islamic Cairo with historic mosques and minarets" 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />

@@ -65,18 +65,18 @@ export const rentals: Apartment[] = [
     ],
     availability: true,
     images: [
-      "/image/Apartments/Ap1/IMG-20250327-WA0003.jpg",
-      "/image/Apartments/Ap1/IMG-20250327-WA0005.jpg",
-      "/image/Apartments/Ap1/IMG-20250327-WA0006.jpg",
-      "/image/Apartments/Ap1/IMG-20250327-WA0007.jpg",
-      "/image/Apartments/Ap1/IMG-20250327-WA0008.jpg",
-      "/image/Apartments/Ap1/IMG-20250327-WA0009.jpg",
-      "/image/Apartments/Ap1/IMG-20250327-WA0010.jpg",
-      "/image/Apartments/Ap1/IMG-20250327-WA0011.jpg",
-      "/image/Apartments/Ap1/IMG-20250327-WA0012.jpg",
-      "/image/Apartments/Ap1/IMG-20250327-WA0013.jpg",
-      "/image/Apartments/Ap1/IMG-20250327-WA0014.jpg",
-      "/image/Apartments/Ap1/IMG-20250327-WA0016.jpg"
+      "/image/Apartments/Ap1/IMG-20250327-WA0010.jpg", // Main living area view
+      "/image/Apartments/Ap1/IMG-20250327-WA0003.jpg", // Living room
+      "/image/Apartments/Ap1/IMG-20250327-WA0005.jpg", // Kitchen
+      "/image/Apartments/Ap1/IMG-20250327-WA0006.jpg", // Bedroom
+      "/image/Apartments/Ap1/IMG-20250327-WA0007.jpg", // Bathroom
+      "/image/Apartments/Ap1/IMG-20250327-WA0008.jpg", // Additional view
+      "/image/Apartments/Ap1/IMG-20250327-WA0009.jpg", // Interior detail
+      "/image/Apartments/Ap1/IMG-20250327-WA0011.jpg", // Garden view
+      "/image/Apartments/Ap1/IMG-20250327-WA0012.jpg", // Interior detail
+      "/image/Apartments/Ap1/IMG-20250327-WA0013.jpg", // Additional view
+      "/image/Apartments/Ap1/IMG-20250327-WA0014.jpg", // Interior detail
+      "/image/Apartments/Ap1/IMG-20250327-WA0016.jpg"  // Final view
     ],
     googleAddress: "Building B6, Group 65, Madinaty, New Cairo, Egypt",
     googleMapsUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.8!2d31.6512!3d30.1038!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDA2JzEzLjciTiAzMcKwMzknMDQuMyJF!5e0!3m2!1sen!2seg!4v1640000000000!5m2!1sen!2seg&output=embed&iwloc=near",
@@ -114,15 +114,15 @@ export const rentals: Apartment[] = [
     ],
     availability: true,
     images: [
-      "/image/Apartments/Ap2/IMG-20250327-WA0015.jpg",
-      "/image/Apartments/Ap2/IMG-20250327-WA0017.jpg",
-      "/image/Apartments/Ap2/IMG-20250327-WA0018.jpg",
-      "/image/Apartments/Ap2/IMG-20250327-WA0019.jpg",
-      "/image/Apartments/Ap2/IMG-20250327-WA0020.jpg",
-      "/image/Apartments/Ap2/IMG-20250327-WA0021.jpg",
-      "/image/Apartments/Ap2/IMG-20250327-WA0022.jpg",
-      "/image/Apartments/Ap2/IMG-20250327-WA0024.jpg",
-      "/image/Apartments/Ap2/IMG-20250327-WA0025.jpg"
+      "/image/Apartments/Ap2/IMG-20250327-WA0015.jpg", // Main living area view
+      "/image/Apartments/Ap2/IMG-20250327-WA0017.jpg", // Living room
+      "/image/Apartments/Ap2/IMG-20250327-WA0018.jpg", // Kitchen
+      "/image/Apartments/Ap2/IMG-20250327-WA0019.jpg", // Bedroom
+      "/image/Apartments/Ap2/IMG-20250327-WA0020.jpg", // Bathroom
+      "/image/Apartments/Ap2/IMG-20250327-WA0021.jpg", // Additional view
+      "/image/Apartments/Ap2/IMG-20250327-WA0022.jpg", // Interior detail
+      "/image/Apartments/Ap2/IMG-20250327-WA0024.jpg", // Additional view
+      "/image/Apartments/Ap2/IMG-20250327-WA0025.jpg"  // Final view
     ],
     googleAddress: "Building B11, Group 113, Madinaty, New Cairo, Egypt",
     googleMapsUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.8!2d31.6520!3d30.1045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDA2JzE2LjIiTiAzMcKwMzknMDcuMiJF!5e0!3m2!1sen!2seg!4v1640000000000!5m2!1sen!2seg&output=embed&iwloc=near",
@@ -160,19 +160,19 @@ export const rentals: Apartment[] = [
     ],
     availability: true,
     images: [
-      "/image/Apartments/Ap3/IMG-20250327-WA0023.jpg",
-      "/image/Apartments/Ap3/IMG-20250327-WA0026.jpg",
-      "/image/Apartments/Ap3/IMG-20250327-WA0027.jpg",
-      "/image/Apartments/Ap3/IMG-20250327-WA0028.jpg",
-      "/image/Apartments/Ap3/IMG-20250327-WA0029.jpg",
-      "/image/Apartments/Ap3/IMG-20250327-WA0030.jpg",
-      "/image/Apartments/Ap3/IMG-20250327-WA0031.jpg",
-      "/image/Apartments/Ap3/IMG-20250327-WA0032.jpg",
-      "/image/Apartments/Ap3/IMG-20250327-WA0033.jpg",
-      "/image/Apartments/Ap3/IMG-20250327-WA0034.jpg",
-      "/image/Apartments/Ap3/IMG-20250327-WA0035.jpg",
-      "/image/Apartments/Ap3/IMG-20250327-WA0036.jpg",
-      "/image/Apartments/Ap3/IMG-20250327-WA0037.jpg"
+      "/image/Apartments/Ap3/IMG-20250327-WA0026.jpg", // Main living area view
+      "/image/Apartments/Ap3/IMG-20250327-WA0023.jpg", // Living room
+      "/image/Apartments/Ap3/IMG-20250327-WA0027.jpg", // Kitchen
+      "/image/Apartments/Ap3/IMG-20250327-WA0028.jpg", // Bedroom
+      "/image/Apartments/Ap3/IMG-20250327-WA0029.jpg", // Bathroom
+      "/image/Apartments/Ap3/IMG-20250327-WA0030.jpg", // Additional view
+      "/image/Apartments/Ap3/IMG-20250327-WA0031.jpg", // Interior detail
+      "/image/Apartments/Ap3/IMG-20250327-WA0032.jpg", // Additional view
+      "/image/Apartments/Ap3/IMG-20250327-WA0033.jpg", // Interior detail
+      "/image/Apartments/Ap3/IMG-20250327-WA0034.jpg", // Additional view
+      "/image/Apartments/Ap3/IMG-20250327-WA0035.jpg", // Interior detail
+      "/image/Apartments/Ap3/IMG-20250327-WA0036.jpg", // Additional view
+      "/image/Apartments/Ap3/IMG-20250327-WA0037.jpg"  // Final view
     ],
     googleAddress: "Building B8, Group 86, Madinaty, New Cairo, Egypt",
     googleMapsUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.8!2d31.6515!3d30.1042!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDA2JzE1LjEiTiAzMcKwMzknMDUuNCJF!5e0!3m2!1sen!2seg!4v1640000000000!5m2!1sen!2seg&output=embed&iwloc=near",
@@ -210,21 +210,21 @@ export const rentals: Apartment[] = [
     ],
     availability: true,
     images: [
-      "/image/Apartments/Ap4/IMG-20250327-WA0043.jpg",
-      "/image/Apartments/Ap4/IMG-20250327-WA0044.jpg",
-      "/image/Apartments/Ap4/IMG-20250327-WA0045.jpg",
-      "/image/Apartments/Ap4/IMG-20250327-WA0046.jpg",
-      "/image/Apartments/Ap4/IMG-20250327-WA0047.jpg",
-      "/image/Apartments/Ap4/IMG-20250327-WA0048.jpg",
-      "/image/Apartments/Ap4/IMG-20250327-WA0049.jpg",
-      "/image/Apartments/Ap4/IMG-20250327-WA0050.jpg",
-      "/image/Apartments/Ap4/IMG-20250327-WA0051.jpg",
-      "/image/Apartments/Ap4/IMG-20250327-WA0052.jpg",
-      "/image/Apartments/Ap4/WhatsApp Image 2025-03-26 at 09.48.48_6b341294.jpg",
-      "/image/Apartments/Ap4/WhatsApp Image 2025-03-26 at 09.48.48_d73a8288.jpg",
-      "/image/Apartments/Ap4/WhatsApp Image 2025-03-26 at 09.48.48_e6dc9f4f.jpg",
-      "/image/Apartments/Ap4/WhatsApp Image 2025-03-26 at 09.48.49_d361c165.jpg",
-      "/image/Apartments/Ap4/WhatsApp Image 2025-03-26 at 09.48.49_d96e4dfe.jpg"
+      "/image/Apartments/Ap4/IMG-20250327-WA0043.jpg", // Main living area view
+      "/image/Apartments/Ap4/IMG-20250327-WA0044.jpg", // Living room
+      "/image/Apartments/Ap4/IMG-20250327-WA0045.jpg", // Kitchen
+      "/image/Apartments/Ap4/IMG-20250327-WA0046.jpg", // Bedroom
+      "/image/Apartments/Ap4/IMG-20250327-WA0047.jpg", // Bathroom
+      "/image/Apartments/Ap4/IMG-20250327-WA0048.jpg", // Additional view
+      "/image/Apartments/Ap4/IMG-20250327-WA0049.jpg", // Interior detail
+      "/image/Apartments/Ap4/IMG-20250327-WA0050.jpg", // Additional view
+      "/image/Apartments/Ap4/IMG-20250327-WA0051.jpg", // Interior detail
+      "/image/Apartments/Ap4/IMG-20250327-WA0052.jpg", // Additional view
+      "/image/Apartments/Ap4/WhatsApp Image 2025-03-26 at 09.48.48_6b341294.jpg", // Interior detail
+      "/image/Apartments/Ap4/WhatsApp Image 2025-03-26 at 09.48.48_d73a8288.jpg", // Additional view
+      "/image/Apartments/Ap4/WhatsApp Image 2025-03-26 at 09.48.48_e6dc9f4f.jpg", // Interior detail
+      "/image/Apartments/Ap4/WhatsApp Image 2025-03-26 at 09.48.49_d361c165.jpg", // Additional view
+      "/image/Apartments/Ap4/WhatsApp Image 2025-03-26 at 09.48.49_d96e4dfe.jpg"  // Final view
     ],
     googleAddress: "Building B11, Group 113, Madinaty, New Cairo, Egypt",
     googleMapsUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.8!2d31.6520!3d30.1045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDA2JzE2LjIiTiAzMcKwMzknMDcuMiJF!5e0!3m2!1sen!2seg!4v1640000000000!5m2!1sen!2seg&output=embed&iwloc=near",
@@ -262,19 +262,19 @@ export const rentals: Apartment[] = [
     ],
     availability: true,
     images: [
-      "/image/Apartments/Ap5/IMG-20250327-WA0053.jpg",
-      "/image/Apartments/Ap5/IMG-20250327-WA0054.jpg",
-      "/image/Apartments/Ap5/IMG-20250327-WA0055.jpg",
-      "/image/Apartments/Ap5/IMG-20250327-WA0056.jpg",
-      "/image/Apartments/Ap5/IMG-20250327-WA0057.jpg",
-      "/image/Apartments/Ap5/IMG-20250327-WA0058.jpg",
-      "/image/Apartments/Ap5/IMG-20250327-WA0059.jpg",
-      "/image/Apartments/Ap5/IMG-20250327-WA0060.jpg",
-      "/image/Apartments/Ap5/IMG-20250327-WA0061.jpg",
-      "/image/Apartments/Ap5/IMG-20250327-WA0062.jpg",
-      "/image/Apartments/Ap5/IMG-20250327-WA0063.jpg",
-      "/image/Apartments/Ap5/IMG-20250327-WA0064.jpg",
-      "/image/Apartments/Ap5/IMG-20250327-WA0065.jpg"
+      "/image/Apartments/Ap5/IMG-20250327-WA0053.jpg", // Main living area view
+      "/image/Apartments/Ap5/IMG-20250327-WA0054.jpg", // Living room
+      "/image/Apartments/Ap5/IMG-20250327-WA0055.jpg", // Kitchen
+      "/image/Apartments/Ap5/IMG-20250327-WA0056.jpg", // Bedroom
+      "/image/Apartments/Ap5/IMG-20250327-WA0057.jpg", // Bathroom
+      "/image/Apartments/Ap5/IMG-20250327-WA0058.jpg", // Additional view
+      "/image/Apartments/Ap5/IMG-20250327-WA0059.jpg", // Interior detail
+      "/image/Apartments/Ap5/IMG-20250327-WA0060.jpg", // Additional view
+      "/image/Apartments/Ap5/IMG-20250327-WA0061.jpg", // Interior detail
+      "/image/Apartments/Ap5/IMG-20250327-WA0062.jpg", // Additional view
+      "/image/Apartments/Ap5/IMG-20250327-WA0063.jpg", // Interior detail
+      "/image/Apartments/Ap5/IMG-20250327-WA0064.jpg", // Additional view
+      "/image/Apartments/Ap5/IMG-20250327-WA0065.jpg"  // Final view
     ],
     googleAddress: "Near Carrefour, Madinaty, New Cairo, Egypt",
     googleMapsUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.8!2d31.6518!3d30.1040!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDA2JzE0LjQiTiAzMcKwMzknMDYuNSJF!5e0!3m2!1sen!2seg!4v1640000000000!5m2!1sen!2seg&output=embed&iwloc=near",
@@ -312,24 +312,24 @@ export const rentals: Apartment[] = [
     ],
     availability: true,
     images: [
-      "/image/Apartments/Ap6/IMG-20250327-WA0066.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0067.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0068.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0069.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0070.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0071.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0072.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0073.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0074.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0075.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0076.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0077.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0078.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0079.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0080.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0081.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0082.jpg",
-      "/image/Apartments/Ap6/IMG-20250327-WA0085.jpg"
+      "/image/Apartments/Ap6/IMG-20250327-WA0066.jpg", // Main living area view
+      "/image/Apartments/Ap6/IMG-20250327-WA0067.jpg", // Living room
+      "/image/Apartments/Ap6/IMG-20250327-WA0068.jpg", // Kitchen
+      "/image/Apartments/Ap6/IMG-20250327-WA0069.jpg", // Bedroom
+      "/image/Apartments/Ap6/IMG-20250327-WA0070.jpg", // Bathroom
+      "/image/Apartments/Ap6/IMG-20250327-WA0071.jpg", // Additional view
+      "/image/Apartments/Ap6/IMG-20250327-WA0072.jpg", // Interior detail
+      "/image/Apartments/Ap6/IMG-20250327-WA0073.jpg", // Additional view
+      "/image/Apartments/Ap6/IMG-20250327-WA0074.jpg", // Interior detail
+      "/image/Apartments/Ap6/IMG-20250327-WA0075.jpg", // Additional view
+      "/image/Apartments/Ap6/IMG-20250327-WA0076.jpg", // Interior detail
+      "/image/Apartments/Ap6/IMG-20250327-WA0077.jpg", // Additional view
+      "/image/Apartments/Ap6/IMG-20250327-WA0078.jpg", // Interior detail
+      "/image/Apartments/Ap6/IMG-20250327-WA0079.jpg", // Additional view
+      "/image/Apartments/Ap6/IMG-20250327-WA0080.jpg", // Interior detail
+      "/image/Apartments/Ap6/IMG-20250327-WA0081.jpg", // Additional view
+      "/image/Apartments/Ap6/IMG-20250327-WA0082.jpg", // Interior detail
+      "/image/Apartments/Ap6/IMG-20250327-WA0085.jpg"  // Final view
     ],
     googleAddress: "Building B6, Group 68, Madinaty, New Cairo, Egypt",
     googleMapsUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.8!2d31.6513!3d30.1039!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDA2JzE0LjAiTiAzMcKwMzknMDQuNyJF!5e0!3m2!1sen!2seg!4v1640000000000!5m2!1sen!2seg&output=embed&iwloc=near",
@@ -367,19 +367,19 @@ export const rentals: Apartment[] = [
     ],
     availability: true,
     images: [
-      "/image/Apartments/Ap7/IMG-20250327-WA0084.jpg",
-      "/image/Apartments/Ap7/IMG-20250327-WA0086.jpg",
-      "/image/Apartments/Ap7/IMG-20250327-WA0087.jpg",
-      "/image/Apartments/Ap7/IMG-20250327-WA0088.jpg",
-      "/image/Apartments/Ap7/IMG-20250327-WA0089.jpg",
-      "/image/Apartments/Ap7/IMG-20250327-WA0090.jpg",
-      "/image/Apartments/Ap7/IMG-20250327-WA0091.jpg",
-      "/image/Apartments/Ap7/IMG-20250327-WA0092.jpg",
-      "/image/Apartments/Ap7/IMG-20250327-WA0093.jpg",
-      "/image/Apartments/Ap7/IMG-20250327-WA0094.jpg",
-      "/image/Apartments/Ap7/IMG-20250327-WA0095.jpg",
-      "/image/Apartments/Ap7/IMG-20250327-WA0096.jpg",
-      "/image/Apartments/Ap7/IMG-20250327-WA0097.jpg"
+      "/image/Apartments/Ap7/IMG-20250327-WA0084.jpg", // Main living area view
+      "/image/Apartments/Ap7/IMG-20250327-WA0086.jpg", // Living room
+      "/image/Apartments/Ap7/IMG-20250327-WA0087.jpg", // Kitchen
+      "/image/Apartments/Ap7/IMG-20250327-WA0088.jpg", // Bedroom
+      "/image/Apartments/Ap7/IMG-20250327-WA0089.jpg", // Bathroom
+      "/image/Apartments/Ap7/IMG-20250327-WA0090.jpg", // Additional view
+      "/image/Apartments/Ap7/IMG-20250327-WA0091.jpg", // Interior detail
+      "/image/Apartments/Ap7/IMG-20250327-WA0092.jpg", // Additional view
+      "/image/Apartments/Ap7/IMG-20250327-WA0093.jpg", // Interior detail
+      "/image/Apartments/Ap7/IMG-20250327-WA0094.jpg", // Additional view
+      "/image/Apartments/Ap7/IMG-20250327-WA0095.jpg", // Interior detail
+      "/image/Apartments/Ap7/IMG-20250327-WA0096.jpg", // Additional view
+      "/image/Apartments/Ap7/IMG-20250327-WA0097.jpg"  // Final view
     ],
     googleAddress: "Building B6, Group 64, Madinaty, New Cairo, Egypt",
     googleMapsUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.8!2d31.6511!3d30.1037!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDA2JzEzLjMiTiAzMcKwMzknMDQuMCJF!5e0!3m2!1sen!2seg!4v1640000000000!5m2!1sen!2seg&output=embed&iwloc=near",
@@ -417,18 +417,18 @@ export const rentals: Apartment[] = [
     ],
     availability: true,
     images: [
-      "/image/Apartments/Ap8/IMG-20250327-WA0098.jpg",
-      "/image/Apartments/Ap8/IMG-20250327-WA0099.jpg",
-      "/image/Apartments/Ap8/IMG-20250327-WA0100.jpg",
-      "/image/Apartments/Ap8/IMG-20250327-WA0101.jpg",
-      "/image/Apartments/Ap8/IMG-20250327-WA0102.jpg",
-      "/image/Apartments/Ap8/IMG-20250327-WA0103.jpg",
-      "/image/Apartments/Ap8/IMG-20250327-WA0104.jpg",
-      "/image/Apartments/Ap8/IMG-20250327-WA0105.jpg",
-      "/image/Apartments/Ap8/IMG-20250327-WA0106.jpg",
-      "/image/Apartments/Ap8/IMG-20250327-WA0107.jpg",
-      "/image/Apartments/Ap8/IMG-20250327-WA0108.jpg",
-      "/image/Apartments/Ap8/IMG-20250327-WA0109.jpg"
+      "/image/Apartments/Ap8/IMG-20250327-WA0098.jpg", // Main living area view
+      "/image/Apartments/Ap8/IMG-20250327-WA0099.jpg", // Living room
+      "/image/Apartments/Ap8/IMG-20250327-WA0100.jpg", // Kitchen
+      "/image/Apartments/Ap8/IMG-20250327-WA0101.jpg", // Bedroom
+      "/image/Apartments/Ap8/IMG-20250327-WA0102.jpg", // Bathroom
+      "/image/Apartments/Ap8/IMG-20250327-WA0103.jpg", // Additional view
+      "/image/Apartments/Ap8/IMG-20250327-WA0104.jpg", // Interior detail
+      "/image/Apartments/Ap8/IMG-20250327-WA0105.jpg", // Additional view
+      "/image/Apartments/Ap8/IMG-20250327-WA0106.jpg", // Interior detail
+      "/image/Apartments/Ap8/IMG-20250327-WA0107.jpg", // Additional view
+      "/image/Apartments/Ap8/IMG-20250327-WA0108.jpg", // Interior detail
+      "/image/Apartments/Ap8/IMG-20250327-WA0109.jpg"  // Final view
     ],
     googleAddress: "Building B11, Group 111, Madinaty, New Cairo, Egypt",
     googleMapsUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.8!2d31.6519!3d30.1043!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDA2JzE1LjUiTiAzMcKwMzknMDYuOCJF!5e0!3m2!1sen!2seg!4v1640000000000!5m2!1sen!2seg&output=embed&iwloc=near",
@@ -466,63 +466,16 @@ export const rentals: Apartment[] = [
     ],
     availability: true,
     images: [
-      "/image/Apartments/Ap9/1.jpg",
-      "/image/Apartments/Ap9/2.jpg",
-      "/image/Apartments/Ap9/3.jpg",
-      "/image/Apartments/Ap9/4.jpg"
+      "/image/Apartments/Ap9/1.jpg", // Main living area view
+      "/image/Apartments/Ap9/2.jpg", // Living room
+      "/image/Apartments/Ap9/3.jpg", // Kitchen
+      "/image/Apartments/Ap9/4.jpg"  // Final view
     ],
     googleAddress: "Building B6, Group 68, Madinaty, New Cairo, Egypt",
     googleMapsUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.8!2d31.6513!3d30.1039!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDA2JzE0LjAiTiAzMcKwMzknMDQuNyJF!5e0!3m2!1sen!2seg!4v1640000000000!5m2!1sen!2seg&output=embed&iwloc=near",
     coordinates: {
       latitude: 30.1039,
       longitude: 31.6513
-    }
-  },
-  {
-    id: 10,
-    title: "Ultra Luxury Three-Bedroom Apartment - Fourth Floor",
-    location: "Madinaty, Egypt - Building B11, Group 113",
-    price: 4000,
-    bedrooms: 3,
-    bathrooms: 2,
-    image: "/image/Apartments/Ap10/IMG-20250709-WA0001.jpg",
-    amenities: ["WiFi", "Air Conditioning", "Ultra Super Luxury", "Three Bedrooms", "Garden View", "Two Bathrooms", "Fourth Floor", "Internet"],
-    description: "Experience the pinnacle of luxury living in this ultra super luxury 3-bedroom, 2-bathroom apartment on the fourth floor (116 sqm). This exceptional unit features the highest level of finishes and complete air conditioning throughout. The spacious layout and premium amenities make it perfect for discerning guests who appreciate the finest in luxury accommodation.",
-    owner: {
-      name: "Property Sisters",
-      phone: "+201000474991",
-      email: "info@propsisters.eg",
-      responseTime: "Usually responds within 1 hour",
-      rating: 4.9,
-    },
-    reviews: [
-      { user: "Amira H.", rating: 5, comment: "Absolutely stunning ultra luxury apartment! The finishes are exceptional." },
-      { user: "Tariq M.", rating: 5, comment: "Perfect for our family. The space and luxury exceeded expectations." },
-      { user: "Laila K.", rating: 5, comment: "Outstanding apartment with beautiful garden views. Highly recommended!" },
-    ],
-    housekeepingOptions: [
-      { service: "Ultra Luxury Clean", price: 5000, description: "Premium cleaning service for ultra luxury apartment" },
-      { service: "Executive Service", price: 8000, description: "Complete luxury cleaning and maintenance service" },
-      { service: "VIP Family Package", price: 7000, description: "Comprehensive cleaning suitable for large luxury apartment" },
-    ],
-    availability: true,
-    images: [
-      "/image/Apartments/Ap10/IMG-20250709-WA0001.jpg",
-      "/image/Apartments/Ap10/IMG-20250709-WA0002.jpg",
-      "/image/Apartments/Ap10/IMG-20250709-WA0003.jpg",
-      "/image/Apartments/Ap10/IMG-20250709-WA0004.jpg",
-      "/image/Apartments/Ap10/IMG-20250709-WA0005.jpg",
-      "/image/Apartments/Ap10/IMG-20250709-WA0006.jpg",
-      "/image/Apartments/Ap10/IMG-20250709-WA0007.jpg",
-      "/image/Apartments/Ap10/IMG-20250709-WA0008.jpg",
-      "/image/Apartments/Ap10/IMG-20250709-WA0009.jpg",
-      "/image/Apartments/Ap10/IMG-20250709-WA0010.jpg"
-    ],
-    googleAddress: "Building B11, Group 113, Madinaty, New Cairo, Egypt",
-    googleMapsUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.8!2d31.6520!3d30.1045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDA2JzE2LjIiTiAzMcKwMzknMDcuMiJF!5e0!3m2!1sen!2seg!4v1640000000000!5m2!1sen!2seg&output=embed&iwloc=near",
-    coordinates: {
-      latitude: 30.1045,
-      longitude: 31.6520
     }
   }
 ];

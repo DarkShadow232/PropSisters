@@ -63,6 +63,8 @@ import { useToast } from "@/hooks/use-toast";
 import Reviews from "@/components/reviews/Reviews";
 import StarRating from "@/components/reviews/StarRating";
 import { getAverageRating } from "@/data/reviewsData";
+import DetailsHero from "@/components/rentals/DetailsHero";
+
 
 const RentalDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -294,133 +296,7 @@ const RentalDetailsPage = () => {
           </DialogContent>
         </Dialog>
       
-        <div className="mb-8">
-          <Button 
-            variant="ghost" 
-            className="mb-4"
-            onClick={() => navigate("/rentals")}
-          >
-            ← Back to Rentals
-          </Button>
-          
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h1 className="font-serif text-3xl md:text-4xl font-medium mb-2">{rental.title}</h1>
-              <div className="flex items-center text-foreground/70">
-                <MapPin className="h-4 w-4 mr-1" />
-                <span>{rental.location}</span>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={handleShare}
-                title="Share"
-              >
-                <Share2 className="h-5 w-5" />
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={handleSaveToTrip}
-                title="Save to Trip"
-              >
-                <BookmarkPlus className="h-5 w-5" />
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={handleDownloadFloorPlan}
-                title="Download Floor Plan"
-              >
-                <Download className="h-5 w-5" />
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="icon"
-                className={isFavorite ? "text-red-500" : ""}
-                onClick={handleFavoriteToggle}
-              >
-                <Heart className={`h-5 w-5 ${isFavorite ? "fill-red-500" : ""}`} />
-              </Button>
-              
-              <div className="text-2xl font-medium text-[#b94a3b]">
-                {rental.price} EGP<span className="text-sm font-normal text-foreground/70"> / night</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Property Images Gallery */}
-        <div className="mb-8 animate-fade-in">
-          <Card className="shadow-md overflow-hidden">
-            <Carousel className="w-full" setApi={setApi}>
-              <CarouselContent>
-                {imagesToShow.map((img, index) => (
-                  <CarouselItem key={index}>
-                    <div className="relative h-[500px] w-full group">
-                      <img 
-                        src={img} 
-                        alt={`${rental.title} - Image ${index + 1}`}
-                        className="w-full h-full object-cover cursor-pointer"
-                        onClick={() => openFullscreen(index)}
-                      />
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="absolute right-4 top-4 bg-white/70 hover:bg-white/90 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => openFullscreen(index)}
-                      >
-                        <Maximize2 className="h-5 w-5" />
-                      </Button>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="absolute left-4 top-1/2 transform -translate-y-1/2" />
-              <CarouselNext className="absolute right-4 top-1/2 transform -translate-y-1/2" />
-            </Carousel>
-          </Card>
-          
-          {/* Thumbnail Gallery */}
-          <div className="grid grid-cols-5 gap-2 mt-2">
-            {imagesToShow.slice(0, 5).map((img, index) => (
-              <div 
-                key={index} 
-                className={`h-20 cursor-pointer rounded-md overflow-hidden ${currentSlide === index ? 'ring-2 ring-[#b94a3b]' : ''}`}
-                onClick={() => selectSlide(index)}
-              >
-                <img 
-                  src={img} 
-                  alt={`Thumbnail ${index + 1}`}
-                  className="w-full h-full object-cover hover:opacity-80 transition-opacity"
-                />
-              </div>
-            ))}
-          </div>
-          {imagesToShow.length > 5 && (
-            <div className="mt-2 text-sm text-right">
-              <Button 
-                variant="link" 
-                className="p-0 h-auto text-[#b94a3b]"
-                onClick={() => {
-                  toast({
-                    title: "All Images",
-                    description: `This property has ${imagesToShow.length} images. Scroll through the carousel to view all.`,
-                    variant: "default",
-                  });
-                }}
-              >
-                +{imagesToShow.length - 5} more images
-              </Button>
-            </div>
-          )}
-        </div>
+        <DetailsHero rental={rental} propertyId={Number(id)} />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
@@ -428,10 +304,11 @@ const RentalDetailsPage = () => {
             <Card className="shadow-md mb-8 animate-fade-in">
               <CardContent className="p-6">
                 <Tabs defaultValue="details" className="w-full">
-                  <TabsList className={`grid w-full ${hasVideo ? 'grid-cols-4' : 'grid-cols-3'} mb-6`}>
-                    <TabsTrigger value="details">Details</TabsTrigger>
-                    <TabsTrigger value="amenities">Amenities</TabsTrigger>
+                  <TabsList className={`grid w-full ${hasVideo ? 'grid-cols-5' : 'grid-cols-4'} mb-6`}>
+                    <TabsTrigger value="details">Description</TabsTrigger>
+                    <TabsTrigger value="amenities">Facilities</TabsTrigger>
                     <TabsTrigger value="reviews">Reviews</TabsTrigger>
+                    <TabsTrigger value="faq">FAQs</TabsTrigger>
                     {hasVideo && <TabsTrigger value="video">Video Tour</TabsTrigger>}
                   </TabsList>
                   
@@ -631,6 +508,24 @@ const RentalDetailsPage = () => {
                   
                   <TabsContent value="reviews" className="space-y-6">
                     <Reviews propertyId={Number(id)} />
+                  </TabsContent>
+
+                  <TabsContent value="faq" className="space-y-6">
+                    <div>
+                      <h2 className="text-xl font-medium mb-4">Frequently asked questions</h2>
+                      <div className="space-y-3">
+                        {[
+                          { q: "Is parking available?", a: "Yes, free on-site parking is available for guests." },
+                          { q: "Do you offer breakfast?", a: "Breakfast is available as an optional add-on." },
+                          { q: "Is there free WiFi?", a: "Yes, high-speed WiFi is available throughout the property." },
+                        ].map((item, idx) => (
+                          <div key={idx} className="p-4 bg-white rounded-lg border border-gray-100">
+                            <div className="font-medium">{item.q}</div>
+                            <div className="text-sm text-foreground/70">{item.a}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </TabsContent>
                   
                   {hasVideo && (

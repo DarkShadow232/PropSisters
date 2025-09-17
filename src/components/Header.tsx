@@ -55,33 +55,20 @@ const Header = () => {
                   <ChevronDown size={16} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="center" className="w-56 bg-white shadow-md rounded-md p-1">
-                  {currentUser ? (
-                    <>
-                      <RoleGuard allowedRoles={['user', 'owner', 'admin']}>
-                        <DropdownMenuItem asChild>
-                          <Link to="/finish-request" className="dropdown-menu-item flex items-center gap-2">
-                            <Palette size={16} className="text-[#b94a3b]" />
-                            <span>Interior Design</span>
-                          </Link>
-                        </DropdownMenuItem>
-                      </RoleGuard>
-                      <RoleGuard allowedRoles={['owner', 'admin']}>
-                        <DropdownMenuItem asChild>
-                          <Link to="/add-property" className="dropdown-menu-item flex items-center gap-2">
-                            <Home size={16} className="text-[#b94a3b]" />
-                            <span>Add Your Property</span>
-                          </Link>
-                        </DropdownMenuItem>
-                      </RoleGuard>
-                    </>
-                  ) : (
+                  <DropdownMenuItem asChild>
+                    <Link to="/finish-request" className="dropdown-menu-item flex items-center gap-2">
+                      <Palette size={16} className="text-[#b94a3b]" />
+                      <span>Interior Design</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <RoleGuard allowedRoles={['owner', 'admin']}>
                     <DropdownMenuItem asChild>
-                      <Link to="/sign-in" className="dropdown-menu-item flex items-center gap-2">
-                        <User size={16} className="text-[#b94a3b]" />
-                        <span>Sign In to Access Services</span>
+                      <Link to="/add-property" className="dropdown-menu-item flex items-center gap-2">
+                        <Home size={16} className="text-[#b94a3b]" />
+                        <span>Add Your Property</span>
                       </Link>
                     </DropdownMenuItem>
-                  )}
+                  </RoleGuard>
                 </DropdownMenuContent>
               </DropdownMenu>
               <NavLink to="/services" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
@@ -131,13 +118,18 @@ const Header = () => {
                 </>
               )}
             </div>
+            {/* Mobile hamburger */}
+            <div className="md:hidden ml-auto">
+              <Button variant="outline" size="icon" aria-label="Menu" className="h-9 w-9" onClick={toggleMenu}>
+                {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden overflow-hidden">
-            <nav className="py-4 animate-fadeIn">
+        <div className={`md:hidden fixed inset-x-0 top-[60px] z-40 transition-max-height duration-300 overflow-hidden bg-white shadow ${isMenuOpen ? 'max-h-[75vh]' : 'max-h-0'}`}>
+            <nav className="py-4">
               <div className="flex flex-col space-y-3">
                 <NavLink 
                   to="/" 
@@ -160,15 +152,13 @@ const Header = () => {
                     <ChevronDown size={16} className="text-foreground/60" />
                   </div>
                   <div className="pl-4 flex flex-col space-y-2 mt-2">
-                    <RoleGuard allowedRoles={['user', 'owner', 'admin']}>
-                      <Link 
-                        to="/finish-request" 
-                        className={`py-2 px-2 flex items-center gap-2 rounded-md ${location.pathname === '/finish-request' ? 'text-[#b94a3b] font-medium bg-secondary/50' : 'text-foreground/80 hover:bg-secondary/30'}`}
-                      >
-                        <Palette size={16} className="text-[#b94a3b]" />
-                        Interior Design
-                      </Link>
-                    </RoleGuard>
+                    <Link 
+                      to="/finish-request" 
+                      className={`py-2 px-2 flex items-center gap-2 rounded-md ${location.pathname === '/finish-request' ? 'text-[#b94a3b] font-medium bg-secondary/50' : 'text-foreground/80 hover:bg-secondary/30'}`}
+                    >
+                      <Palette size={16} className="text-[#b94a3b]" />
+                      Interior Design
+                    </Link>
                     <RoleGuard allowedRoles={['owner', 'admin']}>
                       <Link 
                         to="/add-property" 
@@ -228,8 +218,7 @@ const Header = () => {
                 )}
               </div>
             </nav>
-          </div>
-        )}
+        </div>
       </div>
     </header>
   );
