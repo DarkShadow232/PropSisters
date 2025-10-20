@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface ReviewFormProps {
-  propertyId: number;
+  propertyId: string | number;
   onReviewSubmitted: () => void;
   onCancel: () => void;
 }

@@ -1,0 +1,105 @@
+<%- include('../partials/header') %>
+
+<% if (error && error.length > 0) { %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <%= error[0] %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+<% } %>
+
+<% if (success && success.length > 0) { %>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <%= success[0] %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+<% } %>
+
+<div class="row mb-4">
+  <div class="col">
+    <h1 class="h3 mb-0">
+      <i class="bi bi-calendar-check"></i> Bookings
+    </h1>
+    <p class="text-muted">Manage all property bookings</p>
+  </div>
+  <div class="col-auto">
+    <div class="btn-group">
+      <a href="/bookings?status=all" class="btn btn-<%= currentFilter === 'all' ? 'primary' : 'outline-primary' %>">
+        All
+      </a>
+      <a href="/bookings?status=pending" class="btn btn-<%= currentFilter === 'pending' ? 'warning' : 'outline-warning' %>">
+        Pending
+      </a>
+      <a href="/bookings?status=confirmed" class="btn btn-<%= currentFilter === 'confirmed' ? 'success' : 'outline-success' %>">
+        Confirmed
+      </a>
+      <a href="/bookings?status=cancelled" class="btn btn-<%= currentFilter === 'cancelled' ? 'danger' : 'outline-danger' %>">
+        Cancelled
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <% if (bookings.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Booking ID</th>
+              <th>Property</th>
+              <th>User</th>
+              <th>Check In</th>
+              <th>Check Out</th>
+              <th>Guests</th>
+              <th>Status</th>
+              <th>Total</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% bookings.forEach(booking => { %>
+              <tr>
+                <td><small class="font-monospace"><%= booking._id.toString().substring(0, 8) %>...</small></td>
+                <td>
+                  <strong><%= booking.propertyTitle %></strong>
+                </td>
+                <td><%= booking.userName %></td>
+                <td><%= booking.checkIn.toLocaleDateString() %></td>
+                <td><%= booking.checkOut.toLocaleDateString() %></td>
+                <td><i class="bi bi-people"></i> <%= booking.guests %></td>
+                <td>
+                  <% if (booking.status === 'pending') { %>
+                    <span class="badge bg-warning">Pending</span>
+                  <% } else if (booking.status === 'confirmed') { %>
+                    <span class="badge bg-success">Confirmed</span>
+                  <% } else if (booking.status === 'cancelled') { %>
+                    <span class="badge bg-danger">Cancelled</span>
+                  <% } %>
+                </td>
+                <td><strong>$<%= booking.totalPrice.toLocaleString() %></strong></td>
+                <td>
+                  <a href="/bookings/<%= booking._id %>" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-eye"></i> View
+                  </a>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="text-center py-5 text-muted">
+        <i class="bi bi-calendar-x fs-1 d-block mb-3"></i>
+        <% if (currentFilter !== 'all') { %>
+          <p>No <%= currentFilter %> bookings found</p>
+        <% } else { %>
+          <p>No bookings found</p>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+

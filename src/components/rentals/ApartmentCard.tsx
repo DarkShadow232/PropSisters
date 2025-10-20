@@ -1,23 +1,8 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Check, ChevronDown, ChevronUp, MapPin, Star, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { MapPin, Star } from "lucide-react";
 import StarRating from "@/components/reviews/StarRating";
 import { getAverageRating } from "@/data/reviewsData";
 
@@ -73,6 +58,24 @@ interface ApartmentCardProps {
   }>>;
 }
 
+// Function to get the best image for display
+const getBestDisplayImage = (rental: Apartment): string => {
+  // If there are multiple images, try to find the best one
+  if (rental.images && rental.images.length > 0) {
+    // Prefer the main image if it exists in the images array
+    const mainImageIndex = rental.images.findIndex(img => img === rental.image);
+    if (mainImageIndex !== -1) {
+      return rental.images[mainImageIndex];
+    }
+    
+    // Otherwise, use the first image from the array
+    return rental.images[0];
+  }
+  
+  // Fallback to the main image
+  return rental.image;
+};
+
 const ApartmentCard: React.FC<ApartmentCardProps> = ({
   rental,
   expandedCardId,
@@ -82,151 +85,85 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
   setSelectedDates
 }) => {
   const navigate = useNavigate();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [expanded, setExpanded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  // Get the best image for display
+  const displayImage = getBestDisplayImage(rental);
   
-  const calculatePriceBreakdown = (basePrice: number) => {
-    return {
-      nightly: basePrice,
-      weekly: basePrice * 6.5, // 7 nights with discount
-      monthly: basePrice * 25, // 30 nights with bigger discount
-    };
+  // Fallback image if the main image fails to load
+  const fallbackImage = "/placeholder.svg";
+
+  const average = getAverageRating(rental.id);
+
+  const ratingLabel = (r: number) => {
+    if (r >= 9) return "Exceptional";
+    if (r >= 8) return "Fabulous";
+    if (r >= 7) return "Very good";
+    if (r > 0) return "Good";
+    return "New";
   };
 
-  // Determine which images to use
-  const imagesToShow = rental.images && rental.images.length > 0 
-    ? rental.images 
-    : [rental.image];
+  const formattedPrice = new Intl.NumberFormat("en-EG", { maximumFractionDigits: 2 }).format(rental.price);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
 
   return (
-    <Card className="property-card group overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 rounded-2xl border-0">
-      <div className="relative h-64 overflow-hidden rounded-t-2xl">
-        {/* Image Carousel */}
-        <Carousel className="w-full h-full" opts={{ loop: true }}>
-          <CarouselContent className="h-full">
-            {imagesToShow.map((img, index) => (
-              <CarouselItem key={index} className="h-full">
-                <div className="relative h-full overflow-hidden">
-                  <img 
-                    src={img} 
-                    alt={`${rental.title} - Image ${index + 1}`} 
-                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 h-10 w-10 bg-white/90 hover:bg-white border-0 shadow-lg backdrop-blur-sm" />
-          <CarouselNext className="absolute right-3 top-1/2 transform -translate-y-1/2 z-10 h-10 w-10 bg-white/90 hover:bg-white border-0 shadow-lg backdrop-blur-sm" />
-        </Carousel>
-        
-        {/* Price Badge */}
-        <div className="absolute top-4 right-4 z-20">
-          <div className="bg-gradient-to-r from-[#b94a3b] to-[#d4574a] text-white py-2 px-4 rounded-full text-sm font-semibold shadow-lg backdrop-blur-sm">
-            <span className="text-lg font-bold">{rental.price}</span>
-            <span className="text-xs opacity-90 ml-1">EGP/night</span>
-          </div>
-        </div>
-        
-        {/* Availability Badge */}
-        <div className="absolute top-4 left-4 z-20">
-          <div className={`py-1 px-3 rounded-full text-xs font-medium shadow-lg backdrop-blur-sm ${
-            rental.availability 
-              ? 'bg-green-500/90 text-white' 
-              : 'bg-red-500/90 text-white'
-          }`}>
-            {rental.availability ? '✓ Available' : '✗ Booked'}
-          </div>
-        </div>
-        
-        {/* Image Counter */}
-        {imagesToShow.length > 1 && (
-          <div className="absolute bottom-4 left-4 z-20">
-            <div className="bg-black/50 text-white py-1 px-3 rounded-full text-xs backdrop-blur-sm">
-              {currentImageIndex + 1} / {imagesToShow.length}
-            </div>
-          </div>
-        )}
+    <Card className="overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-shadow bg-white">
+      <div className="relative h-56 w-full overflow-hidden">
+        <img 
+          src={imageError ? fallbackImage : displayImage} 
+          alt={rental.title} 
+          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          onError={handleImageError}
+          loading="lazy"
+        />
+        {/* Image overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
       </div>
-      <CardContent className="p-6">
-        {/* Title and Location */}
-        <div className="mb-4">
-          <h3 className="font-serif text-xl font-semibold mb-2 text-gray-800 group-hover:text-[#b94a3b] transition-colors duration-300">
-            {rental.title}
-          </h3>
-          <div className="flex justify-between items-center">
-            <p className="text-gray-600 text-sm flex items-center">
-              <MapPin className="w-4 h-4 mr-2 text-[#b94a3b]" />
-              {rental.location}
-            </p>
-            <div className="flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-400 px-3 py-1 rounded-full">
-              <StarRating rating={getAverageRating(rental.id)} size={14} />
-              <span className="text-xs text-white font-medium">
-                {getAverageRating(rental.id) > 0 ? `(${rental.reviews.length})` : "New"}
-              </span>
-            </div>
+      <CardContent className="p-4">
+        <div className="mb-2">
+          <h3 className="text-[17px] font-semibold leading-snug mb-1">{rental.title}</h3>
+          <div className="flex items-center gap-2 text-sm text-foreground/70">
+            <MapPin className="h-4 w-4 text-[#b94a3b]" />
+            <span className="truncate">{rental.location}</span>
           </div>
         </div>
-        
-        {/* Property Details */}
-        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 mb-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-[#b94a3b] mb-1">
-                {rental.bedrooms === 0 ? "Studio" : rental.bedrooms}
-              </div>
-              <div className="text-xs text-gray-600 font-medium">
-                {rental.bedrooms === 0 ? "" : "Bedroom" + (rental.bedrooms > 1 ? "s" : "")}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-[#b94a3b] mb-1">
-                {rental.bathrooms}
-              </div>
-              <div className="text-xs text-gray-600 font-medium">
-                Bathroom{rental.bathrooms > 1 ? "s" : ""}
-              </div>
-            </div>
+
+        <div className="text-sm text-foreground/80 mb-3">
+          {expanded ? (
+            <>
+              {rental.description}
+              <button className="text-[#b94a3b] ml-1" onClick={() => setExpanded(false)}>Show less</button>
+            </>
+          ) : (
+            <>
+              <span className="line-clamp-3">{rental.description}</span>
+              <button className="text-[#b94a3b] ml-1" onClick={() => setExpanded(true)}>Show more</button>
+            </>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-sm">
+            <div className="font-medium">{ratingLabel(average)}</div>
+            <div className="text-foreground/70">{rental.reviews.length} reviews</div>
+          </div>
+          <div className="min-w-10 h-10 rounded-lg bg-[#b94a3b] text-white font-semibold flex items-center justify-center px-3">
+            {average || "-"}
           </div>
         </div>
-        
-        {/* Amenities */}
-        <div className="mb-6">
-          <h4 className="text-sm font-semibold text-gray-700 mb-3">Featured Amenities</h4>
-          <div className="flex flex-wrap gap-2">
-            {rental.amenities.slice(0, 3).map((amenity) => (
-              <span 
-                key={amenity} 
-                className="bg-gradient-to-r from-[#b94a3b]/10 to-[#d4574a]/10 text-[#b94a3b] text-xs py-2 px-3 rounded-full flex items-center font-medium border border-[#b94a3b]/20 hover:bg-[#b94a3b]/20 transition-colors duration-300"
-              >
-                <Check className="w-3 h-3 mr-1" />
-                {amenity}
-              </span>
-            ))}
-            {rental.amenities.length > 3 && (
-              <span className="bg-gray-100 text-gray-600 text-xs py-2 px-3 rounded-full font-medium">
-                +{rental.amenities.length - 3} more
-              </span>
-            )}
-          </div>
+
+        <div className="mb-3">
+          <div className="text-emerald-700 text-lg font-extrabold">EGP {formattedPrice}</div>
+          <div className="text-xs text-foreground/70">1 night, 2 adults</div>
         </div>
-        
-        {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-3">
-          <Button 
-            variant="outline"
-            className="w-full border-2 border-[#b94a3b] text-[#b94a3b] hover:bg-[#b94a3b] hover:text-white transition-all duration-300 font-semibold py-2.5"
-            onClick={() => navigate(`/rentals/${rental.id}`)}
-          >
-            View Details
-          </Button>
-          <Button 
-            className="w-full bg-gradient-to-r from-[#b94a3b] to-[#d4574a] hover:from-[#9a3f33] hover:to-[#b94a3b] text-white font-semibold py-2.5 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-            onClick={() => navigate(`/booking/${rental.id}`)}
-          >
-            Book Now
-          </Button>
-        </div>
+
+        <Button className="w-full bg-[#b94a3b] hover:bg-[#9a3f33] text-white" onClick={() => navigate(`/rentals/${rental.id}`)}>
+          Check availability
+        </Button>
       </CardContent>
     </Card>
   );

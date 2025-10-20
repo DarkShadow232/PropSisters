@@ -11,7 +11,7 @@ import {
 const CityCarousel = () => {
   const images = [
     {
-      url: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
+      url: "/image/DISCOVER EGYPT/Pyramids of Giza.jpg",
       alt: "The iconic Great Pyramid of Giza and Sphinx at golden hour",
       title: "Great Pyramid & Sphinx",
       description: "Marvel at the last remaining Wonder of the Ancient World"
@@ -23,13 +23,13 @@ const CityCarousel = () => {
       description: "Experience the vibrant heart of Egypt's capital"
     },
     {
-      url: "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
+      url: "/image/DISCOVER EGYPT/Islamic Cairo.jpg",
       alt: "Islamic Cairo with historic mosques and minarets",
       title: "Islamic Cairo Heritage",
       description: "Explore 1000 years of Islamic architecture"
     },
     {
-      url: "https://images.unsplash.com/photo-1601339434503-8e842e174609?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3",
+      url: "/image/DISCOVER EGYPT/Khan el-Khalili.jpg",
       alt: "Khan el-Khalili bazaar with traditional lanterns and architecture",
       title: "Khan el-Khalili Bazaar",
       description: "Shop for authentic Egyptian treasures and crafts"

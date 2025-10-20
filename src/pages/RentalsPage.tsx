@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import ApartmentDetailModal from "@/components/ApartmentDetailModal";
@@ -8,8 +8,9 @@ import MobileFilter from "@/components/rentals/MobileFilter";
 import SearchBar from "@/components/rentals/SearchBar";
 import SortResults from "@/components/rentals/SortResults";
 import ApartmentCard from "@/components/rentals/ApartmentCard";
-import { rentals } from "@/data/rentalData";
 import { Apartment } from "@/data/rentalData";
+import { useProperties } from "@/hooks/useProperties";
+import { RefreshCw } from "lucide-react";
 
 const RentalsPage = () => {
   const navigate = useNavigate();
@@ -26,9 +27,18 @@ const RentalsPage = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Show all 10 apartments
-  const limitedRentals = rentals.slice(0, 10);
+  // Fetch properties from MongoDB (optimized - no polling)
+  const { properties, loading, error, lastFetch, refetch } = useProperties({
+    pollInterval: 0, // Polling disabled for better performance
+    filters: {
+      limit: 100, // Fetch all properties
+    },
+  });
+
+  // Use fetched properties
+  const limitedRentals = properties;
   
   // Calculate pagination
   const itemsPerPage = 5;
@@ -39,9 +49,22 @@ const RentalsPage = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = limitedRentals.slice(indexOfFirstItem, indexOfLastItem);
 
+  // Sync current page from URL on mount and whenever the URL changes
+  useEffect(() => {
+    const raw = searchParams.get("page");
+    const parsed = Number.parseInt(raw || "1", 10);
+    const clamped = Number.isFinite(parsed) ? Math.min(Math.max(parsed, 1), Math.max(totalPages, 1)) : 1;
+    if (clamped !== currentPage) {
+      setCurrentPage(clamped);
+    }
+  }, [searchParams, totalPages]);
+
+  // Update URL when page changes via UI
   const handlePageChange = (pageNumber: number) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("page", String(pageNumber));
+    setSearchParams(next);
     setCurrentPage(pageNumber);
-    // Scroll to top when page changes
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -62,16 +85,48 @@ const RentalsPage = () => {
     setIsDetailModalOpen(false);
   };
 
-  // Find the selected apartment from the rentals array
-  const selectedApartmentData = rentals.find(rental => rental.id === selectedApartment) || null;
+  // Find the selected apartment from the properties array
+  const selectedApartmentData = properties.find(rental => rental.id === selectedApartment) || null;
+
+  // Show loading state
+  if (loading && properties.length === 0) {
+    return (
+      <div className="bg-beige-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-foreground/70">Loading properties from database...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error && properties.length === 0) {
+    return (
+      <div className="bg-beige-50 min-h-screen flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="text-red-500 text-5xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold mb-2">Failed to Load Properties</h2>
+          <p className="text-foreground/70 mb-4">{error}</p>
+          <p className="text-sm text-foreground/60 mb-4">
+            Please make sure the admin console backend is running on port 3000.
+          </p>
+          <Button onClick={() => refetch()}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-beige-50 min-h-screen">
-      <div className="container-custom py-12">
-        <h1 className="font-serif text-3xl md:text-4xl font-medium mb-2">Browse Rentals</h1>
-        <p className="text-foreground/70 mb-8">
-          Find your perfect apartment from our curated selection of premium rentals.
-        </p>
+      <div className="container-custom py-10">
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-semibold">Browse Rentals</h1>
+          <p className="text-foreground/70">Find your perfect apartment from our curated selection of premium rentals.</p>
+        </div>
 
         {/* Filters and Search */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-10">
@@ -96,13 +151,23 @@ const RentalsPage = () => {
             {/* Results Count & Sort */}
             <div className="flex justify-between items-center mb-6">
               <SortResults resultsCount={limitedRentals.length} />
-              <Button 
-                variant="outline"
-                className="hidden md:flex items-center gap-2"
-                onClick={() => navigate(`/rentals/${limitedRentals[0]?.id || 1}`)}
-              >
-                View Property Details
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => refetch()}
+                  disabled={loading}
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+                {lastFetch && (
+                  <span className="text-xs text-foreground/50 flex items-center">
+                    Last updated: {lastFetch.toLocaleTimeString()}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Property Cards Grid */}

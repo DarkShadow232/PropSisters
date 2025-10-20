@@ -1,0 +1,167 @@
+<%- include('../partials/header') %>
+
+<% if (error && error.length > 0) { %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <%= error[0] %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+<% } %>
+
+<div class="row mb-4">
+  <div class="col">
+    <h1 class="h3 mb-0">
+      <i class="bi bi-pencil"></i> Edit Property
+    </h1>
+    <p class="text-muted">Update property information</p>
+  </div>
+</div>
+
+<form action="/properties/<%= property.id %>/edit" method="POST" enctype="multipart/form-data">
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Property Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="title" class="form-label">Property Title <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="title" name="title" required 
+                   value="<%= property.title %>">
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="description" name="description" rows="5" required><%= property.description %></textarea>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="location" class="form-label">Location/City <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="location" name="location" required
+                     value="<%= property.location %>">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="address" class="form-label">Full Address <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="address" name="address" required
+                     value="<%= property.address %>">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="price" class="form-label">Price per Night ($) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" required
+                     value="<%= property.price %>">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="bedrooms" class="form-label">Bedrooms</label>
+              <input type="number" class="form-control" id="bedrooms" name="bedrooms" min="0" 
+                     value="<%= property.bedrooms %>">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="bathrooms" class="form-label">Bathrooms</label>
+              <input type="number" class="form-control" id="bathrooms" name="bathrooms" min="0" 
+                     value="<%= property.bathrooms %>">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="amenities" class="form-label">Amenities</label>
+            <input type="text" class="form-control" id="amenities" name="amenities"
+                   value="<%= property.amenities ? property.amenities.join(', ') : '' %>">
+            <small class="form-text text-muted">Separate amenities with commas</small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Current Images</label>
+            <div class="row g-2 mb-3">
+              <% if (property.images && property.images.length > 0) { %>
+                <% property.images.forEach((image, index) => { %>
+                  <div class="col-md-3">
+                    <div class="card">
+                      <img src="<%= image %>" class="card-img-top" alt="Property image">
+                      <div class="card-body p-2">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" name="existingImages" 
+                                 value="<%= image %>" id="img<%= index %>" checked>
+                          <label class="form-check-label small" for="img<%= index %>">
+                            Keep
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <% }) %>
+              <% } else { %>
+                <div class="col-12">
+                  <p class="text-muted">No images uploaded yet</p>
+                </div>
+              <% } %>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="images" class="form-label">Add New Images</label>
+            <input type="file" class="form-control" id="images" name="images" multiple accept="image/*">
+            <small class="form-text text-muted">Select additional images to upload</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Owner Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="ownerName" class="form-label">Owner Name</label>
+            <input type="text" class="form-control" id="ownerName" name="ownerName"
+                   value="<%= property.ownerName || '' %>">
+          </div>
+
+          <div class="mb-3">
+            <label for="ownerEmail" class="form-label">Owner Email</label>
+            <input type="email" class="form-control" id="ownerEmail" name="ownerEmail"
+                   value="<%= property.ownerEmail || '' %>">
+          </div>
+
+          <div class="mb-3">
+            <label for="ownerPhone" class="form-label">Owner Phone</label>
+            <input type="tel" class="form-control" id="ownerPhone" name="ownerPhone"
+                   value="<%= property.ownerPhone || '' %>">
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Availability</h5>
+        </div>
+        <div class="card-body">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="availability" name="availability" 
+                   value="true" <%= property.availability ? 'checked' : '' %>>
+            <label class="form-check-label" for="availability">
+              Property is available for booking
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary btn-lg">
+          <i class="bi bi-check-circle"></i> Update Property
+        </button>
+        <a href="/properties" class="btn btn-outline-secondary">
+          <i class="bi bi-x-circle"></i> Cancel
+        </a>
+      </div>
+    </div>
+  </div>
+</form>
+
+<%- include('../partials/footer') %>
+

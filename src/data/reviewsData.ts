@@ -156,12 +156,18 @@ export const reviews: Review[] = [
 ];
 
 // Function to get reviews for a specific property
-export const getReviewsByPropertyId = (propertyId: number): Review[] => {
-  return reviews.filter(review => review.propertyId === propertyId);
+export const getReviewsByPropertyId = (propertyId: string | number): Review[] => {
+  // Convert propertyId to number for comparison if it's a valid number
+  const numericId = typeof propertyId === 'string' ? parseInt(propertyId, 10) : propertyId;
+  
+  // If conversion fails (NaN), return empty array since we can't match MongoDB IDs with numeric reviews
+  if (isNaN(numericId)) return [];
+  
+  return reviews.filter(review => review.propertyId === numericId);
 };
 
 // Function to get average rating for a property
-export const getAverageRating = (propertyId: number): number => {
+export const getAverageRating = (propertyId: string | number): number => {
   const propertyReviews = getReviewsByPropertyId(propertyId);
   if (propertyReviews.length === 0) return 0;
   
@@ -170,7 +176,7 @@ export const getAverageRating = (propertyId: number): number => {
 };
 
 // Function to get rating distribution for a property
-export const getRatingDistribution = (propertyId: number): Record<number, number> => {
+export const getRatingDistribution = (propertyId: string | number): Record<number, number> => {
   const propertyReviews = getReviewsByPropertyId(propertyId);
   const distribution: Record<number, number> = {
     5: 0,

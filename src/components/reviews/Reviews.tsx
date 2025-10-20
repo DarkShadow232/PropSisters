@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
 
 interface ReviewsProps {
-  propertyId: number;
+  propertyId: string | number;
 }
 
 const Reviews: React.FC<ReviewsProps> = ({ propertyId }) => {

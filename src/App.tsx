@@ -22,7 +22,7 @@ import SignUpPage from "./pages/SignUpPage";
 import AddPropertyPage from "./pages/AddPropertyPage";
 import PropertySistersClubPage from "./pages/PropertySistersClubPage";
 import UserDashboardPage from "./pages/UserDashboardPage";
-import AdminInitPage from "./pages/AdminInitPage";
+// Admin pages removed
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,11 +51,7 @@ const App = () => {
                   <BookingPage />
                 </ProtectedRoute>
               } />
-              <Route path="finish-request" element={
-                <ProtectedRoute requiredRole="user">
-                  <FinishRequestPage />
-                </ProtectedRoute>
-              } />
+              <Route path="finish-request" element={<FinishRequestPage />} />
               <Route path="services" element={<ServicesPage />} />
               <Route path="about" element={<AboutPage />} />
               <Route path="contact" element={<ContactPage />} />
@@ -76,7 +72,7 @@ const App = () => {
                   <UserDashboardPage />
                 </ProtectedRoute>
               } />
-              <Route path="admin/init" element={<AdminInitPage />} />
+              {/* admin routes removed */}
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

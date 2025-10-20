@@ -1,0 +1,107 @@
+<%- include('../partials/header') %>
+
+<% if (error && error.length > 0) { %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <%= error[0] %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+<% } %>
+
+<% if (success && success.length > 0) { %>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <%= success[0] %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+<% } %>
+
+<div class="row mb-4">
+  <div class="col">
+    <h1 class="h3 mb-0">
+      <i class="bi bi-building"></i> Properties
+    </h1>
+    <p class="text-muted">Manage all rental properties</p>
+  </div>
+  <div class="col-auto">
+    <a href="/properties/create" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Add New Property
+    </a>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <% if (properties.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Image</th>
+              <th>Title</th>
+              <th>Location</th>
+              <th>Price</th>
+              <th>Beds/Baths</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% properties.forEach(property => { %>
+              <tr>
+                <td>
+                  <% if (property.images && property.images.length > 0) { %>
+                    <img src="<%= property.images[0] %>" alt="<%= property.title %>" 
+                         style="width: 80px; height: 60px; object-fit: cover; border-radius: 5px;">
+                  <% } else { %>
+                    <div style="width: 80px; height: 60px; background: #e9ecef; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+                      <i class="bi bi-image text-muted"></i>
+                    </div>
+                  <% } %>
+                </td>
+                <td>
+                  <strong><%= property.title %></strong><br>
+                  <small class="text-muted"><%= property.address %></small>
+                </td>
+                <td><%= property.location %></td>
+                <td><strong>$<%= property.price.toLocaleString() %></strong>/night</td>
+                <td>
+                  <i class="bi bi-door-closed"></i> <%= property.bedrooms %> 
+                  <i class="bi bi-droplet ms-2"></i> <%= property.bathrooms %>
+                </td>
+                <td>
+                  <% if (property.availability) { %>
+                    <span class="badge bg-success">Available</span>
+                  <% } else { %>
+                    <span class="badge bg-secondary">Unavailable</span>
+                  <% } %>
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <a href="/properties/<%= property._id %>/edit" class="btn btn-outline-primary">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <form action="/properties/<%= property._id %>/delete" method="POST" style="display: inline;">
+                      <button type="submit" class="btn btn-outline-danger delete-confirm">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="text-center py-5 text-muted">
+        <i class="bi bi-building fs-1 d-block mb-3"></i>
+        <p>No properties found</p>
+        <a href="/properties/create" class="btn btn-primary">
+          <i class="bi bi-plus-circle"></i> Create First Property
+        </a>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+

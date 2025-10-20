@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,15 +20,19 @@ const SignUpPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
   const { signUp, signInWithGoogle, currentUser, loading } = useAuth();
+
+  // Get the redirect path from location state, or default to dashboard
+  const from = location.state?.from?.pathname || '/dashboard';
 
   // Redirect if user is already signed in
   useEffect(() => {
     if (!loading && currentUser) {
-      // Immediate redirect without delay to prevent flash
-      navigate('/dashboard', { replace: true });
+      // Redirect to the page they came from or dashboard
+      navigate(from, { replace: true });
     }
-  }, [currentUser, loading, navigate]);
+  }, [currentUser, loading, navigate, from]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,11 +40,12 @@ const SignUpPage = () => {
     setIsLoading(true);
     
     try {
-      await signUp(email, password);
+      const displayName = `${firstName} ${lastName}`.trim();
+      await signUp(email, password, displayName);
       toast.success("Account created successfully!", {
         description: "Welcome to Sisterhood Style Rentals!"
       });
-      navigate('/dashboard');
+      navigate(from, { replace: true });
     } catch (error: any) {
       console.error("Sign up error:", error);
       setError(error.message || "Failed to create account. Please try again.");
@@ -58,7 +63,7 @@ const SignUpPage = () => {
       toast.success("Successfully signed in with Google!", {
         description: "Welcome to Sisterhood Style Rentals!"
       });
-      navigate('/');
+      navigate(from, { replace: true });
     } catch (error: any) {
       console.error("Google sign in error:", error);
       setError(error.message || "Failed to sign in with Google. Please try again.");

@@ -27,11 +27,9 @@ import {
   Crown, 
   Settings, 
   User, 
-  Loader2,
-  Shield
+  Loader2
 } from "lucide-react";
-import UserRoleManager from "@/components/admin/UserRoleManager";
-import RoleGuard from "@/components/auth/RoleGuard";
+// Admin components removed
 
 const sections = [
   { key: "profile", label: "My Profile", icon: User, color: "text-blue-600" },
@@ -40,8 +38,15 @@ const sections = [
   { key: "design", label: "Design Requests", icon: Brush, color: "text-purple-600" },
   { key: "membership", label: "Membership", icon: Crown, color: "text-yellow-600" },
   { key: "settings", label: "Settings", icon: Settings, color: "text-gray-600" },
-  { key: "admin", label: "Admin Panel", icon: Shield, color: "text-red-600", adminOnly: true },
+  // admin section removed
 ];
+
+// Convert timestamp-like values to Date
+const toDate = (value: any): Date => {
+  if (value instanceof Date) return value;
+  if (value && typeof value.seconds === 'number') return new Date(value.seconds * 1000);
+  return new Date(value);
+};
 
 const UserDashboardPage = () => {
   const { currentUser, userRole, signOut } = useAuth();
@@ -175,10 +180,6 @@ const UserDashboardPage = () => {
           {/* Navigation */}
           <nav className="p-4 space-y-2">
             {sections.map((section) => {
-              // Hide admin section for non-admin users
-              if (section.adminOnly && userRole !== 'admin') {
-                return null;
-              }
               
               return (
                 <button
@@ -346,11 +347,11 @@ const UserDashboardPage = () => {
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div>
                             <p className="text-gray-600">Check-in:</p>
-                            <p className="font-medium">{new Date(booking.checkIn.seconds * 1000).toLocaleDateString()}</p>
+                            <p className="font-medium">{toDate(booking.checkIn).toLocaleDateString()}</p>
                           </div>
                           <div>
                             <p className="text-gray-600">Check-out:</p>
-                            <p className="font-medium">{new Date(booking.checkOut.seconds * 1000).toLocaleDateString()}</p>
+                            <p className="font-medium">{toDate(booking.checkOut).toLocaleDateString()}</p>
                           </div>
                           <div>
                             <p className="text-gray-600">Guests:</p>
@@ -462,20 +463,7 @@ const UserDashboardPage = () => {
             </Card>
           )}
 
-          {/* Admin Panel Section - Only visible to admins */}
-          {!loading && activeSection === "admin" && userRole === "admin" && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-2 mb-6">
-                <Shield className="h-6 w-6 text-red-600" />
-                <h2 className="text-2xl font-bold text-gray-900">Admin Panel</h2>
-                <Badge className="bg-red-100 text-red-800 border-red-200">
-                  Administrator
-                </Badge>
-              </div>
-              
-              <UserRoleManager />
-            </div>
-          )}
+          {/* admin panel removed */}
         </main>
       </div>
 

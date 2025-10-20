@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Search, Filter, Star } from "lucide-react";
 
 interface ReviewsListProps {
-  propertyId: number;
+  propertyId: string | number;
 }
 
 type SortOption = "newest" | "oldest" | "highest" | "lowest" | "helpful";

@@ -1,0 +1,186 @@
+<%- include('../partials/header') %>
+
+<% if (error && error.length > 0) { %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <%= error[0] %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+<% } %>
+
+<% if (success && success.length > 0) { %>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <%= success[0] %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+<% } %>
+
+<div class="row mb-4">
+  <div class="col">
+    <h1 class="h3 mb-0">
+      <i class="bi bi-calendar-check"></i> Booking Details
+    </h1>
+    <p class="text-muted">View and manage booking information</p>
+  </div>
+  <div class="col-auto">
+    <a href="/bookings" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Bookings
+    </a>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8 mb-4">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Booking Information</h5>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <small class="text-muted d-block">Booking ID</small>
+            <span class="font-monospace"><%= booking._id %></span>
+          </div>
+          <div class="col-md-6">
+            <small class="text-muted d-block">Status</small>
+            <% if (booking.status === 'pending') { %>
+              <span class="badge bg-warning">Pending</span>
+            <% } else if (booking.status === 'confirmed') { %>
+              <span class="badge bg-success">Confirmed</span>
+            <% } else if (booking.status === 'cancelled') { %>
+              <span class="badge bg-danger">Cancelled</span>
+            <% } %>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <small class="text-muted d-block">Check In</small>
+            <strong><%= booking.checkIn.toLocaleDateString() %></strong>
+          </div>
+          <div class="col-md-4">
+            <small class="text-muted d-block">Check Out</small>
+            <strong><%= booking.checkOut.toLocaleDateString() %></strong>
+          </div>
+          <div class="col-md-4">
+            <small class="text-muted d-block">Guests</small>
+            <strong><i class="bi bi-people"></i> <%= booking.guests %></strong>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <small class="text-muted d-block">Total Price</small>
+          <h3 class="text-primary mb-0">$<%= booking.totalPrice.toLocaleString() %></h3>
+        </div>
+
+        <div class="mb-3">
+          <small class="text-muted d-block">Additional Services</small>
+          <div class="d-flex gap-2 mt-2">
+            <% if (booking.cleaningService) { %>
+              <span class="badge bg-info"><i class="bi bi-check-circle"></i> Cleaning Service</span>
+            <% } %>
+            <% if (booking.airportPickup) { %>
+              <span class="badge bg-info"><i class="bi bi-check-circle"></i> Airport Pickup</span>
+            <% } %>
+            <% if (booking.earlyCheckIn) { %>
+              <span class="badge bg-info"><i class="bi bi-check-circle"></i> Early Check-in</span>
+            <% } %>
+            <% if (!booking.cleaningService && !booking.airportPickup && !booking.earlyCheckIn) { %>
+              <span class="text-muted">None</span>
+            <% } %>
+          </div>
+        </div>
+
+        <% if (booking.specialRequests) { %>
+          <div class="mb-3">
+            <small class="text-muted d-block">Special Requests</small>
+            <p class="mb-0"><%= booking.specialRequests %></p>
+          </div>
+        <% } %>
+
+        <div class="mb-3">
+          <small class="text-muted d-block">Booked On</small>
+          <strong><%= booking.createdAt.toLocaleDateString() %> <%= booking.createdAt.toLocaleTimeString() %></strong>
+        </div>
+      </div>
+    </div>
+
+    <% if (property) { %>
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Property Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <% if (property.images && property.images.length > 0) { %>
+              <div class="col-md-4">
+                <img src="<%= property.images[0] %>" alt="<%= property.title %>" 
+                     class="img-fluid rounded">
+              </div>
+            <% } %>
+            <div class="col-md-<%= property.images && property.images.length > 0 ? '8' : '12' %>">
+              <h5><%= property.title %></h5>
+              <p class="text-muted mb-2">
+                <i class="bi bi-geo-alt"></i> <%= property.location %>
+              </p>
+              <p class="text-muted mb-0"><%= property.address %></p>
+              <a href="/properties/<%= property._id %>/edit" class="btn btn-sm btn-outline-primary mt-3">
+                <i class="bi bi-eye"></i> View Property
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="col-lg-4">
+    <% if (user) { %>
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Guest Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <small class="text-muted d-block">Name</small>
+            <strong><%= user.displayName %></strong>
+          </div>
+          <div class="mb-3">
+            <small class="text-muted d-block">Email</small>
+            <strong><%= user.email %></strong>
+          </div>
+          <div class="mb-3">
+            <small class="text-muted d-block">Phone</small>
+            <strong><%= user.phoneNumber %></strong>
+          </div>
+          <a href="/users/<%= user._id %>" class="btn btn-sm btn-outline-primary w-100">
+            <i class="bi bi-person"></i> View User Profile
+          </a>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Update Status</h5>
+      </div>
+      <div class="card-body">
+        <form action="/bookings/<%= booking._id %>/status" method="POST">
+          <div class="mb-3">
+            <label for="status" class="form-label">Change Booking Status</label>
+            <select class="form-select" id="status" name="status">
+              <option value="pending" <%= booking.status === 'pending' ? 'selected' : '' %>>Pending</option>
+              <option value="confirmed" <%= booking.status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+              <option value="cancelled" <%= booking.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-check-circle"></i> Update Status
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+

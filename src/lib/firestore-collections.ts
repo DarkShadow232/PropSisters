@@ -18,6 +18,10 @@ export interface FirestoreUser {
   role: 'user' | 'owner' | 'admin';
   createdAt: Date;
   updatedAt: Date;
+  // Admin 2FA (TOTP)
+  totpEnabled?: boolean;
+  // WARNING: In a production system, store this server-side and/or encrypted
+  totpSecret?: string;
 }
 
 export interface FirestoreProperty {
@@ -38,6 +42,18 @@ export interface FirestoreProperty {
   availability: boolean;
   createdAt: Date;
   updatedAt: Date;
+  // Optional dynamic pricing tiers by stay duration
+  pricingTiers?: PricingTier[];
+}
+
+// Pricing tier for dynamic pricing rules
+export interface PricingTier {
+  /** Minimum nights inclusive for this tier */
+  minNights: number;
+  /** Maximum nights inclusive for this tier. If omitted, treated as infinity */
+  maxNights?: number;
+  /** Price per night applied when number of nights falls within [minNights, maxNights] */
+  pricePerNight: number;
 }
 
 export interface FirestoreBooking {

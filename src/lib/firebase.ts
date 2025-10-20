@@ -9,16 +9,20 @@ import {
   updateProfile,
   User
 } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAnalytics } from "firebase/analytics";
-import { getFirebaseConfig, validateEnv, ENV } from '@/config/env';
 
-// Validate environment variables before initializing Firebase
-validateEnv();
-
-// Get Firebase configuration from environment variables
-const firebaseConfig = getFirebaseConfig();
+// Firebase configuration - Update this with your credentials
+const firebaseConfig = {
+  apiKey: "AIzaSyAZs_l9PkRHTJFXDag9dLdzqx7ZGOZGzCI",
+  authDomain: "proparty-sister.firebaseapp.com",
+  projectId: "proparty-sister",
+  storageBucket: "proparty-sister.firebasestorage.app",
+  messagingSenderId: "835065821279",
+  appId: "1:835065821279:web:168b1334a6f48037b243ea",
+  measurementId: "G-H5HCSVTPF0"
+};
     
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -28,6 +32,15 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const analytics = getAnalytics(app);
+
+// Enable offline persistence for better performance
+enableIndexedDbPersistence(db).catch((err) => {
+  if (err.code === 'failed-precondition') {
+    console.warn('Multiple tabs open, persistence can only be enabled in one tab at a time.');
+  } else if (err.code === 'unimplemented') {
+    console.warn('The current browser does not support persistence.');
+  }
+});
 
 // Auth providers
 const googleProvider = new GoogleAuthProvider();
