@@ -7,7 +7,7 @@ import StarRating from "@/components/reviews/StarRating";
 import { getAverageRating } from "@/data/reviewsData";
 
 export interface Apartment {
-  id: number;
+  id: number | string;
   title: string;
   location: string;
   price: number;
@@ -161,7 +161,10 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({
           <div className="text-xs text-foreground/70">1 night, 2 adults</div>
         </div>
 
-        <Button className="w-full bg-[#b94a3b] hover:bg-[#9a3f33] text-white" onClick={() => navigate(`/rentals/${rental.id}`)}>
+        <Button className="w-full bg-[#b94a3b] hover:bg-[#9a3f33] text-white" onClick={() => {
+          console.log('🏠 Navigating to rental details for ID:', rental.id);
+          navigate(`/rentals/${rental.id}`);
+        }}>
           Check availability
         </Button>
       </CardContent>

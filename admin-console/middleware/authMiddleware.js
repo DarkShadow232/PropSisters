@@ -24,8 +24,51 @@ const isNotAuthenticated = (req, res, next) => {
   next();
 };
 
+// Middleware to check if user is admin
+const isAdmin = (req, res, next) => {
+  if (req.session && req.session.adminId) {
+    // Attach admin info to request
+    req.admin = {
+      id: req.session.adminId,
+      email: req.session.adminEmail,
+      name: req.session.adminName
+    };
+    return next();
+  }
+  
+  req.flash('error', 'Admin access required');
+  res.redirect('/auth/login');
+};
+
+// Middleware to check if frontend user is authenticated
+const isUserAuthenticated = (req, res, next) => {
+  if (req.session && req.session.userId) {
+    // Attach user info to request
+    req.user = {
+      id: req.session.userId,
+      email: req.session.userEmail,
+      name: req.session.userName
+    };
+    return next();
+  }
+  
+  // For API routes, return JSON error
+  if (req.originalUrl.startsWith('/api/')) {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required'
+    });
+  }
+  
+  // For web routes, redirect to login
+  req.session.returnTo = req.originalUrl;
+  res.redirect('/sign-in');
+};
+
 module.exports = {
   isAuthenticated,
-  isNotAuthenticated
+  isNotAuthenticated,
+  isAdmin,
+  isUserAuthenticated
 };
 

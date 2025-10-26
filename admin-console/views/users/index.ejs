@@ -23,6 +23,9 @@
   </div>
 </div>
 
+<!-- Filters -->
+<%- include('../partials/filters', { search, status, priority, sort, limit }) %>
+
 <div class="card border-0 shadow-sm">
   <div class="card-body p-0">
     <% if (users.length > 0) { %>

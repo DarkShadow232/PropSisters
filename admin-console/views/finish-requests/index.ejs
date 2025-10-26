@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finish Requests - Admin Console</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+        .priority-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+        .request-card {
+            transition: all 0.3s ease;
+        }
+        .request-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="/admin/dashboard">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="/admin/properties">
+                                <i class="bi bi-building"></i> Properties
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="/admin/users">
+                                <i class="bi bi-people"></i> Users
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="/admin/bookings">
+                                <i class="bi bi-calendar-check"></i> Bookings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white active" href="/admin/finish-requests">
+                                <i class="bi bi-tools"></i> Finish Requests
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Finish Requests</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <%- include('../partials/filters', { search, status, priority, sort, limit }) %>
+
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <select class="form-select" id="statusFilter">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="reviewed">Reviewed</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="priorityFilter">
+                            <option value="all">All Priority</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" placeholder="Search requests..." id="searchInput">
+                    </div>
+                </div>
+
+                <!-- Requests List -->
+                <div class="row" id="requestsList">
+                    <!-- Requests will be loaded here via JavaScript -->
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Requests pagination">
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <!-- Pagination will be loaded here -->
+                    </ul>
+                </nav>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentPage = 1;
+        let currentStatus = 'all';
+        let currentPriority = 'all';
+        let currentSearch = '';
+
+        // Load finish requests
+        async function loadFinishRequests() {
+            try {
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    limit: 10
+                });
+                
+                if (currentStatus !== 'all') params.append('status', currentStatus);
+                if (currentPriority !== 'all') params.append('priority', currentPriority);
+
+                const response = await fetch(`/api/admin/finish-requests/all?${params}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayRequests(data.requests);
+                    displayPagination(data.pagination);
+                } else {
+                    console.error('Failed to load finish requests:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading finish requests:', error);
+            }
+        }
+
+        // Display requests
+        function displayRequests(requests) {
+            const container = document.getElementById('requestsList');
+            
+            if (requests.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="bi bi-info-circle"></i> No finish requests found.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = requests.map(request => `
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card request-card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">${request.requestType}</h6>
+                            <span class="badge ${getStatusClass(request.status)} status-badge">${request.status}</span>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title">${request.userName}</h6>
+                            <p class="card-text text-muted small">${request.description.substring(0, 100)}...</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <small class="text-muted">Budget</small><br>
+                                    <strong>${request.budget}</strong>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">Timeline</small><br>
+                                    <strong>${request.timeline}</strong>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="badge ${getPriorityClass(request.priority)} priority-badge">${request.priority}</span>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <small class="text-muted">
+                                <i class="bi bi-geo-alt"></i> ${request.location}
+                            </small>
+                            <div class="mt-1">
+                                <small class="text-muted">
+                                    <i class="bi bi-clock"></i> ${new Date(request.createdAt).toLocaleDateString()}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Display pagination
+        function displayPagination(pagination) {
+            const container = document.getElementById('pagination');
+            const { current, pages, total } = pagination;
+            
+            let paginationHTML = '';
+            
+            // Previous button
+            paginationHTML += `
+                <li class="page-item ${current === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${current - 1})">Previous</a>
+                </li>
+            `;
+            
+            // Page numbers
+            for (let i = 1; i <= pages; i++) {
+                paginationHTML += `
+                    <li class="page-item ${i === current ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                    </li>
+                `;
+            }
+            
+            // Next button
+            paginationHTML += `
+                <li class="page-item ${current === pages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${current + 1})">Next</a>
+                </li>
+            `;
+            
+            container.innerHTML = paginationHTML;
+        }
+
+        // Get status CSS class
+        function getStatusClass(status) {
+            const classes = {
+                'pending': 'bg-warning',
+                'reviewed': 'bg-info',
+                'in-progress': 'bg-primary',
+                'completed': 'bg-success',
+                'cancelled': 'bg-danger'
+            };
+            return classes[status] || 'bg-secondary';
+        }
+
+        // Get priority CSS class
+        function getPriorityClass(priority) {
+            const classes = {
+                'low': 'bg-success',
+                'medium': 'bg-warning',
+                'high': 'bg-danger',
+                'urgent': 'bg-dark'
+            };
+            return classes[priority] || 'bg-secondary';
+        }
+
+        // Change page
+        function changePage(page) {
+            currentPage = page;
+            loadFinishRequests();
+        }
+
+        // Filter by status
+        document.getElementById('statusFilter').addEventListener('change', (e) => {
+            currentStatus = e.target.value;
+            currentPage = 1;
+            loadFinishRequests();
+        });
+
+        // Filter by priority
+        document.getElementById('priorityFilter').addEventListener('change', (e) => {
+            currentPriority = e.target.value;
+            currentPage = 1;
+            loadFinishRequests();
+        });
+
+        // Search
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            currentPage = 1;
+            // Add debouncing here if needed
+            loadFinishRequests();
+        });
+
+        // Load initial data
+        loadFinishRequests();
+    </script>
+</body>
+</html>

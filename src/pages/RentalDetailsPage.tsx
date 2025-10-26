@@ -65,6 +65,7 @@ import StarRating from "@/components/reviews/StarRating";
 import { getAverageRating } from "@/data/reviewsData";
 import DetailsHero from "@/components/rentals/DetailsHero";
 import { fetchPropertyByIdFromMongo, convertMongoToApartment } from "@/services/mongoPropertyService";
+import bookingService from "@/services/bookingService";
 
 
 const RentalDetailsPage = () => {
@@ -86,6 +87,8 @@ const RentalDetailsPage = () => {
   const [rental, setRental] = useState<Apartment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
   
   // Fetch the rental by ID from MongoDB
   useEffect(() => {
@@ -119,6 +122,38 @@ const RentalDetailsPage = () => {
     };
     
     fetchRental();
+  }, [id]);
+
+  // Setup carousel navigation  
+  useEffect(() => {
+    if (!api) return;
+    
+    api.on("select", () => {
+      setCurrentSlide(api.selectedScrollSnap());
+    });
+  }, [api]);
+
+  // Fetch bookings for this property
+  useEffect(() => {
+    const fetchBookings = async () => {
+      if (!id) return;
+      
+      try {
+        setBookingsLoading(true);
+        console.log('📅 Fetching bookings for property:', id);
+        const propertyBookings = await bookingService.getBookingsByPropertyId(id);
+        console.log('✅ Bookings fetched:', propertyBookings);
+        setBookings(propertyBookings);
+      } catch (error) {
+        console.error('❌ Error fetching bookings:', error);
+        // Don't show error to user, just use empty array
+        setBookings([]);
+      } finally {
+        setBookingsLoading(false);
+      }
+    };
+    
+    fetchBookings();
   }, [id]);
   
   if (loading) {
@@ -172,15 +207,6 @@ const RentalDetailsPage = () => {
   const imagesToShow = rental.images && rental.images.length > 0 
     ? rental.images 
     : [rental.image];
-    
-  // Setup carousel navigation  
-  React.useEffect(() => {
-    if (!api) return;
-    
-    api.on("select", () => {
-      setCurrentSlide(api.selectedScrollSnap());
-    });
-  }, [api]);
   
   // Function to select a specific slide
   const selectSlide = (index: number) => {
@@ -259,26 +285,26 @@ const RentalDetailsPage = () => {
   // Similar properties - will be empty for now (could be enhanced with API call)
   const similarProperties: Apartment[] = [];
   
-  // Generate some fake availability data for visualization
-  const generateAvailabilityData = () => {
-    const today = new Date();
-    const bookedDates = [];
+  // Generate booked dates from real booking data
+  const generateBookedDates = () => {
+    const bookedDates: string[] = [];
     
-    // Add some random booked dates for the next 2 months
-    for (let i = 1; i <= 60; i++) {
-      const randomDay = new Date(today);
-      randomDay.setDate(today.getDate() + i);
+    bookings.forEach(booking => {
+      const checkIn = new Date(booking.checkIn);
+      const checkOut = new Date(booking.checkOut);
       
-      // Randomly mark some dates as booked (about 30%)
-      if (Math.random() < 0.3) {
-        bookedDates.push(randomDay.toISOString().split('T')[0]);
+      // Add all dates between check-in and check-out (exclusive of check-out)
+      const currentDate = new Date(checkIn);
+      while (currentDate < checkOut) {
+        bookedDates.push(currentDate.toISOString().split('T')[0]);
+        currentDate.setDate(currentDate.getDate() + 1);
       }
-    }
+    });
     
     return bookedDates;
   };
   
-  const bookedDates = generateAvailabilityData();
+  const bookedDates = generateBookedDates();
   
   // Function to check if a date is booked
   const isDateBooked = (date: Date) => {

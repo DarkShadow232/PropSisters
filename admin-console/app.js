@@ -5,16 +5,27 @@ const flash = require('express-flash');
 const methodOverride = require('method-override');
 const cors = require('cors');
 const path = require('path');
+const cron = require('node-cron');
 require('dotenv').config();
 
 // Initialize database connection
 const connectDB = require('./config/database');
+
+// Initialize services
+const LoggerService = require('./services/loggerService');
 
 // Create Express app
 const app = express();
 
 // Connect to MongoDB
 connectDB();
+
+// Initialize services
+const loggerService = new LoggerService();
+
+// Initialize booking automation
+const BookingAutomation = require('./services/bookingAutomation');
+const bookingAutomation = new BookingAutomation();
 
 // View engine setup
 app.set('view engine', 'ejs');
@@ -31,40 +42,8 @@ app.use(cors({
 }));
 
 // Request logging middleware
-app.use((req, res, next) => {
-  const timestamp = new Date().toISOString();
-  console.log('\n' + '='.repeat(80));
-  console.log(`📥 [${timestamp}] ${req.method} ${req.url}`);
-  console.log(`📍 IP: ${req.ip}`);
-  console.log(`🔗 Origin: ${req.headers.origin || 'N/A'}`);
-  
-  if (Object.keys(req.query).length > 0) {
-    console.log(`🔍 Query:`, req.query);
-  }
-  
-  if (req.body && Object.keys(req.body).length > 0) {
-    // Don't log passwords
-    const sanitizedBody = { ...req.body };
-    if (sanitizedBody.password) sanitizedBody.password = '***HIDDEN***';
-    if (sanitizedBody.currentPassword) sanitizedBody.currentPassword = '***HIDDEN***';
-    if (sanitizedBody.newPassword) sanitizedBody.newPassword = '***HIDDEN***';
-    console.log(`📦 Body:`, sanitizedBody);
-  }
-  
-  if (req.session && req.session.userId) {
-    console.log(`👤 User: ${req.session.userName} (${req.session.userEmail})`);
-  }
-  
-  // Log response
-  const originalSend = res.send;
-  res.send = function(data) {
-    console.log(`📤 Response: ${res.statusCode} ${res.statusMessage || ''}`);
-    console.log('='.repeat(80));
-    return originalSend.apply(res, arguments);
-  };
-  
-  next();
-});
+const requestLogger = require('./middleware/requestLogger');
+app.use(requestLogger);
 
 // Middleware
 app.use(express.json());
@@ -74,7 +53,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Session configuration
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key-change-this',
+  secret: process.env.SESSION_SECRET ,
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
@@ -102,12 +81,14 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const apiRoutes = require('./routes/apiRoutes');
+const logRoutes = require('./routes/logRoutes');
 
 // Public API routes (accessible from frontend)
 app.use('/api', apiRoutes);
 
 // Admin routes
 app.use('/auth', authRoutes);
+app.use('/api/logs', logRoutes);
 app.use('/', adminRoutes);
 
 // 404 handler
@@ -190,7 +171,63 @@ app.listen(PORT, () => {
   console.log('✅ Request logging is ACTIVE');
   console.log('✅ Error logging is ACTIVE');
   console.log('ℹ️  All HTTP requests will be logged below...\n');
+  
+  // Setup booking automation cron jobs
+  setupBookingAutomation();
 });
+
+// Setup booking automation cron jobs
+function setupBookingAutomation() {
+  console.log('🤖 Setting up booking automation cron jobs...');
+  
+  // Run every hour for general booking tasks
+  cron.schedule('0 * * * *', async () => {
+    console.log('🔄 Running hourly booking automation...');
+    try {
+      await bookingAutomation.runAllTasks();
+    } catch (error) {
+      console.error('❌ Error in hourly booking automation:', error);
+    }
+  });
+
+  // Run daily at 9 AM for daily tasks
+  cron.schedule('0 9 * * *', async () => {
+    console.log('🌅 Running daily booking automation...');
+    try {
+      await bookingAutomation.updateActiveBookings();
+      await bookingAutomation.completeBookings();
+      await bookingAutomation.sendReminders();
+    } catch (error) {
+      console.error('❌ Error in daily booking automation:', error);
+    }
+  });
+
+  // Run weekly on Sunday at 2 AM for cleanup tasks
+  cron.schedule('0 2 * * 0', async () => {
+    console.log('🧹 Running weekly booking automation...');
+    try {
+      await bookingAutomation.runWeeklyTasks();
+    } catch (error) {
+      console.error('❌ Error in weekly booking automation:', error);
+    }
+  });
+
+  // Run every 30 minutes for pending payment reminders
+  cron.schedule('*/30 * * * *', async () => {
+    console.log('💳 Checking pending payments...');
+    try {
+      await bookingAutomation.processPendingPayments();
+    } catch (error) {
+      console.error('❌ Error in pending payment automation:', error);
+    }
+  });
+
+  console.log('✅ Booking automation cron jobs configured:');
+  console.log('   - Hourly: General booking tasks');
+  console.log('   - Daily (9 AM): Active/completed bookings, reminders');
+  console.log('   - Weekly (Sunday 2 AM): Calendar cleanup');
+  console.log('   - Every 30 minutes: Pending payment reminders');
+}
 
 module.exports = app;
 

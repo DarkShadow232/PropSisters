@@ -154,7 +154,7 @@
           <tbody>
             <% recentBookings.forEach(booking => { %>
               <tr>
-                <td><small class="font-monospace"><%= booking.id.substring(0, 8) %>...</small></td>
+                <td><small class="font-monospace"><%= booking.id.toString().substring(0, 8) %>...</small></td>
                 <td><%= booking.propertyTitle %></td>
                 <td><%= booking.userName %></td>
                 <td><%= new Date(booking.checkIn).toLocaleDateString() %></td>

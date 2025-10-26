@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-out Reminder - PropSisters</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #fd7e14 0%, #dc3545 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .reminder-details {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #fd7e14;
+        }
+        .checkout-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .checklist {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+        .highlight {
+            color: #fd7e14;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏠 Check-out Reminder</h1>
+        <p>Your stay is ending soon</p>
+    </div>
+    
+    <div class="content">
+        <h2>Hello <%= user.name || user.email %>!</h2>
+        <p>We hope you've enjoyed your stay at <strong><%= property.title %></strong>! Your check-out is approaching.</p>
+        
+        <div class="checkout-info">
+            <h3>📅 Check-out Information</h3>
+            <p><strong>Check-out Date:</strong> <span class="highlight"><%= checkOutDate %></span></p>
+            <p><strong>Property:</strong> <%= property.title %></p>
+            <p><strong>Location:</strong> <%= property.location %></p>
+            <p><strong>Address:</strong> <%= propertyAddress %></p>
+        </div>
+        
+        <div class="checklist">
+            <h3>✅ Check-out Checklist</h3>
+            <p>Please ensure you have completed the following before leaving:</p>
+            <ul>
+                <li>Remove all personal belongings</li>
+                <li>Clean up any mess or trash</li>
+                <li>Turn off all lights and electronics</li>
+                <li>Lock all doors and windows</li>
+                <li>Return any keys or access cards</li>
+                <li>Check all rooms and closets</li>
+            </ul>
+        </div>
+        
+        <div class="reminder-details">
+            <h3>🔑 Check-out Instructions</h3>
+            <p>• Please vacate the property by the scheduled check-out time</p>
+            <p>• Contact the property owner if you need to arrange a different time</p>
+            <p>• Leave the property in the same condition you found it</p>
+            <p>• Follow any specific check-out procedures provided by the owner</p>
+        </div>
+        
+        <div class="reminder-details">
+            <h3>📞 Contact Information</h3>
+            <p><strong>Property Owner:</strong> <%= property.ownerName %></p>
+            <p><strong>Owner Phone:</strong> <a href="tel:<%= property.ownerPhone %>"><%= property.ownerPhone %></a></p>
+            <p><strong>Owner Email:</strong> <a href="mailto:<%= property.ownerEmail %>"><%= property.ownerEmail %></a></p>
+            <p><strong>PropSisters Support:</strong> <%= process.env.ADMIN_EMAIL || 'admin@propsisters.com' %></p>
+        </div>
+        
+        <div class="reminder-details">
+            <h3>⭐ Feedback Request</h3>
+            <p>We would love to hear about your experience! Please consider:</p>
+            <p>• Leaving a review for the property</p>
+            <p>• Rating your overall experience</p>
+            <p>• Sharing any feedback or suggestions</p>
+            <p>• Recommending us to friends and family</p>
+        </div>
+        
+        <div class="reminder-details">
+            <h3>🔄 Future Bookings</h3>
+            <p>Thank you for choosing PropSisters! We hope to welcome you back soon.</p>
+            <p>• Browse our other amazing properties</p>
+            <p>• Book your next getaway</p>
+            <p>• Follow us for special offers</p>
+        </div>
+        
+        <p style="text-align: center; margin-top: 30px;">
+            <strong>Thank you for being a valued PropSisters guest!</strong>
+        </p>
+    </div>
+    
+    <div class="footer">
+        <p>© 2024 PropSisters. All rights reserved.</p>
+        <p>This is an automated email. Please do not reply to this message.</p>
+    </div>
+</body>
+</html>

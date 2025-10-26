@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { updateUserProfileData } from "@/services/userService";
-import { getBookingsByUserId } from "@/services/bookingService";
+import { authService } from "@/services/authService";
+import bookingService from "@/services/bookingService";
 import { toast } from "sonner";
-import type { FirestoreBooking } from "@/lib/firestore-collections";
+// Removed Firebase imports
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -53,7 +53,7 @@ const UserDashboardPage = () => {
   const [activeSection, setActiveSection] = useState("profile");
   const [loading, setLoading] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
-  const [bookings, setBookings] = useState<FirestoreBooking[]>([]);
+  const [bookings, setBookings] = useState<any[]>([]);
   const [bookingsLoading, setBookingsLoading] = useState(false);
   const [editFormData, setEditFormData] = useState({
     displayName: currentUser?.displayName || "",
@@ -76,7 +76,7 @@ const UserDashboardPage = () => {
       if (currentUser && (activeSection === "bookings" || activeSection === "profile")) {
         setBookingsLoading(true);
         try {
-          const userBookings = await getBookingsByUserId(currentUser.uid);
+          const userBookings = await bookingService.getUserBookings(currentUser.id);
           setBookings(userBookings);
         } catch (error) {
           console.error('Error loading bookings:', error);
@@ -110,8 +110,8 @@ const UserDashboardPage = () => {
 
       setLoading(true);
       
-      // Update user profile
-      await updateUserProfileData(currentUser.uid, {
+      // Update user profile using authService
+      await authService.updateProfile({
         displayName: editFormData.displayName,
         phoneNumber: editFormData.phoneNumber,
       });

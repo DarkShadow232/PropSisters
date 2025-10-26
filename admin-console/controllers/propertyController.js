@@ -5,14 +5,58 @@ const fs = require('fs').promises;
 // GET /properties - List all properties
 exports.listProperties = async (req, res) => {
   try {
-    const properties = await Rental.find()
-      .sort({ createdAt: -1 })
-      .lean();
+    const { search, status, priority, sort, limit = 10, page = 1 } = req.query;
+    const skip = (page - 1) * limit;
+
+    // Build query
+    const query = {};
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { location: { $regex: search, $options: 'i' } },
+        { address: { $regex: search, $options: 'i' } }
+      ];
+    }
+    if (status && status !== 'all') {
+      query.status = status;
+    }
+    if (priority && priority !== 'all') {
+      query.priority = priority;
+    }
+
+    // Build sort
+    let sortObj = { priority: -1, createdAt: -1 };
+    if (sort === 'oldest') {
+      sortObj = { createdAt: 1 };
+    } else if (sort === 'name') {
+      sortObj = { title: 1 };
+    } else if (sort === 'name-desc') {
+      sortObj = { title: -1 };
+    }
+
+    const [properties, total] = await Promise.all([
+      Rental.find(query)
+        .sort(sortObj)
+        .skip(skip)
+        .limit(parseInt(limit))
+        .lean(),
+      Rental.countDocuments(query)
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
 
     res.render('properties/index', {
       title: 'Properties',
       admin: req.admin,
       properties,
+      search,
+      status,
+      priority,
+      sort,
+      limit,
+      page: parseInt(page),
+      totalPages,
+      total,
       success: req.flash('success'),
       error: req.flash('error')
     });
@@ -53,7 +97,9 @@ exports.postCreateProperty = async (req, res) => {
       ownerName,
       ownerEmail,
       ownerPhone,
-      availability
+      availability,
+      priority,
+      status
     } = req.body;
 
     // Validate required fields
@@ -95,7 +141,9 @@ exports.postCreateProperty = async (req, res) => {
       ownerName: ownerName || 'Admin',
       ownerEmail: ownerEmail || req.admin.email,
       ownerPhone: ownerPhone || '',
-      availability: availability === 'true' || availability === true
+      availability: availability === 'true' || availability === true,
+      priority: parseInt(priority) || 0,
+      status: status || 'active'
     });
 
     await rental.save();
@@ -150,6 +198,8 @@ exports.postEditProperty = async (req, res) => {
       ownerEmail,
       ownerPhone,
       availability,
+      priority,
+      status,
       existingImages
     } = req.body;
 
@@ -208,6 +258,8 @@ exports.postEditProperty = async (req, res) => {
     property.ownerEmail = ownerEmail || property.ownerEmail;
     property.ownerPhone = ownerPhone || property.ownerPhone;
     property.availability = availability === 'true' || availability === true;
+    property.priority = parseInt(priority) || property.priority;
+    property.status = status || property.status;
 
     await property.save();
 

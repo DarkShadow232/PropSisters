@@ -21,8 +21,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Upload, Building, Brush, Sofa, Home, CheckCircle2, Sparkles, Camera, DollarSign, Palette, FileText, Send, Play, LogIn, UserPlus } from "lucide-react";
+import { Upload, Building, Brush, Sofa, Home, CheckCircle2, Sparkles, Camera, DollarSign, Palette, FileText, Send, Play, LogIn, UserPlus, Clock, Phone } from "lucide-react";
 import { toast } from "sonner";
+import finishRequestService from "@/services/finishRequestService";
 
 const FinishRequestPage = () => {
   const { currentUser } = useAuth();
@@ -31,6 +32,17 @@ const FinishRequestPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [showSignInDialog, setShowSignInDialog] = useState(false);
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    requestType: '',
+    propertyType: '',
+    budget: '',
+    timeline: '',
+    description: '',
+    location: '',
+    contactPhone: ''
+  });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -43,7 +55,14 @@ const FinishRequestPage = () => {
     setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Check if user is signed in
@@ -54,15 +73,41 @@ const FinishRequestPage = () => {
     
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      toast.success("Your finish request has been submitted successfully!", {
-        description: "Our team will review your request and get back to you soon.",
+    try {
+      // Use form state data
+      const requestData = {
+        requestType: formData.requestType,
+        propertyType: formData.propertyType,
+        budget: formData.budget,
+        timeline: formData.timeline,
+        description: formData.description,
+        location: formData.location,
+        contactPhone: formData.contactPhone,
+        attachments: files
+      };
+
+      // Submit to backend
+      const result = await finishRequestService.createFinishRequest(requestData);
+      
+      if (result.success) {
+        toast.success("Your finish request has been submitted successfully!", {
+          description: "Our team will review your request and get back to you soon.",
+        });
+        setFiles([]);
+        (e.target as HTMLFormElement).reset();
+      } else {
+        toast.error("Failed to submit request", {
+          description: result.error || "Please try again later.",
+        });
+      }
+    } catch (error) {
+      console.error('Error submitting finish request:', error);
+      toast.error("Failed to submit request", {
+        description: "Please try again later.",
       });
+    } finally {
       setIsSubmitting(false);
-      setFiles([]);
-      (e.target as HTMLFormElement).reset();
-    }, 1500);
+    }
   };
 
   const handleSignInRedirect = () => {
@@ -281,6 +326,8 @@ const FinishRequestPage = () => {
                       id="address" 
                       placeholder="Enter your complete address" 
                       className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b94a3b] focus:border-[#b94a3b] transition-all duration-300 bg-gray-50 hover:bg-white" 
+                      value={formData.location}
+                      onChange={(e) => handleInputChange('location', e.target.value)}
                       required 
                     />
                   </div>
@@ -291,14 +338,16 @@ const FinishRequestPage = () => {
                       <Brush className="h-4 w-4 text-[#d4574a]" />
                       Service Type
                     </Label>
-                    <Select required>
+                    <Select value={formData.requestType} onValueChange={(value) => handleInputChange('requestType', value)} required>
                       <SelectTrigger className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b94a3b] focus:border-[#b94a3b] transition-all duration-300 bg-gray-50 hover:bg-white">
                         <SelectValue placeholder="Select a service type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="full-design">Full Interior Design</SelectItem>
-                        <SelectItem value="furniture">Furniture Only</SelectItem>
-                        <SelectItem value="painting">Painting & Fixes</SelectItem>
+                        <SelectItem value="renovation">Renovation</SelectItem>
+                        <SelectItem value="decoration">Decoration</SelectItem>
+                        <SelectItem value="furnishing">Furnishing</SelectItem>
+                        <SelectItem value="maintenance">Maintenance</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -336,6 +385,85 @@ const FinishRequestPage = () => {
                       id="description" 
                       placeholder="Tell us about your design preferences, specific requirements, or any inspirations you have..." 
                       className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b94a3b] focus:border-[#b94a3b] transition-all duration-300 bg-gray-50 hover:bg-white resize-none min-h-[150px]" 
+                      value={formData.description}
+                      onChange={(e) => handleInputChange('description', e.target.value)}
+                      required 
+                    />
+                  </div>
+
+                  {/* Property Type */}
+                  <div className="space-y-3">
+                    <Label htmlFor="property-type" className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <Home className="h-4 w-4 text-[#b94a3b]" />
+                      Property Type
+                    </Label>
+                    <Select value={formData.propertyType} onValueChange={(value) => handleInputChange('propertyType', value)} required>
+                      <SelectTrigger className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b94a3b] focus:border-[#b94a3b] transition-all duration-300 bg-gray-50 hover:bg-white">
+                        <SelectValue placeholder="Select property type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="apartment">Apartment</SelectItem>
+                        <SelectItem value="villa">Villa</SelectItem>
+                        <SelectItem value="office">Office</SelectItem>
+                        <SelectItem value="commercial">Commercial</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Budget */}
+                  <div className="space-y-3">
+                    <Label htmlFor="budget" className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-green-500" />
+                      Budget Range
+                    </Label>
+                    <Select value={formData.budget} onValueChange={(value) => handleInputChange('budget', value)} required>
+                      <SelectTrigger className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b94a3b] focus:border-[#b94a3b] transition-all duration-300 bg-gray-50 hover:bg-white">
+                        <SelectValue placeholder="Select your budget range" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="under-10k">Under 10,000 EGP</SelectItem>
+                        <SelectItem value="10k-25k">10,000 - 25,000 EGP</SelectItem>
+                        <SelectItem value="25k-50k">25,000 - 50,000 EGP</SelectItem>
+                        <SelectItem value="50k-100k">50,000 - 100,000 EGP</SelectItem>
+                        <SelectItem value="100k-plus">100,000+ EGP</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Timeline */}
+                  <div className="space-y-3">
+                    <Label htmlFor="timeline" className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-blue-500" />
+                      Timeline
+                    </Label>
+                    <Select value={formData.timeline} onValueChange={(value) => handleInputChange('timeline', value)} required>
+                      <SelectTrigger className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b94a3b] focus:border-[#b94a3b] transition-all duration-300 bg-gray-50 hover:bg-white">
+                        <SelectValue placeholder="Select your preferred timeline" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="asap">ASAP</SelectItem>
+                        <SelectItem value="1-month">Within 1 month</SelectItem>
+                        <SelectItem value="2-3-months">2-3 months</SelectItem>
+                        <SelectItem value="3-6-months">3-6 months</SelectItem>
+                        <SelectItem value="flexible">Flexible</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Contact Phone */}
+                  <div className="space-y-3">
+                    <Label htmlFor="phone" className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-purple-500" />
+                      Contact Phone
+                    </Label>
+                    <Input 
+                      id="phone" 
+                      type="tel"
+                      placeholder="Enter your phone number" 
+                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b94a3b] focus:border-[#b94a3b] transition-all duration-300 bg-gray-50 hover:bg-white" 
+                      value={formData.contactPhone}
+                      onChange={(e) => handleInputChange('contactPhone', e.target.value)}
                       required 
                     />
                   </div>

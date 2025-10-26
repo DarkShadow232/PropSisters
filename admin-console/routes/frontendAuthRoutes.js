@@ -1,58 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const admin = require('firebase-admin');
 const User = require('../models/User');
-
-// Initialize Firebase Admin SDK (for Google Sign-In token verification only)
-let firebaseAdmin;
-try {
-  if (!admin.apps.length) {
-    firebaseAdmin = admin.initializeApp({
-      projectId: process.env.FIREBASE_PROJECT_ID || 'proparty-sister',
-    });
-  } else {
-    firebaseAdmin = admin.app();
-  }
-} catch (error) {
-  console.warn('Firebase Admin not initialized:', error.message);
-}
-
-/**
- * Middleware to verify Firebase ID token (for Google Sign-In only)
- */
-const verifyGoogleToken = async (req, res, next) => {
-  try {
-    const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        message: 'No token provided'
-      });
-    }
-
-    const idToken = authHeader.split('Bearer ')[1];
-    
-    if (!firebaseAdmin) {
-      console.error('Firebase Admin not initialized');
-      return res.status(500).json({
-        success: false,
-        message: 'Authentication service not available'
-      });
-    }
-
-    // Verify the Google token
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    req.googleUser = decodedToken;
-    next();
-  } catch (error) {
-    console.error('Token verification error:', error);
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid or expired token'
-    });
-  }
-};
 
 // ==================== EMAIL/PASSWORD AUTHENTICATION (MongoDB) ====================
 
@@ -95,7 +43,6 @@ router.post('/register', async (req, res) => {
       password,
       displayName,
       phoneNumber: phoneNumber || '',
-      authProvider: 'email',
       role: 'user',
       isEmailVerified: false // Can implement email verification later
     });
@@ -115,7 +62,6 @@ router.post('/register', async (req, res) => {
       phoneNumber: user.phoneNumber,
       photoURL: user.photoURL,
       role: user.role,
-      authProvider: user.authProvider
     };
 
     res.status(201).json({
@@ -158,13 +104,7 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Check if user registered with Google
-    if (user.isGoogleUser()) {
-      return res.status(400).json({
-        success: false,
-        message: 'This account uses Google Sign-In. Please sign in with Google.'
-      });
-    }
+    // User authentication is email/password only
 
     // Verify password
     const isMatch = await user.comparePassword(password);
@@ -189,7 +129,6 @@ router.post('/login', async (req, res) => {
       phoneNumber: user.phoneNumber,
       photoURL: user.photoURL,
       role: user.role,
-      authProvider: user.authProvider
     };
 
     res.json({
@@ -206,82 +145,8 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// ==================== GOOGLE OAUTH AUTHENTICATION ====================
-
-/**
- * POST /api/auth/google
- * Authenticate with Google (verify token and create/update user in MongoDB)
- */
-router.post('/google', verifyGoogleToken, async (req, res) => {
-  try {
-    const { uid, email, name, picture } = req.googleUser;
-
-    // Find user by Google ID or email
-    let user = await User.findOne({
-      $or: [
-        { googleId: uid },
-        { email: email.toLowerCase() }
-      ]
-    });
-    
-    if (!user) {
-      // Create new user with Google auth
-      user = new User({
-        googleId: uid,
-        email: email.toLowerCase(),
-        displayName: name || email.split('@')[0],
-        photoURL: picture || '',
-        authProvider: 'google',
-        role: 'user',
-        isEmailVerified: true // Google emails are pre-verified
-      });
-      
-      await user.save();
-    } else {
-      // Update existing user
-      if (!user.googleId) {
-        // If user registered with email/password, link Google account
-        user.googleId = uid;
-      }
-      
-      // Update profile info from Google
-      user.displayName = name || user.displayName;
-      user.photoURL = picture || user.photoURL;
-      user.updatedAt = new Date();
-      
-      await user.save();
-    }
-
-    // Create session
-    req.session.userId = user._id;
-    req.session.userEmail = user.email;
-    req.session.userName = user.displayName;
-    req.session.googleId = uid;
-
-    // Return user data
-    const userResponse = {
-      id: user._id,
-      email: user.email,
-      displayName: user.displayName,
-      phoneNumber: user.phoneNumber,
-      photoURL: user.photoURL,
-      role: user.role,
-      authProvider: user.authProvider
-    };
-
-    res.json({
-      success: true,
-      message: 'Authenticated with Google successfully',
-      user: userResponse
-    });
-  } catch (error) {
-    console.error('Google auth error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to authenticate with Google: ' + error.message
-    });
-  }
-});
+// ==================== GOOGLE OAUTH AUTHENTICATION REMOVED ====================
+// Google OAuth functionality has been removed to eliminate Firebase dependency
 
 // ==================== SESSION MANAGEMENT ====================
 
@@ -319,7 +184,6 @@ router.get('/verify', async (req, res) => {
         phoneNumber: user.phoneNumber,
         photoURL: user.photoURL,
         role: user.role,
-        authProvider: user.authProvider
       }
     });
   } catch (error) {
@@ -364,7 +228,7 @@ router.get('/me', async (req, res) => {
         phoneNumber: user.phoneNumber,
         photoURL: user.photoURL,
         role: user.role,
-        authProvider: user.authProvider,
+
         isEmailVerified: user.isEmailVerified,
         createdAt: user.createdAt
       }
@@ -493,13 +357,7 @@ router.post('/change-password', async (req, res) => {
       });
     }
 
-    // Check if user is using Google auth
-    if (user.isGoogleUser()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot change password for Google accounts'
-      });
-    }
+    // Password change is available for all users
 
     // Verify current password
     const isMatch = await user.comparePassword(currentPassword);

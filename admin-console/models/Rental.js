@@ -58,6 +58,41 @@ const rentalSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  priority: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 10
+  },
+  status: {
+    type: String,
+    enum: ['active', 'inactive', 'pending', 'maintenance', 'sold'],
+    default: 'active'
+  },
+  calendar: [{
+    date: {
+      type: Date,
+      required: true
+    },
+    available: {
+      type: Boolean,
+      default: true
+    },
+    price: Number,
+    bookingId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Booking'
+    }
+  }],
+  basePrice: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  pricePerDate: {
+    type: Map,
+    of: Number
+  },
   createdAt: {
     type: Date,
     default: Date.now

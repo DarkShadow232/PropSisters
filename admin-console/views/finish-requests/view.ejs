@@ -1,0 +1,189 @@
+<%- include('../partials/header') %>
+
+<div class="row mb-4">
+  <div class="col">
+    <h1 class="h3 mb-0">
+      <i class="bi bi-tools"></i> Finish Request Details
+    </h1>
+    <p class="text-muted">View and manage finish request</p>
+  </div>
+  <div class="col-auto">
+    <a href="/admin/finish-requests" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Requests
+    </a>
+  </div>
+</div>
+
+<% if (request) { %>
+<div class="row">
+  <!-- Request Details -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Request #<%= request._id.toString().substring(0, 8) %>...</h5>
+          <div>
+            <span class="badge bg-<%= request.status === 'pending' ? 'warning' : request.status === 'in-progress' ? 'info' : request.status === 'completed' ? 'success' : 'secondary' %>">
+              <%= request.status %>
+            </span>
+            <span class="badge bg-<%= request.priority === 'urgent' ? 'danger' : request.priority === 'high' ? 'warning' : request.priority === 'medium' ? 'info' : 'secondary' %> ms-2">
+              <%= request.priority %>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="text-muted">Request Type</h6>
+            <p class="mb-3"><%= request.requestType %></p>
+            
+            <h6 class="text-muted">Property Type</h6>
+            <p class="mb-3"><%= request.propertyType %></p>
+            
+            <h6 class="text-muted">Budget Range</h6>
+            <p class="mb-3"><%= request.budget %></p>
+            
+            <h6 class="text-muted">Timeline</h6>
+            <p class="mb-3"><%= request.timeline %></p>
+          </div>
+          <div class="col-md-6">
+            <h6 class="text-muted">Location</h6>
+            <p class="mb-3"><%= request.location %></p>
+            
+            <h6 class="text-muted">Contact Phone</h6>
+            <p class="mb-3"><%= request.contactPhone %></p>
+            
+            <h6 class="text-muted">Created At</h6>
+            <p class="mb-3"><%= new Date(request.createdAt).toLocaleString() %></p>
+            
+            <h6 class="text-muted">Last Updated</h6>
+            <p class="mb-3"><%= new Date(request.updatedAt).toLocaleString() %></p>
+          </div>
+        </div>
+        
+        <h6 class="text-muted">Description</h6>
+        <p class="mb-4"><%= request.description %></p>
+        
+        <% if (request.attachments && request.attachments.length > 0) { %>
+        <h6 class="text-muted">Attachments</h6>
+        <div class="row">
+          <% request.attachments.forEach(attachment => { %>
+          <div class="col-md-4 mb-3">
+            <div class="card">
+              <img src="<%= attachment.path %>" class="card-img-top" alt="Attachment" style="height: 150px; object-fit: cover;">
+              <div class="card-body p-2">
+                <small class="text-muted"><%= attachment.filename %></small>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Admin Actions -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Admin Actions</h5>
+      </div>
+      <div class="card-body">
+        <form id="updateRequestForm">
+          <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status">
+              <option value="pending" <%= request.status === 'pending' ? 'selected' : '' %>>Pending</option>
+              <option value="in-progress" <%= request.status === 'in-progress' ? 'selected' : '' %>>In Progress</option>
+              <option value="completed" <%= request.status === 'completed' ? 'selected' : '' %>>Completed</option>
+              <option value="cancelled" <%= request.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+              <option value="on-hold" <%= request.status === 'on-hold' ? 'selected' : '' %>>On Hold</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="priority" class="form-label">Priority</label>
+            <select class="form-select" id="priority" name="priority">
+              <option value="low" <%= request.priority === 'low' ? 'selected' : '' %>>Low</option>
+              <option value="medium" <%= request.priority === 'medium' ? 'selected' : '' %>>Medium</option>
+              <option value="high" <%= request.priority === 'high' ? 'selected' : '' %>>High</option>
+              <option value="urgent" <%= request.priority === 'urgent' ? 'selected' : '' %>>Urgent</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="estimatedCost" class="form-label">Estimated Cost (EGP)</label>
+            <input type="number" class="form-control" id="estimatedCost" name="estimatedCost" value="<%= request.estimatedCost || '' %>">
+          </div>
+          
+          <div class="mb-3">
+            <label for="adminNotes" class="form-label">Admin Notes</label>
+            <textarea class="form-control" id="adminNotes" name="adminNotes" rows="3"><%= request.adminNotes || '' %></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-check-circle"></i> Update Request
+          </button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- User Information -->
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">User Information</h5>
+      </div>
+      <div class="card-body">
+        <p><strong>Name:</strong> <%= request.userId ? request.userId.displayName || request.userId.email : 'N/A' %></p>
+        <p><strong>Email:</strong> <%= request.userId ? request.userId.email : 'N/A' %></p>
+        <p><strong>Phone:</strong> <%= request.contactPhone %></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('updateRequestForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  const updateData = {
+    status: formData.get('status'),
+    priority: formData.get('priority'),
+    estimatedCost: parseFloat(formData.get('estimatedCost')) || 0,
+    adminNotes: formData.get('adminNotes')
+  };
+  
+  try {
+    const response = await fetch(`/api/finish-requests/<%= request._id %>`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      alert('Request updated successfully!');
+      location.reload();
+    } else {
+      alert('Failed to update request: ' + data.error);
+    }
+  } catch (error) {
+    console.error('Error updating request:', error);
+    alert('Error updating request.');
+  }
+});
+</script>
+
+<% } else { %>
+<div class="alert alert-warning">
+  <i class="bi bi-exclamation-triangle"></i> Finish request not found.
+</div>
+<% } %>
+
+<%- include('../partials/footer') %>

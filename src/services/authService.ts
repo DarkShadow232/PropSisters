@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 export interface AuthResponse {
   success: boolean;
@@ -12,7 +12,6 @@ export interface AuthResponse {
     phoneNumber?: string;
     photoURL?: string;
     role: string;
-    authProvider: 'email' | 'google';
     isEmailVerified?: boolean;
   };
 }
@@ -30,8 +29,7 @@ export interface LoginData {
 }
 
 /**
- * Auth Service - MongoDB-first authentication
- * Firebase only used for Google OAuth
+ * Auth Service - MongoDB-based authentication
  */
 class AuthService {
   private axiosInstance;
@@ -51,7 +49,7 @@ class AuthService {
    */
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
-      const response = await this.axiosInstance.post('/api/auth/register', data);
+      const response = await this.axiosInstance.post('/auth/register', data);
       return response.data as AuthResponse;
     } catch (error: any) {
       console.error('Error registering user:', error);
@@ -64,7 +62,9 @@ class AuthService {
    */
   async login(data: LoginData): Promise<AuthResponse> {
     try {
-      const response = await this.axiosInstance.post('/api/auth/login', data);
+      console.log('AuthService: Making request to:', this.axiosInstance.defaults.baseURL + '/auth/login');
+      const response = await this.axiosInstance.post('/auth/login', data);
+      console.log('AuthService: Response received:', response.data);
       return response.data as AuthResponse;
     } catch (error: any) {
       console.error('Error logging in:', error);
@@ -72,30 +72,13 @@ class AuthService {
     }
   }
 
-  /**
-   * Authenticate with Google (Firebase token verification + MongoDB storage)
-   * @param firebaseToken - ID token from Firebase Google Sign-In
-   */
-  async authenticateWithGoogle(firebaseToken: string): Promise<AuthResponse> {
-    try {
-      const response = await this.axiosInstance.post('/api/auth/google', {}, {
-        headers: {
-          'Authorization': `Bearer ${firebaseToken}`
-        }
-      });
-      return response.data as AuthResponse;
-    } catch (error: any) {
-      console.error('Error authenticating with Google:', error);
-      throw new Error(error.response?.data?.message || 'Failed to authenticate with Google');
-    }
-  }
 
   /**
    * Verify current session
    */
   async verifySession(): Promise<AuthResponse> {
     try {
-      const response = await this.axiosInstance.get('/api/auth/verify');
+      const response = await this.axiosInstance.get('/auth/verify');
       return response.data as AuthResponse;
     } catch (error: any) {
       console.error('Error verifying session:', error);
@@ -108,7 +91,7 @@ class AuthService {
    */
   async getCurrentUser(): Promise<AuthResponse> {
     try {
-      const response = await this.axiosInstance.get('/api/auth/me');
+      const response = await this.axiosInstance.get('/auth/me');
       return response.data as AuthResponse;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to get current user');
@@ -120,7 +103,7 @@ class AuthService {
    */
   async logout(): Promise<void> {
     try {
-      await this.axiosInstance.post('/api/auth/logout');
+      await this.axiosInstance.post('/auth/logout');
     } catch (error) {
       console.error('Error logging out:', error);
       // Don't throw - still try to clean up locally
@@ -136,7 +119,7 @@ class AuthService {
     photoURL?: string 
   }): Promise<AuthResponse> {
     try {
-      const response = await this.axiosInstance.put('/api/auth/profile', updates);
+      const response = await this.axiosInstance.put('/auth/profile', updates);
       return response.data as AuthResponse;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to update profile');
@@ -148,7 +131,7 @@ class AuthService {
    */
   async changePassword(currentPassword: string, newPassword: string): Promise<AuthResponse> {
     try {
-      const response = await this.axiosInstance.post('/api/auth/change-password', {
+      const response = await this.axiosInstance.post('/auth/change-password', {
         currentPassword,
         newPassword
       });

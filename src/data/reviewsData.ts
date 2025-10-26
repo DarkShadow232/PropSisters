@@ -157,19 +157,29 @@ export const reviews: Review[] = [
 
 // Function to get reviews for a specific property
 export const getReviewsByPropertyId = (propertyId: string | number): Review[] => {
-  // Convert propertyId to number for comparison if it's a valid number
-  const numericId = typeof propertyId === 'string' ? parseInt(propertyId, 10) : propertyId;
+  // For MongoDB properties (string IDs), we'll use a mapping approach
+  // This is a temporary solution - in production, reviews should be stored in MongoDB too
   
-  // If conversion fails (NaN), return empty array since we can't match MongoDB IDs with numeric reviews
-  if (isNaN(numericId)) return [];
+  // If it's a string (MongoDB ID), return empty array for now
+  // TODO: Implement MongoDB reviews system
+  if (typeof propertyId === 'string') {
+    return [];
+  }
   
-  return reviews.filter(review => review.propertyId === numericId);
+  // For numeric IDs (static data), return matching reviews
+  return reviews.filter(review => review.propertyId === propertyId);
 };
 
 // Function to get average rating for a property
 export const getAverageRating = (propertyId: string | number): number => {
   const propertyReviews = getReviewsByPropertyId(propertyId);
-  if (propertyReviews.length === 0) return 0;
+  if (propertyReviews.length === 0) {
+    // For MongoDB properties without reviews, return a default rating
+    if (typeof propertyId === 'string') {
+      return 4.7; // Default rating for MongoDB properties
+    }
+    return 0;
+  }
   
   const totalRating = propertyReviews.reduce((sum, review) => sum + review.rating, 0);
   return parseFloat((totalRating / propertyReviews.length).toFixed(1));

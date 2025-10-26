@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Cancellation - PropSisters</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .cancellation-details {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #dc3545;
+        }
+        .refund-amount {
+            background: #28a745;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .reason-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+        .highlight {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>❌ Booking Cancelled</h1>
+        <p>Your booking has been cancelled successfully</p>
+    </div>
+    
+    <div class="content">
+        <h2>Hello <%= user.name || user.email %>!</h2>
+        <p>We're sorry to see you cancel your booking. Your cancellation has been processed and refund initiated.</p>
+        
+        <% if (refundAmount > 0) { %>
+        <div class="refund-amount">
+            Refund Amount: <%= refundAmount %> <%= currency %>
+        </div>
+        <% } %>
+        
+        <div class="cancellation-details">
+            <h3>📋 Cancellation Details</h3>
+            <p><strong>Property:</strong> <%= property.title %></p>
+            <p><strong>Location:</strong> <%= property.location %></p>
+            <p><strong>Original Check-in:</strong> <span class="highlight"><%= new Date(booking.checkIn).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span></p>
+            <p><strong>Original Check-out:</strong> <span class="highlight"><%= new Date(booking.checkOut).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span></p>
+            <p><strong>Cancellation Date:</strong> <span class="highlight"><%= cancellationDate %></span></p>
+            <p><strong>Booking ID:</strong> <%= booking._id %></p>
+        </div>
+        
+        <% if (reason) { %>
+        <div class="reason-box">
+            <h3>📝 Cancellation Reason</h3>
+            <p><%= reason %></p>
+        </div>
+        <% } %>
+        
+        <div class="cancellation-details">
+            <h3>💰 Refund Information</h3>
+            <% if (refundAmount > 0) { %>
+            <p><strong>Refund Amount:</strong> <span class="highlight"><%= refundAmount %> <%= currency %></span></p>
+            <p><strong>Refund Method:</strong> Original payment method</p>
+            <p><strong>Processing Time:</strong> 3-5 business days</p>
+            <p>Your refund will be processed to your original payment method. Please allow 3-5 business days for the refund to appear in your account.</p>
+            <% } else { %>
+            <p><strong>No Refund:</strong> This booking was cancelled outside the refund period.</p>
+            <% } %>
+        </div>
+        
+        <div class="cancellation-details">
+            <h3>🔄 Future Bookings</h3>
+            <p>We hope to see you again soon! You can browse our available properties and make a new booking anytime.</p>
+            <p>Visit our website to explore more amazing properties.</p>
+        </div>
+        
+        <div class="cancellation-details">
+            <h3>📞 Contact Information</h3>
+            <p>If you have any questions about this cancellation or refund, please contact us:</p>
+            <p><strong>Email:</strong> <%= process.env.ADMIN_EMAIL || 'admin@propsisters.com' %></p>
+            <p><strong>Phone:</strong> +20 XXX XXX XXXX</p>
+        </div>
+        
+        <p style="text-align: center; margin-top: 30px;">
+            <strong>Thank you for choosing PropSisters!</strong>
+        </p>
+    </div>
+    
+    <div class="footer">
+        <p>© 2024 PropSisters. All rights reserved.</p>
+        <p>This is an automated email. Please do not reply to this message.</p>
+    </div>
+</body>
+</html>

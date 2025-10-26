@@ -38,7 +38,7 @@ const upload = multer({
 router.get('/', async (req, res) => {
   try {
     const properties = await Rental.find({})
-      .sort({ createdAt: -1 })
+      .sort({ priority: -1, createdAt: -1 })
       .lean();
     
     res.json(properties);
@@ -78,7 +78,7 @@ router.get('/public', async (req, res) => {
     const [properties, total] = await Promise.all([
       Rental.find(query)
         .select('-__v')
-        .sort({ createdAt: -1 })
+        .sort({ priority: -1, createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit))
         .lean()
@@ -167,7 +167,7 @@ router.get('/admin', async (req, res) => {
     
     const [properties, total] = await Promise.all([
       Rental.find(query)
-        .sort({ createdAt: -1 })
+        .sort({ priority: -1, createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit))
         .lean(),
@@ -230,7 +230,8 @@ router.post('/admin', upload.array('images', 10), async (req, res) => {
     const {
       title, description, location, address, price,
       bedrooms, bathrooms, amenities,
-      ownerName, ownerEmail, ownerPhone, availability
+      ownerName, ownerEmail, ownerPhone, availability,
+      priority, status
     } = req.body;
 
     if (!title || !description || !location || !address || !price) {
@@ -267,7 +268,9 @@ router.post('/admin', upload.array('images', 10), async (req, res) => {
       ownerName: ownerName || 'Admin',
       ownerEmail: ownerEmail || req.admin.email,
       ownerPhone: ownerPhone || '',
-      availability: availability === 'true' || availability === true
+      availability: availability === 'true' || availability === true,
+      priority: parseInt(priority) || 0,
+      status: status || 'active'
     });
 
     await rental.save();
@@ -305,7 +308,7 @@ router.put('/admin/:id', upload.array('images', 10), async (req, res) => {
       title, description, location, address, price,
       bedrooms, bathrooms, amenities,
       ownerName, ownerEmail, ownerPhone, availability,
-      existingImages
+      priority, status, existingImages
     } = req.body;
 
     // Handle images
@@ -356,6 +359,8 @@ router.put('/admin/:id', upload.array('images', 10), async (req, res) => {
     property.availability = availability !== undefined 
       ? (availability === 'true' || availability === true) 
       : property.availability;
+    property.priority = priority !== undefined ? parseInt(priority) : property.priority;
+    property.status = status || property.status;
 
     await property.save();
 

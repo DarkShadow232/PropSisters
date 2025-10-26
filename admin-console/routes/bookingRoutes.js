@@ -1,25 +1,30 @@
 const express = require('express');
 const router = express.Router();
-const Booking = require('../models/Booking');
+const bookingController = require('../controllers/bookingController');
+const { isAuthenticated, isAdmin } = require('../middleware/authMiddleware');
 
-/**
- * GET /api/admin/bookings
- * Get all bookings with filters
- */
-router.get('/', async (req, res) => {
+// Public booking routes
+router.post('/create', isAuthenticated, bookingController.createBooking);
+router.post('/payment/callback', bookingController.handlePaymentCallback);
+router.get('/user/:userId', isAuthenticated, bookingController.getUserBookings);
+router.get('/property/:propertyId', bookingController.getBookingsByProperty);
+router.get('/:id', isAuthenticated, bookingController.getBookingDetails);
+router.post('/:id/cancel', isAuthenticated, bookingController.cancelBooking);
+
+// Admin booking routes
+router.get('/admin/all', isAdmin, async (req, res) => {
   try {
-    const { status, propertyId, userId, page = 1, limit = 10 } = req.query;
-    
-    const query = {};
-    if (status && status !== 'all') query.status = status;
-    if (propertyId) query.propertyId = propertyId;
-    if (userId) query.userId = userId;
+    const { status, page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
 
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-    
+    const query = {};
+    if (status && status !== 'all') {
+      query.bookingStatus = status;
+    }
+
     const [bookings, total] = await Promise.all([
       Booking.find(query)
-        .populate('propertyId', 'title')
+        .populate('propertyId', 'title location')
         .populate('userId', 'displayName email')
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -30,74 +35,61 @@ router.get('/', async (req, res) => {
 
     res.json({
       success: true,
-      data: bookings,
+      bookings: bookings.map(booking => ({
+        id: booking._id,
+        property: {
+          id: booking.propertyId._id,
+          title: booking.propertyId.title,
+          location: booking.propertyId.location
+        },
+        user: {
+          id: booking.userId._id,
+          name: booking.userId.displayName || booking.userId.email,
+          email: booking.userId.email
+        },
+        checkIn: booking.checkIn,
+        checkOut: booking.checkOut,
+        guests: booking.guests,
+        totalAmount: booking.totalAmount,
+        currency: booking.currency,
+        bookingStatus: booking.bookingStatus,
+        paymentStatus: booking.paymentStatus,
+        confirmationCode: booking.confirmationCode,
+        createdAt: booking.createdAt
+      })),
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        pages: Math.ceil(total / parseInt(limit))
+        current: parseInt(page),
+        pages: Math.ceil(total / limit),
+        total
       }
     });
   } catch (error) {
-    console.error('List bookings error:', error);
+    console.error('Error getting all bookings:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch bookings'
+      error: 'Failed to get bookings'
     });
   }
 });
 
-/**
- * GET /api/admin/bookings/:id
- * Get single booking with details
- */
-router.get('/:id', async (req, res) => {
+router.patch('/admin/:id/status', isAdmin, async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id)
-      .populate('propertyId')
-      .populate('userId')
-      .lean();
-    
-    if (!booking) {
-      return res.status(404).json({
-        success: false,
-        error: 'Booking not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      data: booking
-    });
-  } catch (error) {
-    console.error('Get booking error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch booking'
-    });
-  }
-});
-
-/**
- * PATCH /api/admin/bookings/:id/status
- * Update booking status
- */
-router.patch('/:id/status', async (req, res) => {
-  try {
+    const { id } = req.params;
     const { status } = req.body;
 
-    if (!['pending', 'confirmed', 'cancelled'].includes(status)) {
+    const validStatuses = ['pending', 'confirmed', 'active', 'completed', 'cancelled'];
+    if (!validStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
-        error: 'Invalid status. Must be: pending, confirmed, or cancelled'
+        error: 'Invalid status'
       });
     }
 
     const booking = await Booking.findByIdAndUpdate(
-      req.params.id,
-      { status },
+      id,
+      { bookingStatus: status },
       { new: true }
-    ).populate('propertyId', 'title').populate('userId', 'displayName email');
+    ).populate('propertyId').populate('userId');
 
     if (!booking) {
       return res.status(404).json({
@@ -106,13 +98,23 @@ router.patch('/:id/status', async (req, res) => {
       });
     }
 
+    // Send notification email if status changed to confirmed
+    if (status === 'confirmed' && booking.emailSent === false) {
+      const emailService = require('../services/emailService');
+      await emailService.sendBookingConfirmation(booking, booking.userId, booking.propertyId);
+    }
+
     res.json({
       success: true,
-      message: `Booking status updated to ${status}`,
-      data: booking
+      booking: {
+        id: booking._id,
+        bookingStatus: booking.bookingStatus,
+        paymentStatus: booking.paymentStatus,
+        confirmationCode: booking.confirmationCode
+      }
     });
   } catch (error) {
-    console.error('Update booking status error:', error);
+    console.error('Error updating booking status:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to update booking status'
@@ -120,14 +122,63 @@ router.patch('/:id/status', async (req, res) => {
   }
 });
 
-/**
- * DELETE /api/admin/bookings/:id
- * Delete booking
- */
-router.delete('/:id', async (req, res) => {
+// Get booking statistics for admin dashboard
+router.get('/admin/stats', isAdmin, async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id);
+    const Booking = require('../models/Booking');
     
+    const [
+      totalBookings,
+      pendingBookings,
+      confirmedBookings,
+      activeBookings,
+      completedBookings,
+      cancelledBookings,
+      totalRevenue
+    ] = await Promise.all([
+      Booking.countDocuments(),
+      Booking.countDocuments({ bookingStatus: 'pending' }),
+      Booking.countDocuments({ bookingStatus: 'confirmed' }),
+      Booking.countDocuments({ bookingStatus: 'active' }),
+      Booking.countDocuments({ bookingStatus: 'completed' }),
+      Booking.countDocuments({ bookingStatus: 'cancelled' }),
+      Booking.aggregate([
+        { $match: { paymentStatus: 'paid' } },
+        { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+      ])
+    ]);
+
+    res.json({
+      success: true,
+      stats: {
+        totalBookings,
+        pendingBookings,
+        confirmedBookings,
+        activeBookings,
+        completedBookings,
+        cancelledBookings,
+        totalRevenue: totalRevenue[0]?.total || 0
+      }
+    });
+  } catch (error) {
+    console.error('Error getting booking stats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get booking statistics'
+    });
+  }
+});
+
+// Resend confirmation email
+router.post('/admin/:id/resend-email', isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { type } = req.body; // 'confirmation', 'receipt', 'cancellation'
+
+    const booking = await Booking.findById(id)
+      .populate('propertyId')
+      .populate('userId');
+
     if (!booking) {
       return res.status(404).json({
         success: false,
@@ -135,20 +186,39 @@ router.delete('/:id', async (req, res) => {
       });
     }
 
-    await Booking.findByIdAndDelete(req.params.id);
+    const emailService = require('../services/emailService');
+    
+    switch (type) {
+      case 'confirmation':
+        await emailService.sendBookingConfirmation(booking, booking.userId, booking.propertyId);
+        break;
+      case 'receipt':
+        const payment = await Payment.findOne({ bookingId: id });
+        if (payment) {
+          await emailService.sendPaymentReceipt(booking, payment, booking.userId, booking.propertyId);
+        }
+        break;
+      case 'cancellation':
+        await emailService.sendCancellationEmail(booking, 0, booking.userId, booking.propertyId);
+        break;
+      default:
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid email type'
+        });
+    }
 
     res.json({
       success: true,
-      message: 'Booking deleted successfully'
+      message: `${type} email sent successfully`
     });
   } catch (error) {
-    console.error('Delete booking error:', error);
+    console.error('Error resending email:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to delete booking'
+      error: 'Failed to resend email'
     });
   }
 });
 
 module.exports = router;
-

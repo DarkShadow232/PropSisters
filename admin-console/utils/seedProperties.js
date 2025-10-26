@@ -20,6 +20,7 @@ const originalProperties = [
     location: "Madinaty, Egypt - Building B6, Group 65, Third Floor",
     address: "Building B6, Group 65, Madinaty, New Cairo, Egypt",
     price: 3000,
+    basePrice: 3000,
     bedrooms: 2,
     bathrooms: 1,
     amenities: ["WiFi", "Air Conditioning", "Wide Garden View", "Premium Special Finishes", "Fully Equipped", "Wired Internet", "Facing Services", "Brand New", "Third Floor", "Group 65"],
@@ -40,7 +41,11 @@ const originalProperties = [
     ownerName: "Property Sisters",
     ownerEmail: "info@propsisters.eg",
     ownerPhone: "+201000474991",
-    availability: true
+    availability: true,
+    priority: 5,
+    status: 'active',
+    calendar: [],
+    pricePerDate: {}
   },
   {
     title: "Modern Two-Bedroom Apartment, Fifth Floor",
@@ -48,6 +53,7 @@ const originalProperties = [
     location: "Madinaty, Egypt - Building B11, Group 113",
     address: "Building B11, Group 113, Madinaty, New Cairo, Egypt",
     price: 3000,
+    basePrice: 3000,
     bedrooms: 2,
     bathrooms: 1,
     amenities: ["WiFi", "Air Conditioning", "Security Doors", "Near Services", "Fully Equipped", "Internet", "High Floor", "Safe Location"],
@@ -65,7 +71,11 @@ const originalProperties = [
     ownerName: "Property Sisters",
     ownerEmail: "info@propsisters.eg",
     ownerPhone: "+201000474991",
-    availability: true
+    availability: true,
+    priority: 5,
+    status: 'active',
+    calendar: [],
+    pricePerDate: {}
   },
   {
     title: "Boho-Style Two-Bedroom Apartment, First Floor",
@@ -73,6 +83,7 @@ const originalProperties = [
     location: "Madinaty, Egypt - Building B8, Group 86",
     address: "Building B8, Group 86, Madinaty, New Cairo, Egypt",
     price: 3000,
+    basePrice: 3000,
     bedrooms: 2,
     bathrooms: 1,
     amenities: ["WiFi", "Air Conditioning", "Boho Design", "First Floor", "Fully Equipped", "Internet", "Stylish Interior", "Modern Amenities"],
@@ -94,7 +105,11 @@ const originalProperties = [
     ownerName: "Property Sisters",
     ownerEmail: "info@propsisters.eg",
     ownerPhone: "+201000474991",
-    availability: true
+    availability: true,
+    priority: 5,
+    status: 'active',
+    calendar: [],
+    pricePerDate: {}
   },
   {
     title: "Spacious Two-Bedroom Ground Floor Apartment",
@@ -102,6 +117,7 @@ const originalProperties = [
     location: "Madinaty, Egypt - Building B11, Group 113",
     address: "Building B11, Group 113, Madinaty, New Cairo, Egypt",
     price: 3000,
+    basePrice: 3000,
     bedrooms: 2,
     bathrooms: 2,
     amenities: ["WiFi", "Air Conditioning", "Two Bathrooms", "Ground Floor", "Near Strip Mall", "Fully Equipped", "Internet", "Easy Access"],
@@ -125,7 +141,11 @@ const originalProperties = [
     ownerName: "Property Sisters",
     ownerEmail: "info@propsisters.eg",
     ownerPhone: "+201000474991",
-    availability: true
+    availability: true,
+    priority: 5,
+    status: 'active',
+    calendar: [],
+    pricePerDate: {}
   },
   {
     title: "Convenient First Floor Apartment Near Carrefour",
@@ -133,6 +153,7 @@ const originalProperties = [
     location: "Madinaty, Egypt - Building B12, Group 122",
     address: "Near Carrefour, Madinaty, New Cairo, Egypt",
     price: 3000,
+    basePrice: 3000,
     bedrooms: 2,
     bathrooms: 1,
     amenities: ["WiFi", "Air Conditioning", "Near Carrefour", "First Floor", "Fully Equipped", "Internet", "Shopping Access", "Easy Access"],
@@ -154,7 +175,11 @@ const originalProperties = [
     ownerName: "Property Sisters",
     ownerEmail: "info@propsisters.eg",
     ownerPhone: "+201000474991",
-    availability: true
+    availability: true,
+    priority: 5,
+    status: 'active',
+    calendar: [],
+    pricePerDate: {}
   },
   {
     title: "Luxury Two-Bedroom Apartment with Two Bathrooms",
@@ -162,6 +187,7 @@ const originalProperties = [
     location: "Madinaty, Egypt - Building B6, Group 68",
     address: "Building B6, Group 68, Madinaty, New Cairo, Egypt",
     price: 2500,
+    basePrice: 2500,
     bedrooms: 2,
     bathrooms: 2,
     amenities: ["WiFi", "Air Conditioning", "Two Bathrooms", "Second Floor", "Near Services", "Fully Equipped", "Internet", "Premium Location"],
@@ -188,7 +214,11 @@ const originalProperties = [
     ownerName: "Property Sisters",
     ownerEmail: "info@propsisters.eg",
     ownerPhone: "+201000474991",
-    availability: true
+    availability: true,
+    priority: 5,
+    status: 'active',
+    calendar: [],
+    pricePerDate: {}
   },
   {
     title: "Cozy Studio Apartment, Ground Floor",
@@ -196,6 +226,7 @@ const originalProperties = [
     location: "Madinaty, Egypt - Building B6, Group 64",
     address: "Building B6, Group 64, Madinaty, New Cairo, Egypt",
     price: 2500,
+    basePrice: 2500,
     bedrooms: 0,
     bathrooms: 1,
     amenities: ["WiFi", "Air Conditioning", "Studio Layout", "Ground Floor", "Fully Equipped", "Internet", "Easy Access", "Compact Living"],
@@ -217,7 +248,11 @@ const originalProperties = [
     ownerName: "Property Sisters",
     ownerEmail: "info@propsisters.eg",
     ownerPhone: "+201000474991",
-    availability: true
+    availability: true,
+    priority: 5,
+    status: 'active',
+    calendar: [],
+    pricePerDate: {}
   },
   {
     title: "Spacious Three-Bedroom Garden View Apartment",
@@ -225,6 +260,7 @@ const originalProperties = [
     location: "Madinaty, Egypt - Building B11, Group 111",
     address: "Building B11, Group 111, Madinaty, New Cairo, Egypt",
     price: 2500,
+    basePrice: 2500,
     bedrooms: 3,
     bathrooms: 2,
     amenities: ["WiFi", "Air Conditioning", "Three Bedrooms", "Garden View", "Near Carrefour", "Two Bathrooms", "Fourth Floor", "Internet"],
@@ -245,7 +281,11 @@ const originalProperties = [
     ownerName: "Property Sisters",
     ownerEmail: "info@propsisters.eg",
     ownerPhone: "+201000474991",
-    availability: true
+    availability: true,
+    priority: 5,
+    status: 'active',
+    calendar: [],
+    pricePerDate: {}
   },
   {
     title: "Premium Two-Bedroom Apartment with Hotel-Style Furnishing",
@@ -253,6 +293,7 @@ const originalProperties = [
     location: "Madinaty, Egypt - Building B6, Group 68",
     address: "Building B6, Group 68, Madinaty, New Cairo, Egypt",
     price: 2500,
+    basePrice: 2500,
     bedrooms: 2,
     bathrooms: 2,
     amenities: ["WiFi", "Air Conditioning", "Hotel Furnishing", "Premium Finishes", "Two Bathrooms", "Third Floor", "Fully Equipped", "Internet"],
@@ -265,7 +306,11 @@ const originalProperties = [
     ownerName: "Property Sisters",
     ownerEmail: "info@propsisters.eg",
     ownerPhone: "+201000474991",
-    availability: true
+    availability: true,
+    priority: 5,
+    status: 'active',
+    calendar: [],
+    pricePerDate: {}
   }
 ];
 
@@ -276,6 +321,7 @@ const testProperty = {
   location: "Test Location - Madinaty, Egypt",
   address: "Test Address, Madinaty, New Cairo, Egypt",
   price: 1000,
+  basePrice: 1000,
   bedrooms: 1,
   bathrooms: 1,
   amenities: ["Test Amenity", "WiFi", "Air Conditioning"],
@@ -290,9 +336,9 @@ async function seedProperties() {
   try {
     // Connect to MongoDB
     console.log('Connecting to MongoDB...');
-    console.log('MongoDB URI:', process.env.MONGODB_URI || 'mongodb://localhost:27017/rental-admin');
+    console.log('MongoDB URI:', process.env.MONGODB_URI || 'mongodb://localhost:27017/test');
     
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/rental-admin', {
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/test', {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });

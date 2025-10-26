@@ -16,10 +16,10 @@ import { rentals } from "@/data/rentalData";
 import { Apartment } from "@/data/rentalData";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { createBooking, checkDateAvailability } from "@/services/bookingService";
+import bookingService from "@/services/bookingService";
 import { processPayment, PaymentRequest } from "@/services/paymentService";
 import PaymentGatewaySelector from "@/components/PaymentGatewaySelector";
-import { Timestamp } from "firebase/firestore";
+import { fetchPropertyByIdFromMongo, convertMongoToApartment } from "@/services/mongoPropertyService";
 
 // Removed PayPalIcon component - now handled by PaymentGatewaySelector
 
@@ -27,8 +27,11 @@ const BookingPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [rental, setRental] = useState<Apartment | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<{
     from: Date | undefined;
     to: Date | undefined;
@@ -70,8 +73,39 @@ const BookingPage = () => {
     routingNumber: ""
   });
   
-  // Find the rental by ID
-  const rental = rentals.find((r) => r.id === Number(id));
+  // Fetch the rental by ID from MongoDB
+  useEffect(() => {
+    const fetchRental = async () => {
+      if (!id) {
+        console.log('⚠️ No ID provided');
+        return;
+      }
+      
+      console.log('🏠 Fetching rental details for booking ID:', id);
+      
+      try {
+        setLoading(true);
+        setError(null);
+        const mongoProperty = await fetchPropertyByIdFromMongo(id);
+        
+        if (mongoProperty) {
+          console.log('✅ Property loaded successfully for booking:', mongoProperty.title);
+          const apartment = convertMongoToApartment(mongoProperty);
+          setRental(apartment);
+        } else {
+          console.error('❌ Property not found for ID:', id);
+          setError("Property not found");
+        }
+      } catch (err) {
+        console.error("❌ Error fetching property:", err);
+        setError("Failed to load property details. Please make sure the admin console is running.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchRental();
+  }, [id]);
   
   // Calculate total nights
   const calculateNights = () => {
@@ -172,7 +206,7 @@ const BookingPage = () => {
     e.preventDefault();
     
     // Check if user is authenticated
-    if (!user) {
+    if (!currentUser) {
       toast({
         title: "Authentication Required",
         description: "Please log in to complete your booking.",
@@ -200,22 +234,8 @@ const BookingPage = () => {
     setIsSubmitting(true);
     
     try {
-      // Check date availability
-      const isAvailable = await checkDateAvailability(
-        id!,
-        selectedDates.from,
-        selectedDates.to
-      );
-      
-      if (!isAvailable) {
-        toast({
-          title: "Dates Not Available",
-          description: "The selected dates are already booked. Please choose different dates.",
-          variant: "destructive",
-        });
-        setIsSubmitting(false);
-        return;
-      }
+      // Note: Availability is already checked in the calendar on the property details page
+      // The calendar shows real booking data and prevents selection of booked dates
       
       // Process payment first
       const paymentRequest: PaymentRequest = {
@@ -256,22 +276,32 @@ const BookingPage = () => {
       // Create booking data
       const bookingData = {
         propertyId: id!,
-        userId: user.uid,
-        checkIn: selectedDates.from,
-        checkOut: selectedDates.to,
+        checkIn: selectedDates.from.toISOString().split('T')[0],
+        checkOut: selectedDates.to.toISOString().split('T')[0],
         guests: 1, // You can add a guest selector later
-        totalPrice: calculateTotal(),
-        status: 'confirmed' as const, // Payment successful
         specialRequests: formData.specialRequests,
         cleaningService: formData.cleaningService,
         airportPickup: formData.airportPickup,
         earlyCheckIn: formData.earlyCheckIn,
-        paymentMethod: formData.paymentMethod,
-        transactionId: paymentResult.transactionId
+        billingData: {
+          first_name: currentUser?.displayName?.split(' ')[0] || '',
+          last_name: currentUser?.displayName?.split(' ').slice(1).join(' ') || '',
+          email: currentUser?.email || '',
+          phone_number: currentUser?.phoneNumber || '',
+          apartment: '',
+          floor: '',
+          street: '',
+          building: '',
+          postal_code: '',
+          city: '',
+          country: 'EG',
+          state: ''
+        }
       };
       
-      // Save booking to Firebase
-      const bookingId = await createBooking(bookingData);
+      // Save booking to backend
+      const bookingResponse = await bookingService.createBooking(bookingData);
+      const bookingId = bookingResponse.bookingId;
       
       // Show success toast
       toast({
@@ -297,11 +327,20 @@ const BookingPage = () => {
     }
   };
   
-  if (!rental) {
+  if (loading) {
+    return (
+      <div className="container-custom py-16 text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+        <p className="text-foreground/70">Loading property details...</p>
+      </div>
+    );
+  }
+  
+  if (error || !rental) {
     return (
       <div className="container-custom py-16 text-center">
         <h1 className="text-2xl font-medium mb-4">Property Not Found</h1>
-        <p className="mb-6">The property you're looking for doesn't exist or has been removed.</p>
+        <p className="mb-6">{error || "The property you're looking for doesn't exist or has been removed."}</p>
         <Button onClick={() => navigate("/rentals")}>Back to Rentals</Button>
       </div>
     );

@@ -34,6 +34,52 @@ const bookingSchema = new mongoose.Schema({
     enum: ['pending', 'confirmed', 'cancelled'],
     default: 'pending'
   },
+  paymentStatus: {
+    type: String,
+    enum: ['pending', 'paid', 'failed', 'refunded', 'cancelled'],
+    default: 'pending'
+  },
+  paymobData: {
+    paymentKey: String,
+    transactionId: String,
+    orderId: String,
+    paymentToken: String,
+    hmac: String
+  },
+  paymentMethod: {
+    type: String,
+    enum: ['card', 'wallet', 'bank_transfer', 'valu', 'fawry'],
+    default: 'card'
+  },
+  totalAmount: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  currency: {
+    type: String,
+    default: 'EGP'
+  },
+  bookingStatus: {
+    type: String,
+    enum: ['pending', 'confirmed', 'active', 'completed', 'cancelled'],
+    default: 'pending'
+  },
+  confirmationCode: String,
+  emailSent: {
+    type: Boolean,
+    default: false
+  },
+  emailSentAt: Date,
+  cancellationPolicy: {
+    canCancel: {
+      type: Boolean,
+      default: true
+    },
+    refundPercentage: Number,
+    cancelledAt: Date,
+    cancellationReason: String
+  },
   specialRequests: {
     type: String,
     default: ''

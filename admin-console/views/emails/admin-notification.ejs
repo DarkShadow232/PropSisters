@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Notification - PropSisters</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .notification-details {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #6f42c1;
+        }
+        .alert-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+        .highlight {
+            color: #6f42c1;
+            font-weight: bold;
+        }
+        .urgent {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔔 Admin Notification</h1>
+        <p><%= type.replace('_', ' ').toUpperCase() %> - <%= notificationDate %></p>
+    </div>
+    
+    <div class="content">
+        <h2>Admin Alert</h2>
+        <p>A new <%= type.replace('_', ' ') %> has occurred in the PropSisters system that requires your attention.</p>
+        
+        <div class="alert-box <%= type === 'payment_failed' ? 'urgent' : '' %>">
+            <h3>⚠️ <%= type === 'payment_failed' ? 'URGENT' : 'NOTIFICATION' %></h3>
+            <p><strong>Type:</strong> <%= type.replace('_', ' ').toUpperCase() %></p>
+            <p><strong>Time:</strong> <%= notificationDate %></p>
+        </div>
+        
+        <div class="notification-details">
+            <h3>📋 Booking Information</h3>
+            <p><strong>Booking ID:</strong> <%= booking._id %></p>
+            <p><strong>Property:</strong> <%= property.title %></p>
+            <p><strong>Location:</strong> <%= property.location %></p>
+            <p><strong>Check-in:</strong> <span class="highlight"><%= new Date(booking.checkIn).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span></p>
+            <p><strong>Check-out:</strong> <span class="highlight"><%= new Date(booking.checkOut).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span></p>
+            <p><strong>Guests:</strong> <%= booking.guests %></p>
+            <p><strong>Total Amount:</strong> <%= booking.totalAmount %> <%= booking.currency %></p>
+            <p><strong>Status:</strong> <span class="highlight"><%= booking.bookingStatus %></span></p>
+            <p><strong>Payment Status:</strong> <span class="highlight"><%= booking.paymentStatus %></span></p>
+        </div>
+        
+        <div class="notification-details">
+            <h3>👤 Customer Information</h3>
+            <p><strong>Name:</strong> <%= user.name || 'N/A' %></p>
+            <p><strong>Email:</strong> <%= user.email %></p>
+            <p><strong>Phone:</strong> <%= user.phone || 'N/A' %></p>
+            <p><strong>User ID:</strong> <%= user._id %></p>
+        </div>
+        
+        <div class="notification-details">
+            <h3>🏠 Property Details</h3>
+            <p><strong>Owner:</strong> <%= property.ownerName %></p>
+            <p><strong>Owner Email:</strong> <%= property.ownerEmail %></p>
+            <p><strong>Owner Phone:</strong> <%= property.ownerPhone %></p>
+            <p><strong>Property ID:</strong> <%= property._id %></p>
+        </div>
+        
+        <% if (type === 'new_booking') { %>
+        <div class="alert-box">
+            <h3>✅ Action Required</h3>
+            <p>• Review the booking details</p>
+            <p>• Contact the property owner if needed</p>
+            <p>• Monitor payment status</p>
+            <p>• Send confirmation to customer</p>
+        </div>
+        <% } %>
+        
+        <% if (type === 'cancellation') { %>
+        <div class="alert-box">
+            <h3>🔄 Action Required</h3>
+            <p>• Process refund if applicable</p>
+            <p>• Update property availability</p>
+            <p>• Notify property owner</p>
+            <p>• Update booking status</p>
+        </div>
+        <% } %>
+        
+        <% if (type === 'payment_failed') { %>
+        <div class="alert-box urgent">
+            <h3>🚨 URGENT ACTION REQUIRED</h3>
+            <p>• Contact customer immediately</p>
+            <p>• Check payment gateway status</p>
+            <p>• Attempt alternative payment method</p>
+            <p>• Update booking status</p>
+        </div>
+        <% } %>
+        
+        <div class="notification-details">
+            <h3>🔗 Quick Actions</h3>
+            <p>• <strong>View Booking:</strong> Admin Dashboard → Bookings → <%= booking._id %></p>
+            <p>• <strong>Contact Customer:</strong> <%= user.email %></p>
+            <p>• <strong>Property Owner:</strong> <%= property.ownerEmail %></p>
+            <p>• <strong>System Logs:</strong> Check payment and booking logs</p>
+        </div>
+        
+        <p style="text-align: center; margin-top: 30px;">
+            <strong>Please take appropriate action as soon as possible.</strong>
+        </p>
+    </div>
+    
+    <div class="footer">
+        <p>© 2024 PropSisters Admin System</p>
+        <p>This is an automated notification. Please check the admin dashboard for more details.</p>
+    </div>
+</body>
+</html>

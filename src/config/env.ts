@@ -2,16 +2,6 @@
 // This file centralizes all environment variable access
 
 export const ENV = {
-  // Firebase Configuration
-  FIREBASE: {
-    API_KEY: import.meta.env.VITE_FIREBASE_API_KEY,
-    AUTH_DOMAIN: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    PROJECT_ID: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    STORAGE_BUCKET: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    MESSAGING_SENDER_ID: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    APP_ID: import.meta.env.VITE_FIREBASE_APP_ID,
-    MEASUREMENT_ID: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-  },
 
   // Application Settings
   APP: {
@@ -99,15 +89,5 @@ export const isDevelopment = () => ENV.APP.NODE_ENV === 'development';
 // Helper function to check if we're in production
 export const isProduction = () => ENV.APP.NODE_ENV === 'production';
 
-// Helper function to get Firebase config object
-export const getFirebaseConfig = () => ({
-  apiKey: ENV.FIREBASE.API_KEY,
-  authDomain: ENV.FIREBASE.AUTH_DOMAIN,
-  projectId: ENV.FIREBASE.PROJECT_ID,
-  storageBucket: ENV.FIREBASE.STORAGE_BUCKET,
-  messagingSenderId: ENV.FIREBASE.MESSAGING_SENDER_ID,
-  appId: ENV.FIREBASE.APP_ID,
-  measurementId: ENV.FIREBASE.MEASUREMENT_ID,
-});
 
 export default ENV;

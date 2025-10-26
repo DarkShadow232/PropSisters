@@ -138,9 +138,38 @@
 
       <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-white">
-          <h5 class="mb-0">Availability</h5>
+          <h5 class="mb-0">Property Settings</h5>
         </div>
         <div class="card-body">
+          <div class="mb-3">
+            <label for="priority" class="form-label">Priority Level</label>
+            <select class="form-select" id="priority" name="priority">
+              <option value="0" <%= property.priority == 0 ? 'selected' : '' %>>Normal (0)</option>
+              <option value="1" <%= property.priority == 1 ? 'selected' : '' %>>Low (1)</option>
+              <option value="2" <%= property.priority == 2 ? 'selected' : '' %>>Medium (2)</option>
+              <option value="3" <%= property.priority == 3 ? 'selected' : '' %>>High (3)</option>
+              <option value="4" <%= property.priority == 4 ? 'selected' : '' %>>Very High (4)</option>
+              <option value="5" <%= property.priority == 5 ? 'selected' : '' %>>Premium (5)</option>
+              <option value="6" <%= property.priority == 6 ? 'selected' : '' %>>Featured (6)</option>
+              <option value="7" <%= property.priority == 7 ? 'selected' : '' %>>Top Featured (7)</option>
+              <option value="8" <%= property.priority == 8 ? 'selected' : '' %>>VIP (8)</option>
+              <option value="9" <%= property.priority == 9 ? 'selected' : '' %>>Ultimate (9)</option>
+              <option value="10" <%= property.priority == 10 ? 'selected' : '' %>>Company Priority (10)</option>
+            </select>
+            <small class="form-text text-muted">Higher priority properties appear first</small>
+          </div>
+
+          <div class="mb-3">
+            <label for="status" class="form-label">Property Status</label>
+            <select class="form-select" id="status" name="status">
+              <option value="active" <%= property.status === 'active' ? 'selected' : '' %>>Active</option>
+              <option value="pending" <%= property.status === 'pending' ? 'selected' : '' %>>Pending</option>
+              <option value="inactive" <%= property.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+              <option value="maintenance" <%= property.status === 'maintenance' ? 'selected' : '' %>>Under Maintenance</option>
+              <option value="sold" <%= property.status === 'sold' ? 'selected' : '' %>>Sold</option>
+            </select>
+          </div>
+
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="availability" name="availability" 
                    value="true" <%= property.availability ? 'checked' : '' %>>

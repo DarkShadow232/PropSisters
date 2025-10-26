@@ -1,10 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { auth, signInWithGoogle as firebaseGoogleSignIn, signOutUser } from '@/lib/firebase';
 import { authService } from '@/services/authService';
 
 // Define user roles
 export type UserRole = 'user' | 'owner' | 'admin';
-export type AuthProvider = 'email' | 'google';
 
 // User interface
 export interface User {
@@ -14,7 +12,6 @@ export interface User {
   phoneNumber?: string;
   photoURL?: string;
   role: UserRole;
-  authProvider: AuthProvider;
   isEmailVerified?: boolean;
 }
 
@@ -22,25 +19,15 @@ export interface User {
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, displayName: string) => Promise<void>;
+  signUp: (email: string, password: string, displayName: string, phoneNumber?: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (updates: { displayName?: string; phoneNumber?: string; photoURL?: string }) => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
-// Create the auth context
+// Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Create a hook to use the auth context
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
 
 // Props for the AuthProvider component
 interface AuthProviderProps {
@@ -87,45 +74,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, []);
 
-  // Sign in with Google (Firebase OAuth + MongoDB storage)
-  const handleSignInWithGoogle = async () => {
-    try {
-      setLoading(true);
-      
-      // 1. Sign in with Firebase (Google OAuth)
-      const firebaseUser = await firebaseGoogleSignIn();
-      
-      // 2. Get Firebase ID token
-      const idToken = await firebaseUser.getIdToken();
-      
-      // 3. Send token to backend for verification and MongoDB storage
-      const response = await authService.authenticateWithGoogle(idToken);
-      
-      if (response.success && response.user) {
-        setCurrentUser(response.user as User);
-      } else {
-        throw new Error('Failed to authenticate with Google');
-      }
-    } catch (error) {
-      console.error('Error signing in with Google:', error);
-      // Sign out from Firebase if backend auth failed
-      await signOutUser().catch(console.error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Sign in with email and password (MongoDB only)
-  const handleSignIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
       
+      console.log('Attempting to sign in with:', { email, password: '***' });
       const response = await authService.login({ email, password });
+      console.log('Login response:', response);
       
       if (response.success && response.user) {
         setCurrentUser(response.user as User);
+        setUserRole(response.user.role as UserRole);
+        console.log('User set successfully:', response.user);
       } else {
+        console.error('Login failed:', response);
         throw new Error(response.message || 'Failed to sign in');
       }
     } catch (error) {
@@ -137,14 +100,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Sign up with email and password (MongoDB only)
-  const handleSignUp = async (email: string, password: string, displayName: string) => {
+  const signUp = async (email: string, password: string, displayName: string, phoneNumber?: string) => {
     try {
       setLoading(true);
       
-      const response = await authService.register({
-        email,
-        password,
-        displayName
+      const response = await authService.register({ 
+        email, 
+        password, 
+        displayName, 
+        phoneNumber: phoneNumber || '' 
       });
       
       if (response.success && response.user) {
@@ -161,27 +125,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Sign out
-  const handleSignOut = async () => {
+  const signOut = async () => {
     try {
-      // Sign out from backend (destroy session)
       await authService.logout();
-      
-      // If user was signed in with Google, also sign out from Firebase
-      if (currentUser?.authProvider === 'google') {
-        await signOutUser().catch(console.error);
-      }
-      
       setCurrentUser(null);
     } catch (error) {
       console.error('Error signing out:', error);
-      throw error;
+      // Still clear the user even if logout fails
+      setCurrentUser(null);
     }
   };
 
-  // Update profile
-  const handleUpdateProfile = async (updates: { 
+  // Update user profile
+  const updateProfile = async (updates: { 
     displayName?: string; 
-    phoneNumber?: string;
+    phoneNumber?: string; 
     photoURL?: string 
   }) => {
     try {
@@ -189,6 +147,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       if (response.success && response.user) {
         setCurrentUser(response.user as User);
+      } else {
+        throw new Error(response.message || 'Failed to update profile');
       }
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -197,24 +157,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Change password
-  const handleChangePassword = async (currentPassword: string, newPassword: string) => {
+  const changePassword = async (currentPassword: string, newPassword: string) => {
     try {
-      await authService.changePassword(currentPassword, newPassword);
+      const response = await authService.changePassword(currentPassword, newPassword);
+      
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to change password');
+      }
     } catch (error) {
       console.error('Error changing password:', error);
       throw error;
     }
   };
 
-  const value = {
+  const value: AuthContextType = {
     currentUser,
     loading,
-    signInWithGoogle: handleSignInWithGoogle,
-    signIn: handleSignIn,
-    signUp: handleSignUp,
-    signOut: handleSignOut,
-    updateProfile: handleUpdateProfile,
-    changePassword: handleChangePassword,
+    signIn,
+    signUp,
+    signOut,
+    updateProfile,
+    changePassword
   };
 
   return (
@@ -223,3 +186,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+// Custom hook to use the auth context
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+export default AuthContext;

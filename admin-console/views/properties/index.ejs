@@ -28,6 +28,9 @@
   </div>
 </div>
 
+<!-- Filters -->
+<%- include('../partials/filters', { search, status, priority, sort, limit }) %>
+
 <div class="card border-0 shadow-sm">
   <div class="card-body p-0">
     <% if (properties.length > 0) { %>
@@ -40,7 +43,9 @@
               <th>Location</th>
               <th>Price</th>
               <th>Beds/Baths</th>
+              <th>Priority</th>
               <th>Status</th>
+              <th>Availability</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -66,6 +71,32 @@
                 <td>
                   <i class="bi bi-door-closed"></i> <%= property.bedrooms %> 
                   <i class="bi bi-droplet ms-2"></i> <%= property.bathrooms %>
+                </td>
+                <td>
+                  <% if (property.priority >= 8) { %>
+                    <span class="badge bg-danger">Priority <%= property.priority %></span>
+                  <% } else if (property.priority >= 5) { %>
+                    <span class="badge bg-warning">Priority <%= property.priority %></span>
+                  <% } else if (property.priority >= 2) { %>
+                    <span class="badge bg-info">Priority <%= property.priority %></span>
+                  <% } else { %>
+                    <span class="badge bg-secondary">Priority <%= property.priority %></span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (property.status === 'active') { %>
+                    <span class="badge bg-success">Active</span>
+                  <% } else if (property.status === 'pending') { %>
+                    <span class="badge bg-warning">Pending</span>
+                  <% } else if (property.status === 'inactive') { %>
+                    <span class="badge bg-secondary">Inactive</span>
+                  <% } else if (property.status === 'maintenance') { %>
+                    <span class="badge bg-info">Maintenance</span>
+                  <% } else if (property.status === 'sold') { %>
+                    <span class="badge bg-danger">Sold</span>
+                  <% } else { %>
+                    <span class="badge bg-secondary"><%= property.status %></span>
+                  <% } %>
                 </td>
                 <td>
                   <% if (property.availability) { %>
@@ -102,6 +133,31 @@
     <% } %>
   </div>
 </div>
+
+<!-- Pagination -->
+<% if (totalPages > 1) { %>
+<nav aria-label="Properties pagination">
+  <ul class="pagination justify-content-center">
+    <% if (page > 1) { %>
+      <li class="page-item">
+        <a class="page-link" href="?page=<%= page - 1 %>&limit=<%= limit %>&search=<%= search || '' %>&status=<%= status || 'all' %>&priority=<%= priority || 'all' %>&sort=<%= sort || 'newest' %>">Previous</a>
+      </li>
+    <% } %>
+    
+    <% for (let i = Math.max(1, page - 2); i <= Math.min(totalPages, page + 2); i++) { %>
+      <li class="page-item <%= i === page ? 'active' : '' %>">
+        <a class="page-link" href="?page=<%= i %>&limit=<%= limit %>&search=<%= search || '' %>&status=<%= status || 'all' %>&priority=<%= priority || 'all' %>&sort=<%= sort || 'newest' %>"><%= i %></a>
+      </li>
+    <% } %>
+    
+    <% if (page < totalPages) { %>
+      <li class="page-item">
+        <a class="page-link" href="?page=<%= page + 1 %>&limit=<%= limit %>&search=<%= search || '' %>&status=<%= status || 'all' %>&priority=<%= priority || 'all' %>&sort=<%= sort || 'newest' %>">Next</a>
+      </li>
+    <% } %>
+  </ul>
+</nav>
+<% } %>
 
 <%- include('../partials/footer') %>
 

@@ -1,0 +1,87 @@
+<!-- Reusable Filter Component -->
+<div class="row mb-3">
+  <div class="col-md-3">
+    <input type="text" id="searchInput" class="form-control" placeholder="Search..." value="<%= search || '' %>">
+  </div>
+  <div class="col-md-2">
+    <select id="statusFilter" class="form-select">
+      <option value="all" <%= (status === 'all' || !status) ? 'selected' : '' %>>All Status</option>
+      <option value="active" <%= status === 'active' ? 'selected' : '' %>>Active</option>
+      <option value="inactive" <%= status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+      <option value="pending" <%= status === 'pending' ? 'selected' : '' %>>Pending</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select id="priorityFilter" class="form-select">
+      <option value="all" <%= (priority === 'all' || !priority) ? 'selected' : '' %>>All Priority</option>
+      <option value="high" <%= priority === 'high' ? 'selected' : '' %>>High</option>
+      <option value="medium" <%= priority === 'medium' ? 'selected' : '' %>>Medium</option>
+      <option value="low" <%= priority === 'low' ? 'selected' : '' %>>Low</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select id="sortFilter" class="form-select">
+      <option value="newest" <%= (sort === 'newest' || !sort) ? 'selected' : '' %>>Newest First</option>
+      <option value="oldest" <%= sort === 'oldest' ? 'selected' : '' %>>Oldest First</option>
+      <option value="name" <%= sort === 'name' ? 'selected' : '' %>>Name A-Z</option>
+      <option value="name-desc" <%= sort === 'name-desc' ? 'selected' : '' %>>Name Z-A</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select id="limitFilter" class="form-select">
+      <option value="10" <%= (limit === '10' || !limit) ? 'selected' : '' %>>10 per page</option>
+      <option value="25" <%= limit === '25' ? 'selected' : '' %>>25 per page</option>
+      <option value="50" <%= limit === '50' ? 'selected' : '' %>>50 per page</option>
+      <option value="100" <%= limit === '100' ? 'selected' : '' %>>100 per page</option>
+    </select>
+  </div>
+  <div class="col-md-1">
+    <button id="applyFilters" class="btn btn-primary w-100">
+      <i class="bi bi-funnel"></i> Apply
+    </button>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('searchInput');
+  const statusFilter = document.getElementById('statusFilter');
+  const priorityFilter = document.getElementById('priorityFilter');
+  const sortFilter = document.getElementById('sortFilter');
+  const limitFilter = document.getElementById('limitFilter');
+  const applyFiltersBtn = document.getElementById('applyFilters');
+
+  function applyCurrentFilters() {
+    const currentSearch = searchInput.value;
+    const currentStatus = statusFilter.value;
+    const currentPriority = priorityFilter.value;
+    const currentSort = sortFilter.value;
+    const currentLimit = limitFilter.value;
+    
+    const params = new URLSearchParams();
+    if (currentSearch) params.append('search', currentSearch);
+    if (currentStatus !== 'all') params.append('status', currentStatus);
+    if (currentPriority !== 'all') params.append('priority', currentPriority);
+    if (currentSort !== 'newest') params.append('sort', currentSort);
+    if (currentLimit !== '10') params.append('limit', currentLimit);
+    
+    const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+    window.location.href = newUrl;
+  }
+
+  applyFiltersBtn.addEventListener('click', applyCurrentFilters);
+
+  // Apply filters on Enter key in search input
+  searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      applyCurrentFilters();
+    }
+  });
+
+  // Auto-apply filters when other dropdowns change
+  statusFilter.addEventListener('change', applyCurrentFilters);
+  priorityFilter.addEventListener('change', applyCurrentFilters);
+  sortFilter.addEventListener('change', applyCurrentFilters);
+  limitFilter.addEventListener('change', applyCurrentFilters);
+});
+</script>

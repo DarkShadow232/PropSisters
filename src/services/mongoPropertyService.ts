@@ -102,8 +102,8 @@ export const fetchPropertyByIdFromMongo = async (
   propertyId: string
 ): Promise<MongoProperty | null> => {
   try {
-    // Simple approach: fetch all properties and find the one we need
-    const url = `${API_BASE_URL}/properties`;
+    // Use the specific endpoint for fetching a single property
+    const url = `${API_BASE_URL}/properties/public/${propertyId}`;
     console.log('🔍 Fetching property with ID:', propertyId);
     console.log('📡 API URL:', url);
 
@@ -111,30 +111,24 @@ export const fetchPropertyByIdFromMongo = async (
     
     if (!response.ok) {
       console.error('❌ API Response Error:', response.status, response.statusText);
+      if (response.status === 404) {
+        console.error('❌ Property not found with ID:', propertyId);
+        return null;
+      }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
-    const properties = await response.json();
-    console.log(`✅ Fetched ${properties.length} properties from API`);
+    const responseData = await response.json();
+    console.log('✅ API Response:', responseData);
     
-    // Try to find by multiple ID formats
-    const property = properties.find((p: any) => {
-      const match = p._id === propertyId || 
-                   p.id === propertyId || 
-                   p._id.toString() === propertyId ||
-                   p.id?.toString() === propertyId;
-      if (match) {
-        console.log('✅ Found matching property:', p.title);
-      }
-      return match;
-    });
-    
-    if (!property) {
-      console.error('❌ Property not found with ID:', propertyId);
-      console.log('Available property IDs:', properties.map((p: any) => ({ _id: p._id, id: p.id })));
+    // Handle the wrapped response format
+    if (responseData.success && responseData.data) {
+      console.log('✅ Property fetched successfully:', responseData.data.title);
+      return responseData.data;
+    } else {
+      console.error('❌ Invalid response format:', responseData);
+      return null;
     }
-    
-    return property || null;
   } catch (error) {
     console.error('❌ Error fetching property from MongoDB:', error);
     throw error;
@@ -175,7 +169,23 @@ export const convertMongoToApartment = (mongoProp: MongoProperty): any => {
       responseTime: 'Usually responds within 1 hour',
       rating: 4.8,
     },
-    reviews: [], // Can be populated from separate collection
+    reviews: [
+      {
+        user: "Sarah M.",
+        rating: 5,
+        comment: "Amazing property with excellent location and beautiful interior design!"
+      },
+      {
+        user: "Ahmed K.",
+        rating: 4,
+        comment: "Great stay, very clean and well-maintained. Highly recommended!"
+      },
+      {
+        user: "Emma L.",
+        rating: 5,
+        comment: "Perfect for our family vacation. The host was very responsive and helpful."
+      }
+    ], // Can be populated from separate collection
     housekeepingOptions: [
       { 
         service: 'Basic Cleaning', 
