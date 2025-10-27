@@ -21,9 +21,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Upload, Building, Brush, Sofa, Home, CheckCircle2, Sparkles, Camera, DollarSign, Palette, FileText, Send, Play, LogIn, UserPlus, Clock, Phone } from "lucide-react";
+import { Upload, Building, Brush, Sofa, Home, CheckCircle2, Sparkles, Camera, DollarSign, Palette, FileText, Send, Play, LogIn, UserPlus, Clock } from "lucide-react";
 import { toast } from "sonner";
 import finishRequestService from "@/services/finishRequestService";
+import PhoneInput from "@/components/PhoneInput";
+import { CountryCode } from "@/data/countryCodes";
 
 const FinishRequestPage = () => {
   const { currentUser } = useAuth();
@@ -42,6 +44,14 @@ const FinishRequestPage = () => {
     description: '',
     location: '',
     contactPhone: ''
+  });
+  
+  // Phone country state
+  const [selectedCountry, setSelectedCountry] = useState<CountryCode>({
+    code: 'EG',
+    name: 'Egypt',
+    flag: '🇪🇬',
+    dialCode: '+20'
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,6 +84,11 @@ const FinishRequestPage = () => {
     setIsSubmitting(true);
     
     try {
+      // Format phone number with country code
+      const formattedPhone = formData.contactPhone.startsWith(selectedCountry.dialCode) 
+        ? formData.contactPhone 
+        : `${selectedCountry.dialCode}${formData.contactPhone.replace(/^\+?\d+/, '')}`;
+
       // Use form state data
       const requestData = {
         requestType: formData.requestType,
@@ -82,7 +97,8 @@ const FinishRequestPage = () => {
         timeline: formData.timeline,
         description: formData.description,
         location: formData.location,
-        contactPhone: formData.contactPhone,
+        contactPhone: formattedPhone,
+        countryCode: selectedCountry.code,
         attachments: files
       };
 
@@ -94,6 +110,21 @@ const FinishRequestPage = () => {
           description: "Our team will review your request and get back to you soon.",
         });
         setFiles([]);
+        setFormData({
+          requestType: '',
+          propertyType: '',
+          budget: '',
+          timeline: '',
+          description: '',
+          location: '',
+          contactPhone: ''
+        });
+        setSelectedCountry({
+          code: 'EG',
+          name: 'Egypt',
+          flag: '🇪🇬',
+          dialCode: '+20'
+        });
         (e.target as HTMLFormElement).reset();
       } else {
         toast.error("Failed to submit request", {
@@ -452,21 +483,14 @@ const FinishRequestPage = () => {
                   </div>
 
                   {/* Contact Phone */}
-                  <div className="space-y-3">
-                    <Label htmlFor="phone" className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-purple-500" />
-                      Contact Phone
-                    </Label>
-                    <Input 
-                      id="phone" 
-                      type="tel"
-                      placeholder="Enter your phone number" 
-                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#b94a3b] focus:border-[#b94a3b] transition-all duration-300 bg-gray-50 hover:bg-white" 
-                      value={formData.contactPhone}
-                      onChange={(e) => handleInputChange('contactPhone', e.target.value)}
-                      required 
-                    />
-                  </div>
+                  <PhoneInput
+                    value={formData.contactPhone}
+                    onChange={(value) => handleInputChange('contactPhone', value)}
+                    onCountryChange={setSelectedCountry}
+                    selectedCountry={selectedCountry}
+                    placeholder="Enter your phone number"
+                    required
+                  />
 
                   {/* Image Upload */}
                   <div className="space-y-3">

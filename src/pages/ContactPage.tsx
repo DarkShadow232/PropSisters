@@ -7,22 +7,41 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { contactService, ContactData } from "@/services/contactService";
 
 const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
-      toast.success("Your message has been sent!", {
-        description: "We'll get back to you as soon as possible.",
+    const formData = new FormData(e.target as HTMLFormElement);
+    const contactData: ContactData = {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      subject: formData.get('subject') as string,
+      message: formData.get('message') as string,
+    };
+
+    try {
+      const response = await contactService.submitContact(contactData);
+      
+      if (response.success) {
+        toast.success("Your message has been sent!", {
+          description: "We'll get back to you as soon as possible.",
+        });
+        (e.target as HTMLFormElement).reset();
+      } else {
+        throw new Error(response.message || 'Failed to send message');
+      }
+    } catch (error: any) {
+      toast.error("Failed to send message", {
+        description: error.message || "Please try again later.",
       });
+    } finally {
       setIsSubmitting(false);
-      (e.target as HTMLFormElement).reset();
-    }, 1500);
+    }
   };
 
   return (
@@ -46,6 +65,7 @@ const ContactPage = () => {
                       <Label htmlFor="name" className="form-label">Full Name</Label>
                       <Input 
                         id="name" 
+                        name="name"
                         placeholder="Enter your full name" 
                         className="form-input" 
                         required 
@@ -55,6 +75,7 @@ const ContactPage = () => {
                       <Label htmlFor="email" className="form-label">Email Address</Label>
                       <Input 
                         id="email" 
+                        name="email"
                         type="email" 
                         placeholder="Enter your email" 
                         className="form-input" 
@@ -67,6 +88,7 @@ const ContactPage = () => {
                     <Label htmlFor="subject" className="form-label">Subject</Label>
                     <Input 
                       id="subject" 
+                      name="subject"
                       placeholder="What is your message about?" 
                       className="form-input" 
                       required 
@@ -77,6 +99,7 @@ const ContactPage = () => {
                     <Label htmlFor="message" className="form-label">Message</Label>
                     <Textarea 
                       id="message" 
+                      name="message"
                       placeholder="Type your message here..." 
                       className="form-input min-h-[150px]" 
                       required 

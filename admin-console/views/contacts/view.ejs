@@ -1,0 +1,305 @@
+<%- include('../partials/header') %>
+
+<% if (error && error.length > 0) { %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <%= error[0] %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+<% } %>
+
+<% if (success && success.length > 0) { %>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <%= success[0] %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+<% } %>
+
+<div class="row mb-4">
+  <div class="col">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/contacts">Contact Messages</a></li>
+        <li class="breadcrumb-item active" aria-current="page">View Message</li>
+      </ol>
+    </nav>
+    <h1 class="h3 mb-0">
+      <i class="bi bi-envelope-open"></i> Contact Message Details
+    </h1>
+  </div>
+  <div class="col-auto">
+    <div class="btn-group">
+      <a href="/contacts" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to List
+      </a>
+      <a href="mailto:<%= contact.email %>?subject=Re: <%= encodeURIComponent(contact.subject) %>" class="btn btn-primary">
+        <i class="bi bi-reply"></i> Reply
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-light">
+        <div class="row align-items-center">
+          <div class="col">
+            <h5 class="mb-0"><%= contact.subject %></h5>
+            <small class="text-muted">
+              From: <%= contact.name %> &lt;<%= contact.email %>&gt;
+            </small>
+          </div>
+          <div class="col-auto">
+            <span class="badge bg-<%= 
+              contact.status === 'new' ? 'warning' : 
+              contact.status === 'read' ? 'info' : 
+              contact.status === 'replied' ? 'success' : 
+              'secondary' 
+            %> fs-6">
+              <%= contact.status.charAt(0).toUpperCase() + contact.status.slice(1) %>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <h6 class="text-muted mb-2">Message:</h6>
+          <div class="border rounded p-3 bg-light">
+            <%= contact.message.replace(/\n/g, '<br>') %>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="text-muted mb-2">Contact Information:</h6>
+            <ul class="list-unstyled">
+              <li><strong>Name:</strong> <%= contact.name %></li>
+              <li><strong>Email:</strong> 
+                <a href="mailto:<%= contact.email %>" class="text-decoration-none">
+                  <%= contact.email %>
+                </a>
+              </li>
+              <li><strong>Received:</strong> <%= new Date(contact.createdAt).toLocaleString() %></li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h6 class="text-muted mb-2">Status Information:</h6>
+            <ul class="list-unstyled">
+              <li><strong>Priority:</strong> 
+                <span class="badge bg-<%= 
+                  contact.priority === 'urgent' ? 'danger' : 
+                  contact.priority === 'high' ? 'warning' : 
+                  contact.priority === 'medium' ? 'info' : 
+                  'secondary' 
+                %>">
+                  <%= contact.priority.charAt(0).toUpperCase() + contact.priority.slice(1) %>
+                </span>
+              </li>
+              <li><strong>Status:</strong> 
+                <span class="badge bg-<%= 
+                  contact.status === 'new' ? 'warning' : 
+                  contact.status === 'read' ? 'info' : 
+                  contact.status === 'replied' ? 'success' : 
+                  'secondary' 
+                %>">
+                  <%= contact.status.charAt(0).toUpperCase() + contact.status.slice(1) %>
+                </span>
+              </li>
+              <% if (contact.repliedAt) { %>
+                <li><strong>Replied:</strong> <%= new Date(contact.repliedAt).toLocaleString() %></li>
+                <% if (contact.repliedBy) { %>
+                  <li><strong>Replied by:</strong> <%= contact.repliedBy.name %></li>
+                <% } %>
+              <% } %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Quick Actions</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <a href="mailto:<%= contact.email %>?subject=Re: <%= encodeURIComponent(contact.subject) %>" class="btn btn-primary">
+            <i class="bi bi-reply"></i> Reply via Email
+          </a>
+          
+          <button class="btn btn-outline-success" onclick="updateStatus('<%= contact._id %>', 'read')" 
+                  <%= contact.status === 'read' ? 'disabled' : '' %>>
+            <i class="bi bi-check-circle"></i> Mark as Read
+          </button>
+          
+          <button class="btn btn-outline-info" onclick="updateStatus('<%= contact._id %>', 'replied')" 
+                  <%= contact.status === 'replied' ? 'disabled' : '' %>>
+            <i class="bi bi-reply-all"></i> Mark as Replied
+          </button>
+          
+          <button class="btn btn-outline-secondary" onclick="updateStatus('<%= contact._id %>', 'closed')" 
+                  <%= contact.status === 'closed' ? 'disabled' : '' %>>
+            <i class="bi bi-archive"></i> Close Message
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Update Priority</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <button class="btn btn-outline-danger btn-sm" onclick="updatePriority('<%= contact._id %>', 'urgent')" 
+                  <%= contact.priority === 'urgent' ? 'disabled' : '' %>>
+            <i class="bi bi-exclamation-triangle"></i> Urgent
+          </button>
+          
+          <button class="btn btn-outline-warning btn-sm" onclick="updatePriority('<%= contact._id %>', 'high')" 
+                  <%= contact.priority === 'high' ? 'disabled' : '' %>>
+            <i class="bi bi-exclamation-circle"></i> High
+          </button>
+          
+          <button class="btn btn-outline-info btn-sm" onclick="updatePriority('<%= contact._id %>', 'medium')" 
+                  <%= contact.priority === 'medium' ? 'disabled' : '' %>>
+            <i class="bi bi-info-circle"></i> Medium
+          </button>
+          
+          <button class="btn btn-outline-secondary btn-sm" onclick="updatePriority('<%= contact._id %>', 'low')" 
+                  <%= contact.priority === 'low' ? 'disabled' : '' %>>
+            <i class="bi bi-dash-circle"></i> Low
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Admin Notes</h5>
+      </div>
+      <div class="card-body">
+        <form id="notesForm">
+          <div class="mb-3">
+            <textarea class="form-control" id="adminNotes" rows="4" placeholder="Add internal notes about this contact..."><%= contact.adminNotes || '' %></textarea>
+          </div>
+          <button type="submit" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-save"></i> Save Notes
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Danger Zone</h5>
+      </div>
+      <div class="card-body">
+        <button class="btn btn-outline-danger btn-sm w-100" onclick="deleteContact('<%= contact._id %>')">
+          <i class="bi bi-trash"></i> Delete Message
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateStatus(contactId, status) {
+  fetch(`/api/admin/contacts/${contactId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ status: status }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert('Failed to update status: ' + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('An error occurred while updating the status.');
+  });
+}
+
+function updatePriority(contactId, priority) {
+  fetch(`/api/admin/contacts/${contactId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ priority: priority }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert('Failed to update priority: ' + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('An error occurred while updating the priority.');
+  });
+}
+
+function deleteContact(contactId) {
+  if (confirm('Are you sure you want to delete this contact message? This action cannot be undone.')) {
+    fetch(`/api/admin/contacts/${contactId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        window.location.href = '/contacts';
+      } else {
+        alert('Failed to delete contact message: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while deleting the contact message.');
+    });
+  }
+}
+
+// Handle admin notes form submission
+document.getElementById('notesForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const notes = document.getElementById('adminNotes').value;
+  const contactId = '<%= contact._id %>';
+  
+  fetch(`/api/admin/contacts/${contactId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ adminNotes: notes }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Notes saved successfully!');
+    } else {
+      alert('Failed to save notes: ' + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('An error occurred while saving the notes.');
+  });
+});
+</script>
+
+<%- include('../partials/footer') %>

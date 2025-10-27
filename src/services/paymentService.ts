@@ -202,18 +202,46 @@ export const processPayment = async (paymentRequest: PaymentRequest): Promise<Pa
 
 // Paymob payment processing
 const processPaymobPayment = async (request: PaymentRequest): Promise<PaymentResponse> => {
-  // In production, integrate with Paymob API
-  // https://docs.paymob.com/
-  
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
-  return {
-    success: true,
-    transactionId: `paymob_${Date.now()}`,
-    redirectUrl: `https://accept.paymob.com/api/acceptance/iframes/123456?payment_token=sample_token`,
-    gateway: 'paymob'
-  };
+  try {
+    // Call backend API to create Paymob payment
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/paymob/create-payment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: request.amount,
+        currency: request.currency,
+        customerInfo: request.customerInfo,
+        bookingInfo: request.bookingInfo,
+        paymentMethod: request.paymentMethod
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.success) {
+      return {
+        success: true,
+        transactionId: data.transactionId,
+        redirectUrl: data.paymentUrl,
+        gateway: 'paymob'
+      };
+    } else {
+      throw new Error(data.error || 'Payment creation failed');
+    }
+  } catch (error) {
+    console.error('Paymob payment error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Payment processing failed',
+      gateway: 'paymob'
+    };
+  }
 };
 
 // Fawry payment processing

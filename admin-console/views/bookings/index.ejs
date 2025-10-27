@@ -63,13 +63,13 @@
           <tbody>
             <% bookings.forEach(booking => { %>
               <tr>
-                <td><small class="font-monospace"><%= booking._id.toString().substring(0, 8) %>...</small></td>
+                <td><small class="font-monospace"><%= booking.id.toString().substring(0, 8) %>...</small></td>
                 <td>
                   <strong><%= booking.propertyTitle %></strong>
                 </td>
                 <td><%= booking.userName %></td>
-                <td><%= booking.checkIn.toLocaleDateString() %></td>
-                <td><%= booking.checkOut.toLocaleDateString() %></td>
+                <td><%= booking.checkIn ? new Date(booking.checkIn).toLocaleDateString() : 'N/A' %></td>
+                <td><%= booking.checkOut ? new Date(booking.checkOut).toLocaleDateString() : 'N/A' %></td>
                 <td><i class="bi bi-people"></i> <%= booking.guests %></td>
                 <td>
                   <% if (booking.status === 'pending') { %>
@@ -80,9 +80,9 @@
                     <span class="badge bg-danger">Cancelled</span>
                   <% } %>
                 </td>
-                <td><strong>$<%= booking.totalPrice.toLocaleString() %></strong></td>
+                <td><strong>EGP <%= booking.totalPrice ? booking.totalPrice.toLocaleString() : '0' %></strong></td>
                 <td>
-                  <a href="/bookings/<%= booking._id %>" class="btn btn-sm btn-outline-primary">
+                  <a href="/bookings/<%= booking.id %>" class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-eye"></i> View
                   </a>
                 </td>

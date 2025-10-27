@@ -82,9 +82,13 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const apiRoutes = require('./routes/apiRoutes');
 const logRoutes = require('./routes/logRoutes');
+const paymobRoutes = require('./routes/paymobRoutes');
+const finishRequestRoutes = require('./routes/finishRequestRoutes');
 
 // Public API routes (accessible from frontend)
 app.use('/api', apiRoutes);
+app.use('/api/paymob', paymobRoutes);
+app.use('/api/finish-requests', finishRequestRoutes);
 
 // Admin routes
 app.use('/auth', authRoutes);

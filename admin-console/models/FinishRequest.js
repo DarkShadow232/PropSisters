@@ -47,6 +47,11 @@ const finishRequestSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  countryCode: {
+    type: String,
+    required: true,
+    default: 'EG'
+  },
   attachments: [{
     filename: String,
     originalName: String,

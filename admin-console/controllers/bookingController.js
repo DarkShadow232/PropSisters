@@ -13,7 +13,7 @@ exports.listBookings = async (req, res) => {
     const { status } = req.query;
 
     // Build query
-    const query = status && status !== 'all' ? { status } : {};
+    const query = status && status !== 'all' ? { bookingStatus: status } : {};
 
     // Get bookings with property and user details
     const bookings = await Booking.find(query)
@@ -32,7 +32,7 @@ exports.listBookings = async (req, res) => {
       checkIn: booking.checkIn,
       checkOut: booking.checkOut,
       guests: booking.guests || 1,
-      status: booking.status,
+      status: booking.bookingStatus,
       totalPrice: booking.totalPrice,
       createdAt: booking.createdAt
     }));
@@ -42,6 +42,11 @@ exports.listBookings = async (req, res) => {
       admin: req.admin,
       bookings: formattedBookings,
       currentFilter: status || 'all',
+      search: req.query.search || '',
+      status: req.query.status || 'all',
+      priority: req.query.priority || 'all',
+      sort: req.query.sort || 'createdAt',
+      limit: req.query.limit || '10',
       success: req.flash('success'),
       error: req.flash('error')
     });
@@ -53,6 +58,11 @@ exports.listBookings = async (req, res) => {
       admin: req.admin,
       bookings: [],
       currentFilter: 'all',
+      search: req.query.search || '',
+      status: req.query.status || 'all',
+      priority: req.query.priority || 'all',
+      sort: req.query.sort || 'createdAt',
+      limit: req.query.limit || '10',
       success: req.flash('success'),
       error: req.flash('error')
     });

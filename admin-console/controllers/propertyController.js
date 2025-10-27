@@ -67,6 +67,13 @@ exports.listProperties = async (req, res) => {
       title: 'Properties',
       admin: req.admin,
       properties: [],
+      search: req.query.search || '',
+      status: req.query.status || 'all',
+      priority: req.query.priority || 'all',
+      sort: req.query.sort || 'createdAt',
+      limit: req.query.limit || '10',
+      page: 1,
+      totalPages: 0,
       success: req.flash('success'),
       error: req.flash('error')
     });

@@ -66,6 +66,12 @@ const BookingPage = () => {
   
   // Form validation state
   const [errors, setErrors] = useState({
+    paymentMethod: "",
+    paymentSubMethod: "",
+    phone: "",
+    firstName: "",
+    lastName: "",
+    email: "",
     cardNumber: "",
     cardExpiry: "",
     cardCVV: "",
@@ -167,7 +173,19 @@ const BookingPage = () => {
 
   // Validate payment information before submission
   const validatePaymentInfo = () => {
-    const newErrors: { [key: string]: string } = {};
+    const newErrors = {
+      paymentMethod: "",
+      paymentSubMethod: "",
+      phone: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      cardNumber: "",
+      cardExpiry: "",
+      cardCVV: "",
+      accountNumber: "",
+      routingNumber: ""
+    };
     
     // Basic validation for all payment methods
     if (!formData.paymentMethod) {
@@ -545,12 +563,17 @@ const BookingPage = () => {
                       </h2>
                       
                       <PaymentGatewaySelector
-                        selectedGateway={formData.paymentMethod}
-                        selectedMethod={formData.paymentSubMethod}
-                        onGatewayChange={(gateway) => setFormData({...formData, paymentMethod: gateway})}
-                        onMethodChange={(method) => setFormData({...formData, paymentSubMethod: method})}
                         amount={calculateTotal()}
                         currency="EGP"
+                        onGatewaySelect={(gateway, method) => {
+                          setFormData({
+                            ...formData, 
+                            paymentMethod: gateway,
+                            paymentSubMethod: method
+                          });
+                        }}
+                        selectedGateway={formData.paymentMethod}
+                        userLocation="egypt"
                       />
                       
                       <div className="mb-6">

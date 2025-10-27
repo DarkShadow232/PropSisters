@@ -12,6 +12,11 @@ exports.listUsers = async (req, res) => {
       title: 'Users',
       admin: req.admin,
       users,
+      search: req.query.search || '',
+      status: req.query.status || 'all',
+      priority: req.query.priority || 'all',
+      sort: req.query.sort || 'createdAt',
+      limit: req.query.limit || '10',
       success: req.flash('success'),
       error: req.flash('error')
     });
@@ -22,6 +27,11 @@ exports.listUsers = async (req, res) => {
       title: 'Users',
       admin: req.admin,
       users: [],
+      search: req.query.search || '',
+      status: req.query.status || 'all',
+      priority: req.query.priority || 'all',
+      sort: req.query.sort || 'createdAt',
+      limit: req.query.limit || '10',
       success: req.flash('success'),
       error: req.flash('error')
     });

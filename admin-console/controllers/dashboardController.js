@@ -1,15 +1,17 @@
 const Rental = require('../models/Rental');
 const User = require('../models/User');
 const Booking = require('../models/Booking');
+const Contact = require('../models/Contact');
 
 // GET / - Dashboard
 exports.getDashboard = async (req, res) => {
   try {
     // Fetch statistics from MongoDB
-    const [totalProperties, totalUsers, totalBookings] = await Promise.all([
+    const [totalProperties, totalUsers, totalBookings, totalContacts] = await Promise.all([
       Rental.countDocuments(),
       User.countDocuments(),
-      Booking.countDocuments()
+      Booking.countDocuments(),
+      Contact.countDocuments()
     ]);
 
     // Calculate booking stats
@@ -64,6 +66,7 @@ exports.getDashboard = async (req, res) => {
         totalProperties,
         totalUsers,
         totalBookings,
+        totalContacts,
         pendingBookings,
         confirmedBookings,
         cancelledBookings,
@@ -82,6 +85,7 @@ exports.getDashboard = async (req, res) => {
         totalProperties: 0,
         totalUsers: 0,
         totalBookings: 0,
+        totalContacts: 0,
         pendingBookings: 0,
         confirmedBookings: 0,
         cancelledBookings: 0,

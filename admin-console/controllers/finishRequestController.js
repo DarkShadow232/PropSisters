@@ -49,7 +49,8 @@ exports.createFinishRequest = async (req, res) => {
       timeline,
       description,
       location,
-      contactPhone
+      contactPhone,
+      countryCode = 'EG'
     } = req.body;
 
     // Validate required fields
@@ -95,6 +96,7 @@ exports.createFinishRequest = async (req, res) => {
       description,
       location,
       contactPhone,
+      countryCode,
       attachments
     });
 
