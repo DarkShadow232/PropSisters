@@ -12,6 +12,8 @@ exports.getLogin = (req, res) => {
 // POST /auth/login - Handle login
 exports.postLogin = async (req, res) => {
   try {
+
+    console.log('🔴 Login request received:', req.body);
     const { email, password } = req.body;
 
     // Validate input
@@ -22,7 +24,7 @@ exports.postLogin = async (req, res) => {
 
     // Find admin by email
     const admin = await Admin.findOne({ email: email.toLowerCase() });
-    
+    console.log('🔴 Admin found:', admin);
     if (!admin) {
       req.flash('error', 'Invalid email or password');
       return res.redirect('/auth/login');
@@ -30,23 +32,24 @@ exports.postLogin = async (req, res) => {
 
     // Check password
     const isMatch = await admin.comparePassword(password);
-    
+    console.log('🔴 Password match:', isMatch);
     if (!isMatch) {
       req.flash('error', 'Invalid email or password');
       return res.redirect('/auth/login');
     }
 
+    console.log('🔴 Creating session');
     // Create session
     req.session.adminId = admin._id;
     req.session.adminEmail = admin.email;
     req.session.adminName = admin.name;
 
     req.flash('success', 'Welcome back, ' + admin.name + '!');
-    
+    console.log('🔴 Session created:', req.session);
     // Redirect to return URL or dashboard
     const returnTo = req.session.returnTo || '/';
     delete req.session.returnTo;
-    res.redirect(returnTo);
+    res.redirect(returnTo); console.log('🔴 Redirecting to:', returnTo);
     
   } catch (error) {
     console.error('Login error:', error);
