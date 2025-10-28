@@ -120,6 +120,20 @@ app.use('/api', apiRoutes);
 app.use('/api/paymob', paymobRoutes);
 app.use('/api/finish-requests', finishRequestRoutes);
 
+// Debug middleware to log all POST requests
+app.use((req, res, next) => {
+  if (req.method === 'POST') {
+    console.log('📮 POST request received:', {
+      url: req.originalUrl,
+      path: req.path,
+      body: req.body,
+      params: req.params,
+      headers: req.headers['content-type']
+    });
+  }
+  next();
+});
+
 // Admin routes
 app.use('/auth', authRoutes);
 app.use('/api/logs', logRoutes);
@@ -182,6 +196,8 @@ app.use((req, res) => {
   // For other web routes, redirect to frontend
   const frontendUrl = process.env.FRONTEND_URL || 'https://propsiss.com';
   console.log('🔄 Redirecting to frontend:', frontendUrl);
+  console.log('🔄 Current environment:', process.env.NODE_ENV);
+  console.log('🔄 FRONTEND_URL env var:', process.env.FRONTEND_URL);
   res.redirect(frontendUrl);
 });
 

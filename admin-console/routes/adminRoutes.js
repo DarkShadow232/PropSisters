@@ -49,7 +49,10 @@ router.get('/properties', propertyController.listProperties);
 router.get('/properties/create', propertyController.getCreateProperty);
 router.post('/properties/create', upload.array('images', 10), propertyController.postCreateProperty);
 router.get('/properties/:id/edit', propertyController.getEditProperty);
-router.post('/properties/:id/edit', upload.array('images', 10), propertyController.postEditProperty);
+router.post('/properties/:id/edit', upload.array('images', 10), (req, res, next) => {
+  console.log('🔍 Property edit route hit:', req.params.id, req.body);
+  next();
+}, propertyController.postEditProperty);
 router.post('/properties/:id/delete', propertyController.deleteProperty);
 
 // Users
@@ -60,7 +63,10 @@ router.post('/users/:id/delete', userController.deleteUser);
 // Bookings
 router.get('/bookings', bookingController.listBookings);
 router.get('/bookings/:id', bookingController.viewBooking);
-router.post('/bookings/:id/status', bookingController.updateBookingStatus);
+router.post('/bookings/:id/status', (req, res, next) => {
+  console.log('🔍 Booking status route hit:', req.params.id, req.body);
+  next();
+}, bookingController.updateBookingStatus);
 
 // Finish Requests
 router.get('/finish-requests', async (req, res) => {
