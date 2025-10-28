@@ -194,7 +194,14 @@ app.use((req, res) => {
   }
   
   // For other web routes, redirect to frontend
-  const frontendUrl = process.env.FRONTEND_URL || 'https://propsiss.com';
+  let frontendUrl = process.env.FRONTEND_URL || 'https://propsiss.com';
+  
+  // Fix incorrect localhost URL in production
+  if (process.env.NODE_ENV === 'production' && frontendUrl.includes('localhost')) {
+    frontendUrl = 'https://propsiss.com';
+    console.log('🔧 Fixed incorrect FRONTEND_URL for production');
+  }
+  
   console.log('🔄 Redirecting to frontend:', frontendUrl);
   console.log('🔄 Current environment:', process.env.NODE_ENV);
   console.log('🔄 FRONTEND_URL env var:', process.env.FRONTEND_URL);

@@ -164,7 +164,7 @@
         <h5 class="mb-0">Update Status</h5>
       </div>
       <div class="card-body">
-        <form action="/bookings/<%= booking._id %>/status" method="POST">
+        <form action="/bookings/<%= booking.id %>/status" method="POST" onsubmit="console.log('Form submitting to:', this.action, 'with data:', new FormData(this).get('status')); return true;">
           <div class="mb-3">
             <label for="status" class="form-label">Change Booking Status</label>
             <select class="form-select" id="status" name="status">
