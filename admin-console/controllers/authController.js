@@ -12,10 +12,6 @@ exports.getLogin = (req, res) => {
 // POST /auth/login - Handle login
 exports.postLogin = async (req, res) => {
   try {
-    console.log('🔐 POST /auth/login - Login attempt received');
-    console.log('🔐 Request body:', req.body);
-    console.log('🔐 Request headers:', req.headers);
-    
     const { email, password } = req.body;
 
     // Validate input

@@ -49,6 +49,7 @@ app.use(cors({
 const requestLogger = require('./middleware/requestLogger');
 app.use(requestLogger);
 
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
