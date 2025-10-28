@@ -126,9 +126,9 @@ class PaymobService {
       };
 
       console.log('🔗 Paymob: Creating payment key with data:', JSON.stringify(paymentKeyData, null, 2));
-      console.log('🔗 Paymob: Request URL:', `${this.baseUrl}/accept/payment_keys`);
+      console.log('🔗 Paymob: Request URL:', `${this.baseUrl}/acceptance/payment_keys`);
       
-      const response = await fetch(`${this.baseUrl}/accept/payment_keys`, {
+      const response = await fetch(`${this.baseUrl}/acceptance/payment_keys`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
