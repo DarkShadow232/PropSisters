@@ -122,10 +122,15 @@ class PaymobService {
           state: billingData.state || 'Cairo'
         },
         currency: 'EGP',
-        integration_id: this.integrationId
+        integration_id: this.integrationId,
+        // Add success and failure redirect URLs
+        success_url: `${process.env.API_URL || 'https://api.propsiss.com'}/payment/success`,
+        failure_url: `${process.env.API_URL || 'https://api.propsiss.com'}/payment/failure`
       };
 
       console.log('🔗 Paymob: Creating payment key with data:', JSON.stringify(paymentKeyData, null, 2));
+      console.log('🔗 Paymob: Success URL:', paymentKeyData.success_url);
+      console.log('🔗 Paymob: Failure URL:', paymentKeyData.failure_url);
       console.log('🔗 Paymob: Request URL:', `${this.baseUrl}/acceptance/payment_keys`);
       
       const response = await fetch(`${this.baseUrl}/acceptance/payment_keys`, {

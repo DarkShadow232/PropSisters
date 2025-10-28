@@ -22,6 +22,8 @@ import SignUpPage from "./pages/SignUpPage";
 import AddPropertyPage from "./pages/AddPropertyPage";
 import PropertySistersClubPage from "./pages/PropertySistersClubPage";
 import UserDashboardPage from "./pages/UserDashboardPage";
+import BookingSuccessPage from "./pages/BookingSuccessPage";
+import BookingFailurePage from "./pages/BookingFailurePage";
 // Admin pages removed
 import NotFound from "./pages/NotFound";
 
@@ -72,6 +74,8 @@ const App = () => {
                   <UserDashboardPage />
                 </ProtectedRoute>
               } />
+              <Route path="booking-success" element={<BookingSuccessPage />} />
+              <Route path="booking-failure" element={<BookingFailurePage />} />
               {/* admin routes removed */}
               <Route path="*" element={<NotFound />} />
             </Route>

@@ -106,14 +106,43 @@ app.use('/paymob/callback', (req, res) => {
   res.redirect('/api/paymob/callback');
 });
 
+// Paymob test page
+app.get('/paymob-test', (req, res) => {
+  res.render('paymob-test', {
+    title: 'Paymob Payment Test'
+  });
+});
+
+// Handle Paymob payment success/failure redirects
+app.get('/payment/success', (req, res) => {
+  console.log('✅ Payment success redirect received');
+  const frontendUrl = process.env.FRONTEND_URL || 'https://propsiss.com';
+  res.redirect(`${frontendUrl}/booking-success`);
+});
+
+app.get('/payment/failure', (req, res) => {
+  console.log('❌ Payment failure redirect received');
+  const frontendUrl = process.env.FRONTEND_URL || 'https://propsiss.com';
+  res.redirect(`${frontendUrl}/booking-failure`);
+});
+
 // 404 handler
 app.use((req, res) => {
   console.log('❌ 404 - Route not found:', req.originalUrl);
-  res.status(404).render('auth/login', {
-    title: '404 Not Found',
-    error: ['Page not found'],
-    success: []
-  });
+  
+  // If it's an API route, return JSON error
+  if (req.originalUrl.startsWith('/api/')) {
+    return res.status(404).json({
+      success: false,
+      error: 'API endpoint not found',
+      path: req.originalUrl
+    });
+  }
+  
+  // For web routes, redirect to frontend
+  const frontendUrl = process.env.FRONTEND_URL || 'https://propsiss.com';
+  console.log('🔄 Redirecting to frontend:', frontendUrl);
+  res.redirect(frontendUrl);
 });
 
 // Error handler
