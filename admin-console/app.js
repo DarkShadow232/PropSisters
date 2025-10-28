@@ -155,6 +155,8 @@ app.get('/payment/failure', (req, res) => {
 // 404 handler
 app.use((req, res) => {
   console.log('❌ 404 - Route not found:', req.originalUrl);
+  console.log('❌ Method:', req.method);
+  console.log('❌ Headers:', req.headers);
   
   // If it's an API route, return JSON error
   if (req.originalUrl.startsWith('/api/')) {
@@ -165,7 +167,19 @@ app.use((req, res) => {
     });
   }
   
-  // For web routes, redirect to frontend
+  // For admin console routes, show 404 page instead of redirecting
+  if (req.originalUrl.startsWith('/properties') || 
+      req.originalUrl.startsWith('/bookings') || 
+      req.originalUrl.startsWith('/users') || 
+      req.originalUrl.startsWith('/contacts') ||
+      req.originalUrl.startsWith('/finish-requests')) {
+    return res.status(404).render('404', {
+      title: 'Page Not Found',
+      message: 'The requested page was not found in the admin console.'
+    });
+  }
+  
+  // For other web routes, redirect to frontend
   const frontendUrl = process.env.FRONTEND_URL || 'https://propsiss.com';
   console.log('🔄 Redirecting to frontend:', frontendUrl);
   res.redirect(frontendUrl);

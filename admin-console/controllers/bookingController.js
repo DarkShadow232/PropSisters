@@ -132,6 +132,11 @@ exports.viewBooking = async (req, res) => {
 // POST /bookings/:id/status - Update booking status
 exports.updateBookingStatus = async (req, res) => {
   try {
+    console.log('🔍 Booking status update attempt:', {
+      id: req.params.id,
+      body: req.body
+    });
+    
     const { id } = req.params;
     const { status } = req.body;
 
@@ -140,12 +145,19 @@ exports.updateBookingStatus = async (req, res) => {
       return res.redirect(`/bookings/${id}`);
     }
 
-    await Booking.findByIdAndUpdate(id, { status });
+    await Booking.findByIdAndUpdate(id, { bookingStatus: status });
 
+    console.log('✅ Booking status updated successfully:', id, 'to', status);
     req.flash('success', `Booking status updated to ${status}!`);
     res.redirect(`/bookings/${id}`);
   } catch (error) {
-    console.error('Error updating booking status:', error);
+    console.error('❌ Error updating booking status:', error);
+    console.error('❌ Error details:', {
+      name: error.name,
+      message: error.message,
+      code: error.code,
+      errors: error.errors
+    });
     req.flash('error', 'Error updating booking status');
     res.redirect(`/bookings/${req.params.id}`);
   }

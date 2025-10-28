@@ -211,6 +211,12 @@ exports.getEditProperty = async (req, res) => {
 // POST /properties/:id/edit - Update property
 exports.postEditProperty = async (req, res) => {
   try {
+    console.log('🔍 Property edit attempt:', {
+      id: req.params.id,
+      body: req.body,
+      files: req.files ? req.files.length : 0
+    });
+    
     const { id } = req.params;
     const {
       title,
@@ -290,10 +296,17 @@ exports.postEditProperty = async (req, res) => {
 
     await property.save();
 
+    console.log('✅ Property updated successfully:', property._id);
     req.flash('success', 'Property updated successfully!');
     res.redirect('/properties');
   } catch (error) {
-    console.error('Error updating property:', error);
+    console.error('❌ Error updating property:', error);
+    console.error('❌ Error details:', {
+      name: error.name,
+      message: error.message,
+      code: error.code,
+      errors: error.errors
+    });
     req.flash('error', 'Error updating property: ' + error.message);
     res.redirect(`/properties/${req.params.id}/edit`);
   }
