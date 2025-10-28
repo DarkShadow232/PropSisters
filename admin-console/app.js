@@ -58,17 +58,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Session configuration
 app.use(session({
-  secret: process.env.SESSION_SECRET ,
-  resave: false,
+  secret: process.env.SESSION_SECRET,
+  resave: true, // Force session save on every request
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost:27017/rental-admin',
-    touchAfter: 24 * 3600 // lazy session update
+    touchAfter: 0 // Save session immediately on every touch
   }),
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production' // true in production
+    secure: process.env.NODE_ENV === 'production', // true in production
+    sameSite: 'lax' // Add sameSite for better compatibility
   }
 }));
 
