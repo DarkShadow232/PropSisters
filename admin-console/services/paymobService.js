@@ -160,6 +160,10 @@ class PaymobService {
    */
   verifyPaymentHmac(data) {
     try {
+      console.log('🔐 Paymob: Verifying HMAC for data:', JSON.stringify(data, null, 2));
+      
+      // Handle the webhook data structure
+      const obj = data.obj || data;
       const {
         amount_cents,
         created_at,
@@ -174,41 +178,52 @@ class PaymobService {
         is_refunded,
         is_standalone_payment,
         is_voided,
-        order: { id: order_id },
+        order,
         owner,
         pending,
-        source_data: { pan, sub_type, type },
+        source_data,
         success,
         txn_response_code
-      } = data;
+      } = obj;
+
+      const order_id = order?.id;
+      const pan = source_data?.pan;
+      const sub_type = source_data?.sub_type;
+      const type = source_data?.type;
 
       const stringToHash = 
-        amount_cents +
-        created_at +
-        currency +
-        error_occured +
-        has_parent_transaction +
-        id +
-        integration_id +
-        is_3d_secure +
-        is_auth +
-        is_capture +
-        is_refunded +
-        is_standalone_payment +
-        is_voided +
-        order_id +
-        owner +
-        pending +
-        pan +
-        sub_type +
-        type +
-        success +
-        txn_response_code;
+        (amount_cents || '') +
+        (created_at || '') +
+        (currency || '') +
+        (error_occured || '') +
+        (has_parent_transaction || '') +
+        (id || '') +
+        (integration_id || '') +
+        (is_3d_secure || '') +
+        (is_auth || '') +
+        (is_capture || '') +
+        (is_refunded || '') +
+        (is_standalone_payment || '') +
+        (is_voided || '') +
+        (order_id || '') +
+        (owner || '') +
+        (pending || '') +
+        (pan || '') +
+        (sub_type || '') +
+        (type || '') +
+        (success || '') +
+        (txn_response_code || '');
 
+      console.log('🔐 Paymob: String to hash:', stringToHash);
+      
       const calculatedHmac = crypto
         .createHmac('sha256', this.hmacSecret)
         .update(stringToHash)
         .digest('hex');
+
+      console.log('🔐 Paymob: Generated hash:', calculatedHmac);
+      console.log('🔐 Paymob: Received HMAC:', data.hmac);
+      console.log('🔐 Paymob: HMAC valid:', calculatedHmac === data.hmac);
 
       return calculatedHmac === data.hmac;
     } catch (error) {
