@@ -255,23 +255,69 @@ const BookingPage = () => {
       // Note: Availability is already checked in the calendar on the property details page
       // The calendar shows real booking data and prevents selection of booked dates
       
-      // Process payment first
+      // Create booking first (with pending status)
+      const bookingData = {
+        propertyId: id!,
+        checkIn: selectedDates.from.toISOString().split('T')[0],
+        checkOut: selectedDates.to.toISOString().split('T')[0],
+        guests: 1, // You can add a guest selector later
+        specialRequests: formData.specialRequests,
+        cleaningService: formData.cleaningService,
+        airportPickup: formData.airportPickup,
+        earlyCheckIn: formData.earlyCheckIn,
+        totalAmount: calculateTotal(),
+        currency: 'EGP',
+        paymentMethod: 'card',
+        status: 'pending',
+        paymentStatus: 'pending',
+        billingData: {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          phone_number: formData.phone,
+          apartment: '',
+          floor: '',
+          street: '',
+          building: '',
+          postal_code: '',
+          city: 'Cairo',
+          country: 'EG',
+          state: 'Cairo'
+        }
+      };
+      
+      // Create booking in database
+      const bookingResponse = await bookingService.createBooking(bookingData);
+      
+      if (!bookingResponse.success) {
+        toast({
+          title: "Booking Failed",
+          description: bookingResponse.error || "Failed to create booking. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const bookingId = bookingResponse.bookingId;
+      
+      // Now create Paymob payment with booking ID
       const paymentRequest: PaymentRequest = {
         amount: calculateTotal(),
         currency: 'EGP',
-        gateway: formData.paymentMethod,
+        gateway: 'paymob',
         customerInfo: {
           name: `${formData.firstName} ${formData.lastName}`,
           email: formData.email,
           phone: formData.phone
         },
         bookingInfo: {
+          bookingId: bookingId,
           propertyId: rental.id.toString(),
           checkIn: selectedDates.from,
           checkOut: selectedDates.to,
           nights: calculateNights()
         },
-        paymentMethod: formData.paymentSubMethod
+        paymentMethod: 'card'
       };
       
       const paymentResult = await processPayment(paymentRequest);
@@ -285,53 +331,18 @@ const BookingPage = () => {
         return;
       }
       
-      // If payment requires redirect (like Paymob, Fawry), redirect user
+      // Redirect to Paymob payment page
       if (paymentResult.redirectUrl) {
         window.location.href = paymentResult.redirectUrl;
         return;
       }
       
-      // Create booking data
-      const bookingData = {
-        propertyId: id!,
-        checkIn: selectedDates.from.toISOString().split('T')[0],
-        checkOut: selectedDates.to.toISOString().split('T')[0],
-        guests: 1, // You can add a guest selector later
-        specialRequests: formData.specialRequests,
-        cleaningService: formData.cleaningService,
-        airportPickup: formData.airportPickup,
-        earlyCheckIn: formData.earlyCheckIn,
-        billingData: {
-          first_name: currentUser?.displayName?.split(' ')[0] || '',
-          last_name: currentUser?.displayName?.split(' ').slice(1).join(' ') || '',
-          email: currentUser?.email || '',
-          phone_number: currentUser?.phoneNumber || '',
-          apartment: '',
-          floor: '',
-          street: '',
-          building: '',
-          postal_code: '',
-          city: '',
-          country: 'EG',
-          state: ''
-        }
-      };
-      
-      // Save booking to backend
-      const bookingResponse = await bookingService.createBooking(bookingData);
-      const bookingId = bookingResponse.bookingId;
-      
-      // Show success toast
+      // This should not reach here as Paymob always returns a redirect URL
       toast({
-        title: "Booking Confirmed!",
-        description: `Your booking for ${rental?.title} has been confirmed. Booking ID: ${bookingId}`,
-        variant: "default",
+        title: "Payment Error",
+        description: "No payment URL received. Please try again.",
+        variant: "destructive",
       });
-      
-      // Navigate to user dashboard after 2 seconds
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 2000);
       
     } catch (error) {
       console.error('Error creating booking:', error);
@@ -359,7 +370,7 @@ const BookingPage = () => {
       <div className="container-custom py-16 text-center">
         <h1 className="text-2xl font-medium mb-4">Property Not Found</h1>
         <p className="mb-6">{error || "The property you're looking for doesn't exist or has been removed."}</p>
-        <Button onClick={() => navigate("/rentals")}>Back to Rentals</Button>
+        <Button onClick={() => navigate("/rentals")} className="bg-[#b94a3b] hover:bg-[#a03e30] text-white">Back to Rentals</Button>
       </div>
     );
   }
@@ -369,8 +380,7 @@ const BookingPage = () => {
       <div className="container-custom">
         <div className="mb-8">
           <Button 
-            variant="ghost" 
-            className="mb-4"
+            className="mb-4 bg-transparent hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-md"
             onClick={() => navigate("/rentals")}
           >
             ← Back to Rentals
@@ -562,38 +572,37 @@ const BookingPage = () => {
                         Payment Method
                       </h2>
                       
-                      <PaymentGatewaySelector
-                        amount={calculateTotal()}
-                        currency="EGP"
-                        onGatewaySelect={(gateway, method) => {
-                          setFormData({
-                            ...formData, 
-                            paymentMethod: gateway,
-                            paymentSubMethod: method
-                          });
-                        }}
-                        selectedGateway={formData.paymentMethod}
-                        userLocation="egypt"
-                      />
-                      
-                      <div className="mb-6">
-                        <Tabs 
-                          defaultValue="paymob" 
-                          value={formData.paymentMethod}
-                          onValueChange={(value) => setFormData({...formData, paymentMethod: value})}
-                          className="w-full"
-                        >
-                          {/* Payment gateway selector replaces old tabs */}
-                          
-                          {/* Old payment tabs removed - replaced by PaymentGatewaySelector component above */}
-                        </Tabs>
+                      {/* Credit Card Payment Only */}
+                      <div className="space-y-4">
+                        <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                          <CreditCard className="h-6 w-6 text-[#b94a3b]" />
+                          <div className="flex-1">
+                            <h3 className="font-medium text-gray-900">Credit/Debit Card</h3>
+                            <p className="text-sm text-gray-600">Pay securely with Visa, Mastercard, or other major cards</p>
+                          </div>
+                          <div className="flex space-x-2">
+                            <div className="w-8 h-5 bg-blue-600 rounded text-white text-xs flex items-center justify-center font-bold">V</div>
+                            <div className="w-8 h-5 bg-red-600 rounded text-white text-xs flex items-center justify-center font-bold">M</div>
+                          </div>
+                        </div>
+                        
+                        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                          <div className="flex items-start">
+                            <Shield className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
+                            <div>
+                              <h4 className="font-medium text-blue-900 mb-1">Secure Payment</h4>
+                              <p className="text-sm text-blue-700">
+                                Your payment is processed securely by Paymob. We do not store your payment information.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       
                       <div className="mt-6">
                         <Button 
                           type="submit" 
-                          className="w-full bg-[#b94a3b] hover:bg-[#a03e30]" 
-                          size="lg"
+                          className="w-full bg-[#b94a3b] hover:bg-[#a03e30] text-white py-3 px-6 rounded-md font-medium" 
                           disabled={isSubmitting}
                         >
                           {isSubmitting ? "Processing Booking..." : "Complete Booking"}

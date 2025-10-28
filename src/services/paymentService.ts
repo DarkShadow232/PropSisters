@@ -124,6 +124,7 @@ export interface PaymentRequest {
     phone: string;
   };
   bookingInfo: {
+    bookingId?: string;
     propertyId: string;
     checkIn: Date;
     checkOut: Date;
