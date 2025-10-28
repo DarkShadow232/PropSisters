@@ -35,6 +35,7 @@ class AuthService {
   private axiosInstance;
 
   constructor() {
+    console.log('🔗 AuthService: Initializing with base URL:', API_BASE_URL);
     this.axiosInstance = axios.create({
       baseURL: API_BASE_URL,
       withCredentials: true, // Important for session cookies

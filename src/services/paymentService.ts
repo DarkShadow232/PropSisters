@@ -203,8 +203,11 @@ export const processPayment = async (paymentRequest: PaymentRequest): Promise<Pa
 // Paymob payment processing
 const processPaymobPayment = async (request: PaymentRequest): Promise<PaymentResponse> => {
   try {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+    console.log('🔗 PaymentService: Making Paymob payment request to:', `${apiUrl}/paymob/create-payment`);
+    
     // Call backend API to create Paymob payment
-    const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/paymob/create-payment`, {
+    const response = await fetch(`${apiUrl}/paymob/create-payment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

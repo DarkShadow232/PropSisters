@@ -57,6 +57,12 @@ export const ENV = {
   },
 } as const;
 
+// Log environment configuration for debugging
+console.log('🔗 Environment Configuration:');
+console.log('  - APP.URL:', ENV.APP.URL);
+console.log('  - API.BASE_URL:', ENV.API.BASE_URL);
+console.log('  - NODE_ENV:', ENV.APP.NODE_ENV);
+
 // Validation function for required environment variables
 export const validateEnv = () => {
   const requiredVars = [
