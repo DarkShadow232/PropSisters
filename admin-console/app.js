@@ -36,9 +36,13 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://localhost:8081',
+    'https://propsiss.com',
+    'https://www.propsiss.com',
     process.env.FRONTEND_URL
   ].filter(Boolean), // Support multiple ports
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Request logging middleware
