@@ -40,6 +40,7 @@ exports.postLogin = async (req, res) => {
 
     console.log('🔴 Creating session');
     console.log('🔴 Session ID before:', req.sessionID);
+    console.log('🔴 Request cookies:', req.headers.cookie);
     // Create session
     req.session.adminId = admin._id;
     req.session.adminEmail = admin.email;

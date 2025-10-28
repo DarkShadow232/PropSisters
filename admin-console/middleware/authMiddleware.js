@@ -1,6 +1,7 @@
 // Middleware to check if admin is authenticated
 const isAuthenticated = (req, res, next) => {
   console.log('🔴 isAuthenticated middleware - Session ID:', req.sessionID);
+  console.log('🔴 isAuthenticated middleware - Request cookies:', req.headers.cookie);
   console.log('🔴 isAuthenticated middleware - Session:', req.session);
   console.log('🔴 isAuthenticated middleware - adminId:', req.session?.adminId);
   

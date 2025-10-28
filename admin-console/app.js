@@ -86,11 +86,14 @@ app.use(session({
   saveUninitialized: false,
   // Temporarily disable store to test if MongoDB is the issue
   // store: sessionStore,
+  name: 'admin.sid', // Custom session name
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // true in production
-    sameSite: 'lax' // Add sameSite for better compatibility
+    secure: false, // Temporarily disable secure for testing
+    sameSite: 'lax', // Add sameSite for better compatibility
+    domain: undefined, // Let browser determine domain
+    path: '/' // Ensure cookie is available for all paths
   }
 }));
 
