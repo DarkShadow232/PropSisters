@@ -64,7 +64,7 @@
         </div>
       <% } %>
 
-      <form action="/auth/login" method="POST">
+      <form action="/auth/login" method="POST" id="loginForm">
         <div class="mb-3">
           <label for="email" class="form-label">
             <i class="bi bi-envelope"></i> Email Address
@@ -74,7 +74,8 @@
             class="form-control" 
             id="email" 
             name="email" 
-            placeholder="admin@example.com"
+            placeholder="admin@propsiss.com"
+            value="admin@propsiss.com"
             required 
             autofocus
           >
@@ -90,6 +91,7 @@
             id="password" 
             name="password" 
             placeholder="Enter your password"
+            value="admin123"
             required
           >
         </div>
@@ -98,10 +100,36 @@
           <i class="bi bi-box-arrow-in-right"></i> Sign In
         </button>
       </form>
+      
+      <div class="mt-3 text-center">
+        <small class="text-muted">
+          Default credentials:<br>
+          Email: admin@propsiss.com<br>
+          Password: admin123
+        </small>
+      </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      console.log('🔐 Form submission started');
+      console.log('🔐 Form data:', {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+      });
+      
+      // Don't prevent default - let it submit normally
+      console.log('🔐 Form submitting to:', this.action);
+    });
+    
+    // Also log when page loads
+    console.log('🔐 Login page loaded');
+    console.log('🔐 Form action:', document.getElementById('loginForm').action);
+    console.log('🔐 Form method:', document.getElementById('loginForm').method);
+  </script>
 </body>
 </html>
 

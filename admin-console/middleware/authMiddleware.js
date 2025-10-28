@@ -18,9 +18,14 @@ const isAuthenticated = (req, res, next) => {
 
 // Middleware to redirect authenticated users away from login
 const isNotAuthenticated = (req, res, next) => {
+  console.log('🔐 isNotAuthenticated middleware called for:', req.method, req.originalUrl);
+  console.log('🔐 Session adminId:', req.session?.adminId);
+  
   if (req.session && req.session.adminId) {
+    console.log('🔐 User already authenticated, redirecting to dashboard');
     return res.redirect('/');
   }
+  console.log('🔐 User not authenticated, proceeding to login');
   next();
 };
 
