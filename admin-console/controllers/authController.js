@@ -49,7 +49,17 @@ exports.postLogin = async (req, res) => {
     // Redirect to return URL or dashboard
     const returnTo = req.session.returnTo || '/';
     delete req.session.returnTo;
-    res.redirect(returnTo); console.log('🔴 Redirecting to:', returnTo);
+    console.log('🔴 Redirecting to:', returnTo);
+    
+    // Save session before redirect
+    req.session.save((err) => {
+      if (err) {
+        console.log('🔴 Session save error:', err);
+        return res.redirect('/auth/login');
+      }
+      console.log('🔴 Session saved successfully, redirecting to:', returnTo);
+      res.redirect(returnTo);
+    });
     
   } catch (error) {
     console.error('Login error:', error);

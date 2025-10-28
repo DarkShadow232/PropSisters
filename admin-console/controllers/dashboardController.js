@@ -6,6 +6,9 @@ const Contact = require('../models/Contact');
 // GET / - Dashboard
 exports.getDashboard = async (req, res) => {
   try {
+    console.log('🔴 Dashboard accessed - Session:', req.session);
+    console.log('🔴 Dashboard accessed - Admin:', req.admin);
+    console.log('🔴 Dashboard accessed - Session adminId:', req.session?.adminId);
     // Fetch statistics from MongoDB
     const [totalProperties, totalUsers, totalBookings, totalContacts] = await Promise.all([
       Rental.countDocuments(),

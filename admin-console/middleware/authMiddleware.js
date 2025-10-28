@@ -1,5 +1,8 @@
 // Middleware to check if admin is authenticated
 const isAuthenticated = (req, res, next) => {
+  console.log('🔴 isAuthenticated middleware - Session:', req.session);
+  console.log('🔴 isAuthenticated middleware - adminId:', req.session?.adminId);
+  
   if (req.session && req.session.adminId) {
     // Attach admin info to request
     req.admin = {
@@ -7,9 +10,11 @@ const isAuthenticated = (req, res, next) => {
       email: req.session.adminEmail,
       name: req.session.adminName
     };
+    console.log('🔴 isAuthenticated - Admin attached:', req.admin);
     return next();
   }
   
+  console.log('🔴 isAuthenticated - No session, redirecting to login');
   // Store the original URL to redirect back after login
   req.session.returnTo = req.originalUrl;
   req.flash('error', 'Please log in to access this page');
