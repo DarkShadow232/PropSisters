@@ -120,15 +120,31 @@ class BookingService {
    */
   async createBooking(bookingData: BookingData): Promise<BookingResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/create`, {
+      console.log('🔗 BookingService: Making request to:', `${this.baseUrl}/bookings/create`);
+      console.log('📦 BookingService: Request data:', bookingData);
+      
+      const response = await fetch(`${this.baseUrl}/bookings/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify(bookingData)
       });
 
+      console.log('📡 BookingService: Response status:', response.status);
+      console.log('📡 BookingService: Response headers:', Object.fromEntries(response.headers.entries()));
+      
+      // Check if response is HTML (error page)
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('text/html')) {
+        const htmlText = await response.text();
+        console.error('❌ BookingService: Received HTML instead of JSON:', htmlText.substring(0, 200));
+        throw new Error('Server returned HTML instead of JSON. Check if API endpoint exists.');
+      }
+
       const data = await response.json();
+      console.log('✅ BookingService: Response data:', data);
       return data;
     } catch (error) {
       console.error('Error creating booking:', error);
@@ -148,10 +164,12 @@ class BookingService {
   async getUserBookings(userId: string, status?: string): Promise<Booking[]> {
     try {
       const url = status && status !== 'all' 
-        ? `${this.baseUrl}/user/${userId}?status=${status}`
-        : `${this.baseUrl}/user/${userId}`;
+        ? `${this.baseUrl}/bookings/user/${userId}?status=${status}`
+        : `${this.baseUrl}/bookings/user/${userId}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: 'include'
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -170,7 +188,9 @@ class BookingService {
    */
   async getBookingDetails(bookingId: string): Promise<Booking | null> {
     try {
-      const response = await fetch(`${this.baseUrl}/${bookingId}`);
+      const response = await fetch(`${this.baseUrl}/bookings/${bookingId}`, {
+        credentials: 'include'
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -189,11 +209,12 @@ class BookingService {
    */
   async cancelBooking(bookingId: string, reason: string): Promise<CancelResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/${bookingId}/cancel`, {
+      const response = await fetch(`${this.baseUrl}/bookings/${bookingId}/cancel`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ reason })
       });
 
@@ -215,11 +236,12 @@ class BookingService {
    */
   async checkAvailability(propertyId: string, dates: DateRange): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/check-availability`, {
+      const response = await fetch(`${this.baseUrl}/bookings/check-availability`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           propertyId,
           checkIn: dates.startDate,
@@ -240,11 +262,12 @@ class BookingService {
    */
   async calculatePrice(propertyId: string, dates: DateRange): Promise<number> {
     try {
-      const response = await fetch(`${this.baseUrl}/calculate-price`, {
+      const response = await fetch(`${this.baseUrl}/bookings/calculate-price`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           propertyId,
           checkIn: dates.startDate,
@@ -265,11 +288,12 @@ class BookingService {
    */
   async getAvailabilitySummary(propertyId: string, startDate: string, endDate: string): Promise<AvailabilitySummary | null> {
     try {
-      const response = await fetch(`${this.baseUrl}/availability`, {
+      const response = await fetch(`${this.baseUrl}/bookings/availability`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           propertyId,
           startDate,
@@ -290,11 +314,12 @@ class BookingService {
    */
   async resendConfirmationEmail(bookingId: string): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/${bookingId}/resend-email`, {
+      const response = await fetch(`${this.baseUrl}/bookings/${bookingId}/resend-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ type: 'confirmation' })
       });
 
@@ -311,7 +336,9 @@ class BookingService {
    */
   async getBookingStats(): Promise<any> {
     try {
-      const response = await fetch(`${this.baseUrl}/admin/stats`);
+      const response = await fetch(`${this.baseUrl}/admin/stats`, {
+        credentials: 'include'
+      });
       const data = await response.json();
       return data.success ? data.stats : null;
     } catch (error) {
@@ -334,7 +361,9 @@ class BookingService {
         params.append('status', status);
       }
 
-      const response = await fetch(`${this.baseUrl}/admin/all?${params}`);
+      const response = await fetch(`${this.baseUrl}/admin/all?${params}`, {
+        credentials: 'include'
+      });
       const data = await response.json();
       return data;
     } catch (error) {
@@ -353,6 +382,7 @@ class BookingService {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ status })
       });
 
@@ -374,6 +404,7 @@ class BookingService {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ type })
       });
 
@@ -522,6 +553,7 @@ class BookingService {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
 
       if (!response.ok) {

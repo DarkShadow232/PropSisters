@@ -210,7 +210,7 @@ exports.createBooking = async (req, res) => {
     // Create booking
     const booking = new Booking({
       propertyId,
-      userId: req.user.id,
+      userId: req.user?.id || billingData?.userId || null, // Handle both authenticated and public requests
       checkIn: new Date(checkIn),
       checkOut: new Date(checkOut),
       guests: parseInt(guests),
@@ -243,7 +243,7 @@ exports.createBooking = async (req, res) => {
     const paymentKey = await paymobService.createPaymentKey(
       order.id,
       totalPrice,
-      req.user,
+      req.user || billingData, // Use billingData if no authenticated user
       billingData
     );
 

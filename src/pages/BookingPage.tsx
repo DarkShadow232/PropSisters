@@ -66,18 +66,28 @@ const BookingPage = () => {
   
   // Form validation state
   const [errors, setErrors] = useState({
-    paymentMethod: "",
-    paymentSubMethod: "",
     phone: "",
     firstName: "",
     lastName: "",
-    email: "",
-    cardNumber: "",
-    cardExpiry: "",
-    cardCVV: "",
-    accountNumber: "",
-    routingNumber: ""
+    email: ""
   });
+  
+  // Pre-populate form with user data
+  useEffect(() => {
+    if (currentUser) {
+      const userData = {
+        firstName: currentUser.displayName?.split(' ')[0] || '',
+        lastName: currentUser.displayName?.split(' ').slice(1).join(' ') || '',
+        email: currentUser.email || '',
+        phone: currentUser.phoneNumber || ''
+      };
+      console.log('👤 Pre-populating form with user data:', userData);
+      setFormData(prev => ({
+        ...prev,
+        ...userData
+      }));
+    }
+  }, [currentUser]);
   
   // Fetch the rental by ID from MongoDB
   useEffect(() => {
@@ -174,54 +184,51 @@ const BookingPage = () => {
   // Validate payment information before submission
   const validatePaymentInfo = () => {
     const newErrors = {
-      paymentMethod: "",
-      paymentSubMethod: "",
       phone: "",
       firstName: "",
       lastName: "",
-      email: "",
-      cardNumber: "",
-      cardExpiry: "",
-      cardCVV: "",
-      accountNumber: "",
-      routingNumber: ""
+      email: ""
     };
     
-    // Basic validation for all payment methods
-    if (!formData.paymentMethod) {
-      newErrors.paymentMethod = 'Please select a payment method';
-    }
-    
-    // Validate phone number for mobile wallet payments
-    if (['vodafone-cash', 'orange-money', 'etisalat-cash'].includes(formData.paymentSubMethod)) {
-      if (!formData.phone || !isValidEgyptianPhone(formData.phone)) {
-        newErrors.phone = 'Please enter a valid Egyptian mobile number (+20xxxxxxxxxx)';
-      }
-    }
+    let hasErrors = false;
     
     // Validate required guest information
     if (!formData.firstName.trim()) {
       newErrors.firstName = 'First name is required';
+      hasErrors = true;
     }
     
     if (!formData.lastName.trim()) {
       newErrors.lastName = 'Last name is required';
+      hasErrors = true;
     }
     
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
+      hasErrors = true;
     }
     
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
+      hasErrors = true;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email.trim() && !emailRegex.test(formData.email.trim())) {
+      newErrors.email = 'Please enter a valid email address';
+      hasErrors = true;
     }
     
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    console.log('✅ Validation result:', { hasErrors, newErrors, formData });
+    return !hasErrors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🔘 Button clicked - handleSubmit called');
+    console.log('👤 Current user:', currentUser);
     
     // Check if user is authenticated
     if (!currentUser) {
@@ -236,7 +243,32 @@ const BookingPage = () => {
     
     // Validate payment information
     if (!validatePaymentInfo()) {
+      console.log('❌ Validation failed:', errors);
+      console.log('📝 Current form data:', formData);
       return;
+    }
+    
+    console.log('✅ Validation passed - proceeding with booking');
+    
+    // Test API connectivity first
+    try {
+      console.log('🧪 Testing API connectivity...');
+      const testResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.propsiss.com/api'}/properties`, {
+        credentials: 'include'
+      });
+      console.log('🧪 API test response status:', testResponse.status);
+      console.log('🧪 API test response headers:', Object.fromEntries(testResponse.headers.entries()));
+      
+      // Test authentication endpoint
+      console.log('🔐 Testing authentication...');
+      const authResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.propsiss.com/api'}/auth/verify`, {
+        credentials: 'include'
+      });
+      console.log('🔐 Auth test response status:', authResponse.status);
+      const authData = await authResponse.text();
+      console.log('🔐 Auth test response:', authData.substring(0, 200));
+    } catch (testError) {
+      console.error('🧪 API test failed:', testError);
     }
     
     // Validate dates are selected
@@ -322,6 +354,8 @@ const BookingPage = () => {
       
       const paymentResult = await processPayment(paymentRequest);
       
+      console.log('💳 Payment result:', paymentResult);
+      
       if (!paymentResult.success) {
         toast({
           title: "Payment Failed",
@@ -333,6 +367,7 @@ const BookingPage = () => {
       
       // Redirect to Paymob payment page
       if (paymentResult.redirectUrl) {
+        console.log('🔄 Redirecting to Paymob:', paymentResult.redirectUrl);
         window.location.href = paymentResult.redirectUrl;
         return;
       }
@@ -411,7 +446,11 @@ const BookingPage = () => {
                             value={formData.firstName} 
                             onChange={handleInputChange} 
                             required 
+                            className={errors.firstName ? "border-red-500" : ""}
                           />
+                          {errors.firstName && (
+                            <p className="text-red-500 text-sm">{errors.firstName}</p>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="lastName">Last Name</Label>
@@ -421,7 +460,11 @@ const BookingPage = () => {
                             value={formData.lastName} 
                             onChange={handleInputChange} 
                             required 
+                            className={errors.lastName ? "border-red-500" : ""}
                           />
+                          {errors.lastName && (
+                            <p className="text-red-500 text-sm">{errors.lastName}</p>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="email">Email</Label>
@@ -432,7 +475,11 @@ const BookingPage = () => {
                             value={formData.email} 
                             onChange={handleInputChange} 
                             required 
+                            className={errors.email ? "border-red-500" : ""}
                           />
+                          {errors.email && (
+                            <p className="text-red-500 text-sm">{errors.email}</p>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="phone">Phone Number</Label>
@@ -442,7 +489,11 @@ const BookingPage = () => {
                             value={formData.phone} 
                             onChange={handleInputChange} 
                             required 
+                            className={errors.phone ? "border-red-500" : ""}
                           />
+                          {errors.phone && (
+                            <p className="text-red-500 text-sm">{errors.phone}</p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -604,6 +655,7 @@ const BookingPage = () => {
                           type="submit" 
                           className="w-full bg-[#b94a3b] hover:bg-[#a03e30] text-white py-3 px-6 rounded-md font-medium" 
                           disabled={isSubmitting}
+                          onClick={() => console.log('🔘 Button onClick triggered')}
                         >
                           {isSubmitting ? "Processing Booking..." : "Complete Booking"}
                         </Button>

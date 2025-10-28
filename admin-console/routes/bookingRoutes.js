@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const bookingController = require('../controllers/bookingController');
-const { isAuthenticated, isAdmin } = require('../middleware/authMiddleware');
+const { isAuthenticated, isAdmin, isUserAuthenticated } = require('../middleware/authMiddleware');
 
 // Public booking routes
-router.post('/create', isAuthenticated, bookingController.createBooking);
+router.post('/create', bookingController.createBooking);
 router.post('/payment/callback', bookingController.handlePaymentCallback);
-router.get('/user/:userId', isAuthenticated, bookingController.getUserBookings);
+router.get('/user/:userId', isUserAuthenticated, bookingController.getUserBookings);
 router.get('/property/:propertyId', bookingController.getBookingsByProperty);
-router.get('/:id', isAuthenticated, bookingController.getBookingDetails);
-router.post('/:id/cancel', isAuthenticated, bookingController.cancelBooking);
+router.get('/:id', isUserAuthenticated, bookingController.getBookingDetails);
+router.post('/:id/cancel', isUserAuthenticated, bookingController.cancelBooking);
 
 // Admin booking routes
 router.get('/admin/all', isAdmin, async (req, res) => {
