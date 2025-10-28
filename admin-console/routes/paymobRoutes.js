@@ -85,7 +85,140 @@ router.post('/create-payment', async (req, res) => {
   }
 });
 
-// Handle Paymob callback
+// Handle Paymob callback (GET with query parameters)
+router.get('/callback', async (req, res) => {
+  try {
+    console.log('🔔 Paymob GET callback received!');
+    console.log('🔔 Query parameters:', req.query);
+    console.log('🔔 Request headers:', req.headers);
+    
+    const paymobService = new PaymobService();
+    
+    // Extract data from query parameters
+    const {
+      id: transactionId,
+      pending,
+      amount_cents,
+      success: transactionSuccess,
+      is_auth,
+      is_capture,
+      is_standalone_payment,
+      is_voided,
+      is_refunded,
+      is_3d_secure,
+      integration_id,
+      profile_id,
+      has_parent_transaction,
+      order: orderId,
+      created_at,
+      currency,
+      merchant_commission,
+      accept_fees,
+      discount_details,
+      is_void,
+      is_refund,
+      error_occured,
+      refunded_amount_cents,
+      captured_amount,
+      updated_at,
+      is_settled,
+      bill_balanced,
+      is_bill,
+      owner,
+      'data.message': dataMessage,
+      'source_data.type': sourceDataType,
+      'source_data.pan': sourceDataPan,
+      'source_data.sub_type': sourceDataSubType,
+      acq_response_code,
+      txn_response_code,
+      hmac
+    } = req.query;
+    
+    console.log('🔔 Processing GET webhook:');
+    console.log('🔔 Transaction success:', transactionSuccess);
+    console.log('🔔 Transaction ID:', transactionId);
+    console.log('🔔 Order ID:', orderId);
+    console.log('🔔 HMAC:', hmac);
+    
+    if (transactionSuccess === 'true') {
+      // Payment successful - update booking status
+      console.log(`Payment successful for order ${orderId}, transaction ${transactionId}`);
+      
+      try {
+        // Find and update the booking
+        const booking = await Booking.findOneAndUpdate(
+          { 'paymobData.orderId': parseInt(orderId) },
+          { 
+            $set: {
+              status: 'confirmed',
+              paymentStatus: 'paid',
+              bookingStatus: 'confirmed',
+              'paymobData.transactionId': transactionId,
+              'paymobData.hmac': hmac,
+              updatedAt: new Date()
+            }
+          },
+          { new: true }
+        );
+
+        if (booking) {
+          console.log(`✅ Booking ${booking._id} confirmed successfully`);
+          res.json({
+            success: true,
+            message: 'Payment processed successfully',
+            bookingId: booking._id
+          });
+        } else {
+          console.log(`⚠️ No booking found for order ${orderId}`);
+          res.json({
+            success: true,
+            message: 'Payment processed successfully (booking not found)'
+          });
+        }
+      } catch (dbError) {
+        console.error('Database update error:', dbError);
+        res.json({
+          success: true,
+          message: 'Payment processed successfully (database update failed)'
+        });
+      }
+    } else {
+      // Payment failed
+      console.log(`Payment failed for order ${orderId}, transaction ${transactionId}`);
+      console.log(`Error message: ${dataMessage}`);
+      
+      try {
+        // Update booking status to failed
+        await Booking.findOneAndUpdate(
+          { 'paymobData.orderId': parseInt(orderId) },
+          { 
+            $set: {
+              paymentStatus: 'failed',
+              updatedAt: new Date()
+            }
+          }
+        );
+      } catch (dbError) {
+        console.error('Database update error for failed payment:', dbError);
+      }
+      
+      res.json({
+        success: false,
+        message: 'Payment failed',
+        error: dataMessage
+      });
+    }
+
+  } catch (error) {
+    console.error('Paymob GET callback error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Callback processing failed'
+    });
+  }
+});
+
+// Handle Paymob callback (POST with JSON body)
 router.post('/callback', async (req, res) => {
   try {
     console.log('🔔 Paymob webhook callback received!');
