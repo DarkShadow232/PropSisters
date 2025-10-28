@@ -20,6 +20,10 @@ const rentalSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  googleMapsUrl: {
+    type: String,
+    trim: true
+  },
   price: {
     type: Number,
     required: true,

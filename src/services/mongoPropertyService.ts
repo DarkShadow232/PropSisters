@@ -16,6 +16,7 @@ export interface MongoProperty {
   description: string;
   location: string;
   address: string;
+  googleMapsUrl?: string;
   price: number;
   bedrooms: number;
   bathrooms: number;
@@ -208,7 +209,7 @@ export const convertMongoToApartment = (mongoProp: MongoProperty): any => {
       },
     ],
     googleAddress: mongoProp.address,
-    googleMapsUrl: '', // Can be generated from address
+    googleMapsUrl: mongoProp.googleMapsUrl || '',
     coordinates: { latitude: 0, longitude: 0 }, // Can be added to schema if needed
   };
 };

@@ -102,6 +102,7 @@ exports.postCreateProperty = async (req, res) => {
       description,
       location,
       address,
+      googleMapsUrl,
       price,
       bedrooms,
       bathrooms,
@@ -152,6 +153,7 @@ exports.postCreateProperty = async (req, res) => {
       description,
       location,
       address,
+      googleMapsUrl: googleMapsUrl || '',
       price: parseFloat(price),
       basePrice: parseFloat(price), // Add basePrice field
       bedrooms: parseInt(bedrooms) || 0,
@@ -223,6 +225,7 @@ exports.postEditProperty = async (req, res) => {
       description,
       location,
       address,
+      googleMapsUrl,
       price,
       bedrooms,
       bathrooms,
@@ -282,6 +285,7 @@ exports.postEditProperty = async (req, res) => {
     property.description = description;
     property.location = location;
     property.address = address;
+    property.googleMapsUrl = googleMapsUrl || '';
     property.price = parseFloat(price);
     property.bedrooms = parseInt(bedrooms) || 0;
     property.bathrooms = parseInt(bathrooms) || 0;

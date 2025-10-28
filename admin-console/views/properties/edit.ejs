@@ -48,6 +48,14 @@
             </div>
           </div>
 
+          <div class="mb-3">
+            <label for="googleMapsUrl" class="form-label">Google Maps URL (optional)</label>
+            <input type="url" class="form-control" id="googleMapsUrl" name="googleMapsUrl"
+                   value="<%= property.googleMapsUrl || '' %>"
+                   placeholder="https://www.google.com/maps/...">
+            <small class="form-text text-muted">Paste the Google Maps embed or share URL for this property</small>
+          </div>
+
           <div class="row">
             <div class="col-md-4 mb-3">
               <label for="price" class="form-label">Price per Night ($) <span class="text-danger">*</span></label>
