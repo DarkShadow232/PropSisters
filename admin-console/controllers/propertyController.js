@@ -92,6 +92,11 @@ exports.getCreateProperty = (req, res) => {
 // POST /properties/create - Create new property
 exports.postCreateProperty = async (req, res) => {
   try {
+    console.log('🔍 Property creation attempt:', {
+      body: req.body,
+      files: req.files ? req.files.length : 0
+    });
+
     const {
       title,
       description,
@@ -111,6 +116,13 @@ exports.postCreateProperty = async (req, res) => {
 
     // Validate required fields
     if (!title || !description || !location || !address || !price) {
+      console.log('❌ Validation failed - missing required fields:', {
+        title: !!title,
+        description: !!description,
+        location: !!location,
+        address: !!address,
+        price: !!price
+      });
       req.flash('error', 'Please fill in all required fields');
       return res.redirect('/properties/create');
     }
@@ -141,6 +153,7 @@ exports.postCreateProperty = async (req, res) => {
       location,
       address,
       price: parseFloat(price),
+      basePrice: parseFloat(price), // Add basePrice field
       bedrooms: parseInt(bedrooms) || 0,
       bathrooms: parseInt(bathrooms) || 0,
       amenities: amenitiesArray,
@@ -155,10 +168,17 @@ exports.postCreateProperty = async (req, res) => {
 
     await rental.save();
 
+    console.log('✅ Property created successfully:', rental._id);
     req.flash('success', 'Property created successfully!');
     res.redirect('/properties');
   } catch (error) {
-    console.error('Error creating property:', error);
+    console.error('❌ Error creating property:', error);
+    console.error('❌ Error details:', {
+      name: error.name,
+      message: error.message,
+      code: error.code,
+      errors: error.errors
+    });
     req.flash('error', 'Error creating property: ' + error.message);
     res.redirect('/properties/create');
   }
