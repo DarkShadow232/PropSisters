@@ -278,6 +278,76 @@ class EmailService {
   }
 
   /**
+   * Send password reset email
+   * @param {Object} user - User object
+   * @param {string} resetToken - Reset token for password reset
+   * @returns {Promise<Object>} Email send result
+   */
+  async sendPasswordResetEmail(user, resetToken) {
+    try {
+      console.log('📧 EmailService: Starting password reset email process');
+      console.log('📧 EmailService: User details:', {
+        email: user.email,
+        displayName: user.displayName,
+        tokenLength: resetToken.length
+      });
+
+      // Check email configuration
+      console.log('📧 EmailService: Checking email configuration...');
+      console.log('📧 EmailService: EMAIL_USER:', process.env.EMAIL_USER ? 'Set' : 'Not set');
+      console.log('📧 EmailService: EMAIL_PASSWORD:', process.env.EMAIL_PASSWORD ? 'Set' : 'Not set');
+      
+      if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+        throw new Error('Email configuration is missing. Please set EMAIL_USER and EMAIL_PASSWORD environment variables.');
+      }
+
+      // Test email configuration
+      console.log('📧 EmailService: Testing email configuration...');
+      await this.transporter.verify();
+      console.log('✅ EmailService: Email configuration is valid');
+
+      const templatePath = path.join(__dirname, '../views/emails/password-reset.ejs');
+      console.log('📧 EmailService: Template path:', templatePath);
+      
+      const template = fs.readFileSync(templatePath, 'utf8');
+      console.log('✅ EmailService: Template loaded successfully');
+      
+      const html = ejs.render(template, {
+        user,
+        resetToken
+      });
+      console.log('✅ EmailService: Template rendered successfully');
+
+      const mailOptions = {
+        from: `"PropSisters" <${process.env.EMAIL_USER}>`,
+        to: user.email,
+        subject: 'Password Reset Request - PropSisters',
+        html: html
+      };
+
+      console.log('📧 EmailService: Sending email with options:', {
+        from: mailOptions.from,
+        to: mailOptions.to,
+        subject: mailOptions.subject
+      });
+
+      const result = await this.transporter.sendMail(mailOptions);
+      console.log('✅ EmailService: Password reset email sent successfully to:', user.email);
+      console.log('✅ EmailService: Message ID:', result.messageId);
+      return result;
+    } catch (error) {
+      console.error('❌ EmailService: Error sending password reset email:', error);
+      console.error('❌ EmailService: Error details:', {
+        name: error.name,
+        message: error.message,
+        code: error.code,
+        response: error.response
+      });
+      throw error;
+    }
+  }
+
+  /**
    * Test email configuration
    * @returns {Promise<boolean>} Whether email configuration is working
    */

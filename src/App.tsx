@@ -19,6 +19,8 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import AddPropertyPage from "./pages/AddPropertyPage";
 import PropertySistersClubPage from "./pages/PropertySistersClubPage";
 import UserDashboardPage from "./pages/UserDashboardPage";
@@ -59,6 +61,8 @@ const App = () => {
               <Route path="contact" element={<ContactPage />} />
               <Route path="sign-in" element={<SignInPage />} />
               <Route path="sign-up" element={<SignUpPage />} />
+              <Route path="forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="reset-password" element={<ResetPasswordPage />} />
               <Route path="add-property" element={
                 <ProtectedRoute requiredRole="owner">
                   <AddPropertyPage />

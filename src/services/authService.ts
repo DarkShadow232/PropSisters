@@ -141,6 +141,46 @@ class AuthService {
       throw new Error(error.response?.data?.message || 'Failed to change password');
     }
   }
+
+  /**
+   * Request password reset
+   */
+  async requestPasswordReset(email: string): Promise<AuthResponse> {
+    try {
+      console.log('🔍 AuthService: Requesting password reset for email:', email);
+      console.log('🔍 AuthService: Making request to:', this.axiosInstance.defaults.baseURL + '/auth/forgot-password');
+      
+      const response = await this.axiosInstance.post('/auth/forgot-password', {
+        email
+      });
+      
+      console.log('✅ AuthService: Password reset request successful:', response.data);
+      return response.data as AuthResponse;
+    } catch (error: any) {
+      console.error('❌ AuthService: Password reset request failed:', error);
+      console.error('❌ AuthService: Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      throw new Error(error.response?.data?.message || 'Failed to send password reset email');
+    }
+  }
+
+  /**
+   * Reset password with token
+   */
+  async resetPassword(token: string, newPassword: string): Promise<AuthResponse> {
+    try {
+      const response = await this.axiosInstance.post('/auth/reset-password', {
+        token,
+        newPassword
+      });
+      return response.data as AuthResponse;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to reset password');
+    }
+  }
 }
 
 export const authService = new AuthService();

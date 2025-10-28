@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -14,7 +14,7 @@ import { RefreshCw } from "lucide-react";
 
 const RentalsPage = () => {
   const navigate = useNavigate();
-  const [priceRange, setPriceRange] = useState([100, 500]);
+  const [priceRange, setPriceRange] = useState([2000, 3500]);
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
   const [selectedDates, setSelectedDates] = useState<{
     from: Date | undefined;
@@ -29,16 +29,113 @@ const RentalsPage = () => {
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // Filter states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
+  const [guestsFilter, setGuestsFilter] = useState("any");
+  const [durationFilter, setDurationFilter] = useState("any");
+  const [amenitiesFilter, setAmenitiesFilter] = useState<string[]>([]);
+  const [bedroomsFilter, setBedroomsFilter] = useState("any");
+  const [bathroomsFilter, setBathroomsFilter] = useState("any");
+  const [sortBy, setSortBy] = useState("price-asc");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Memoize filters to prevent unnecessary re-renders
+  const propertyFilters = useMemo(() => ({
+    limit: 100, // Fetch all properties
+  }), []);
+
   // Fetch properties from MongoDB (optimized - no polling)
   const { properties, loading, error, lastFetch, refetch } = useProperties({
     pollInterval: 0, // Polling disabled for better performance
-    filters: {
-      limit: 100, // Fetch all properties
-    },
+    filters: propertyFilters,
+    autoFetch: true,
   });
 
-  // Use fetched properties
-  const limitedRentals = properties;
+  // Filter and sort properties
+  const filteredAndSortedRentals = useMemo(() => {
+    let filtered = properties.filter((rental) => {
+      // Search query filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = 
+          rental.title.toLowerCase().includes(query) ||
+          rental.location.toLowerCase().includes(query) ||
+          rental.description.toLowerCase().includes(query) ||
+          rental.amenities.some(amenity => amenity.toLowerCase().includes(query));
+        if (!matchesSearch) return false;
+      }
+
+      // Location filter
+      if (locationFilter) {
+        const location = locationFilter.toLowerCase();
+        if (!rental.location.toLowerCase().includes(location)) return false;
+      }
+
+      // Price range filter
+      if (rental.price < priceRange[0] || rental.price > priceRange[1]) return false;
+
+      // Guests filter (based on bedrooms)
+      if (guestsFilter && guestsFilter !== "any") {
+        const guests = parseInt(guestsFilter);
+        const maxGuests = rental.bedrooms * 2; // Assume 2 guests per bedroom
+        if (guests > maxGuests) return false;
+      }
+
+      // Bedrooms filter
+      if (bedroomsFilter && bedroomsFilter !== "any") {
+        const bedrooms = parseInt(bedroomsFilter);
+        if (rental.bedrooms !== bedrooms) return false;
+      }
+
+      // Bathrooms filter
+      if (bathroomsFilter && bathroomsFilter !== "any") {
+        const bathrooms = parseInt(bathroomsFilter);
+        if (rental.bathrooms !== bathrooms) return false;
+      }
+
+      // Amenities filter
+      if (amenitiesFilter.length > 0) {
+        const hasAllAmenities = amenitiesFilter.every(amenity => 
+          rental.amenities.some(rentalAmenity => 
+            rentalAmenity.toLowerCase().includes(amenity.toLowerCase())
+          )
+        );
+        if (!hasAllAmenities) return false;
+      }
+
+      return true;
+    });
+
+    // Sort properties
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "price-asc":
+          return a.price - b.price;
+        case "price-desc":
+          return b.price - a.price;
+        case "bedrooms-asc":
+          return a.bedrooms - b.bedrooms;
+        case "bedrooms-desc":
+          return b.bedrooms - a.bedrooms;
+        case "bathrooms-asc":
+          return a.bathrooms - b.bathrooms;
+        case "bathrooms-desc":
+          return b.bathrooms - a.bathrooms;
+        case "title-asc":
+          return a.title.localeCompare(b.title);
+        case "title-desc":
+          return b.title.localeCompare(a.title);
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [properties, searchQuery, locationFilter, priceRange, guestsFilter, bedroomsFilter, bathroomsFilter, amenitiesFilter, sortBy]);
+
+  // Use filtered properties
+  const limitedRentals = filteredAndSortedRentals;
   
   // Calculate pagination
   const itemsPerPage = 5;
@@ -83,6 +180,27 @@ const RentalsPage = () => {
       description: `You've started the booking process for apartment #${apartmentId}. This functionality will be implemented soon.`,
     });
     setIsDetailModalOpen(false);
+  };
+
+  const clearAllFilters = () => {
+    setSearchQuery("");
+    setLocationFilter("");
+    setGuestsFilter("any");
+    setDurationFilter("any");
+    setAmenitiesFilter([]);
+    setBedroomsFilter("any");
+    setBathroomsFilter("any");
+    setPriceRange([2000, 3500]);
+    setSortBy("price-asc");
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   // Find the selected apartment from the properties array
@@ -131,13 +249,29 @@ const RentalsPage = () => {
         {/* Filters and Search */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-10">
           {/* Search & Filter on Mobile */}
-          <MobileFilter />
+          <MobileFilter 
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
 
           {/* Desktop Filters Sidebar */}
           <div className="hidden lg:block">
             <FilterSidebar 
               priceRange={priceRange} 
-              setPriceRange={setPriceRange} 
+              setPriceRange={setPriceRange}
+              locationFilter={locationFilter}
+              setLocationFilter={setLocationFilter}
+              guestsFilter={guestsFilter}
+              setGuestsFilter={setGuestsFilter}
+              durationFilter={durationFilter}
+              setDurationFilter={setDurationFilter}
+              amenitiesFilter={amenitiesFilter}
+              setAmenitiesFilter={setAmenitiesFilter}
+              bedroomsFilter={bedroomsFilter}
+              setBedroomsFilter={setBedroomsFilter}
+              bathroomsFilter={bathroomsFilter}
+              setBathroomsFilter={setBathroomsFilter}
+              clearAllFilters={clearAllFilters}
             />
           </div>
 
@@ -145,7 +279,12 @@ const RentalsPage = () => {
           <div className="lg:col-span-3">
             {/* Desktop Search Bar */}
             <div className="hidden lg:flex">
-              <SearchBar />
+              <SearchBar 
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+              />
             </div>
 
             {/* Results Count & Sort */}
@@ -155,12 +294,12 @@ const RentalsPage = () => {
                 <Button 
                   variant="outline"
                   size="sm"
-                  onClick={() => refetch()}
-                  disabled={loading}
+                  onClick={handleRefresh}
+                  disabled={isRefreshing || loading}
                   className="flex items-center gap-2"
                 >
-                  <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                  Refresh
+                  <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  {isRefreshing ? 'Refreshing...' : 'Refresh'}
                 </Button>
                 {lastFetch && (
                   <span className="text-xs text-foreground/50 flex items-center">

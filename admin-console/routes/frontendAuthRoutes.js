@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const passwordResetController = require('../controllers/passwordResetController');
 
 // ==================== EMAIL/PASSWORD AUTHENTICATION (MongoDB) ====================
 
@@ -385,5 +386,19 @@ router.post('/change-password', async (req, res) => {
     });
   }
 });
+
+// ==================== PASSWORD RESET ROUTES ====================
+
+/**
+ * POST /api/auth/forgot-password
+ * Request password reset
+ */
+router.post('/forgot-password', passwordResetController.requestPasswordReset);
+
+/**
+ * POST /api/auth/reset-password
+ * Reset password with token
+ */
+router.post('/reset-password', passwordResetController.resetPassword);
 
 module.exports = router;
