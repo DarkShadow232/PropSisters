@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const PaymobService = require('../services/paymobService');
+const Booking = require('../models/Booking');
 
 // Create Paymob payment
 router.post('/create-payment', async (req, res) => {
@@ -48,6 +49,25 @@ router.post('/create-payment', async (req, res) => {
     // Generate payment URL
     const paymentUrl = paymobService.generatePaymentUrl(paymentKey.token);
 
+    // Store Paymob data in booking if bookingId is provided
+    if (bookingInfo.bookingId) {
+      try {
+        await Booking.findByIdAndUpdate(bookingInfo.bookingId, {
+          $set: {
+            'paymobData.paymentKey': paymentKey.token,
+            'paymobData.orderId': order.id,
+            'paymobData.paymentToken': paymentKey.token,
+            paymentMethod: paymentMethod || 'card',
+            updatedAt: new Date()
+          }
+        });
+        console.log(`✅ Paymob data stored for booking ${bookingInfo.bookingId}`);
+      } catch (dbError) {
+        console.error('Error storing Paymob data:', dbError);
+        // Continue with payment even if database update fails
+      }
+    }
+
     res.json({
       success: true,
       transactionId: paymentKey.token,
@@ -86,16 +106,66 @@ router.post('/callback', async (req, res) => {
       // Payment successful - update booking status
       console.log(`Payment successful for order ${order.id}, transaction ${id}`);
       
-      // TODO: Update booking status in database
-      // await updateBookingStatus(order.id, 'confirmed');
-      
-      res.json({
-        success: true,
-        message: 'Payment processed successfully'
-      });
+      try {
+        // Find and update the booking
+        const booking = await Booking.findOneAndUpdate(
+          { 'paymobData.orderId': order.id },
+          { 
+            $set: {
+              status: 'confirmed',
+              paymentStatus: 'paid',
+              bookingStatus: 'confirmed',
+              'paymobData.transactionId': id,
+              'paymobData.hmac': req.body.hmac,
+              updatedAt: new Date()
+            }
+          },
+          { new: true }
+        );
+
+        if (booking) {
+          console.log(`✅ Booking ${booking._id} confirmed successfully`);
+          
+          // TODO: Send confirmation email to customer
+          // TODO: Send notification to admin
+          
+          res.json({
+            success: true,
+            message: 'Payment processed successfully',
+            bookingId: booking._id
+          });
+        } else {
+          console.log(`⚠️ No booking found for order ${order.id}`);
+          res.json({
+            success: true,
+            message: 'Payment processed successfully (booking not found)'
+          });
+        }
+      } catch (dbError) {
+        console.error('Database update error:', dbError);
+        res.json({
+          success: true,
+          message: 'Payment processed successfully (database update failed)'
+        });
+      }
     } else {
       // Payment failed
       console.log(`Payment failed for order ${order.id}, transaction ${id}`);
+      
+      try {
+        // Update booking status to failed
+        await Booking.findOneAndUpdate(
+          { 'paymobData.orderId': order.id },
+          { 
+            $set: {
+              paymentStatus: 'failed',
+              updatedAt: new Date()
+            }
+          }
+        );
+      } catch (dbError) {
+        console.error('Database update error for failed payment:', dbError);
+      }
       
       res.json({
         success: false,
