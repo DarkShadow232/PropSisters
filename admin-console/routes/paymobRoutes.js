@@ -163,17 +163,205 @@ router.get('/callback', async (req, res) => {
 
         if (booking) {
           console.log(`✅ Booking ${booking._id} confirmed successfully`);
-          res.json({
-            success: true,
-            message: 'Payment processed successfully',
-            bookingId: booking._id
-          });
+          res.send(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Payment Successful - PropSisters</title>
+              <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+              <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+              <style>
+                body {
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  min-height: 100vh;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                .payment-card {
+                  background: white;
+                  border-radius: 15px;
+                  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                  overflow: hidden;
+                  max-width: 500px;
+                  width: 100%;
+                  text-align: center;
+                }
+                .payment-header {
+                  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                  color: white;
+                  padding: 30px;
+                }
+                .payment-body {
+                  padding: 40px 30px;
+                }
+                .success-icon {
+                  font-size: 4rem;
+                  color: #28a745;
+                  margin-bottom: 20px;
+                }
+                .btn-primary {
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  border: none;
+                  padding: 12px 30px;
+                  font-weight: 600;
+                  border-radius: 25px;
+                }
+                .btn-primary:hover {
+                  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+                }
+                .booking-details {
+                  background: #f8f9fa;
+                  border-radius: 10px;
+                  padding: 15px;
+                  margin: 20px 0;
+                  font-family: monospace;
+                  font-size: 0.9rem;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="payment-card">
+                <div class="payment-header">
+                  <i class="bi bi-check-circle-fill fs-1 mb-3"></i>
+                  <h2 class="mb-0">Payment Successful!</h2>
+                  <p class="mb-0 mt-2 opacity-75">PropSisters</p>
+                </div>
+                <div class="payment-body">
+                  <div class="success-icon">
+                    <i class="bi bi-check-circle"></i>
+                  </div>
+                  <h4 class="text-success mb-3">Booking Confirmed</h4>
+                  <p class="text-muted mb-4">
+                    Congratulations! Your payment has been processed successfully 
+                    and your booking is now confirmed.
+                  </p>
+                  
+                  <div class="booking-details">
+                    <strong>Booking ID:</strong> ${booking._id}<br>
+                    <strong>Transaction ID:</strong> ${transactionId}<br>
+                    <strong>Status:</strong> Confirmed
+                  </div>
+                  
+                  <div class="row mt-4">
+                    <div class="col-6">
+                      <a href="https://propsiss.com" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-house"></i> Go Home
+                      </a>
+                    </div>
+                    <div class="col-6">
+                      <a href="https://propsiss.com/rentals" class="btn btn-primary w-100">
+                        <i class="bi bi-calendar-check"></i> View Bookings
+                      </a>
+                    </div>
+                  </div>
+                  
+                  <div class="mt-4">
+                    <small class="text-muted">
+                      <i class="bi bi-envelope"></i>
+                      A confirmation email will be sent to your registered email address.
+                    </small>
+                  </div>
+                </div>
+              </div>
+              
+              <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            </body>
+            </html>
+          `);
         } else {
           console.log(`⚠️ No booking found for order ${orderId}`);
-          res.json({
-            success: true,
-            message: 'Payment processed successfully (booking not found)'
-          });
+          res.send(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Payment Successful - PropSisters</title>
+              <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+              <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+              <style>
+                body {
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  min-height: 100vh;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                .payment-card {
+                  background: white;
+                  border-radius: 15px;
+                  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                  overflow: hidden;
+                  max-width: 500px;
+                  width: 100%;
+                  text-align: center;
+                }
+                .payment-header {
+                  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                  color: white;
+                  padding: 30px;
+                }
+                .payment-body {
+                  padding: 40px 30px;
+                }
+                .success-icon {
+                  font-size: 4rem;
+                  color: #28a745;
+                  margin-bottom: 20px;
+                }
+                .btn-primary {
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  border: none;
+                  padding: 12px 30px;
+                  font-weight: 600;
+                  border-radius: 25px;
+                }
+                .btn-primary:hover {
+                  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+                }
+              </style>
+            </head>
+            <body>
+              <div class="payment-card">
+                <div class="payment-header">
+                  <i class="bi bi-check-circle-fill fs-1 mb-3"></i>
+                  <h2 class="mb-0">Payment Successful!</h2>
+                  <p class="mb-0 mt-2 opacity-75">PropSisters</p>
+                </div>
+                <div class="payment-body">
+                  <div class="success-icon">
+                    <i class="bi bi-check-circle"></i>
+                  </div>
+                  <h4 class="text-success mb-3">Payment Processed</h4>
+                  <p class="text-muted mb-4">
+                    Your payment has been processed successfully. 
+                    Please contact support if you have any questions.
+                  </p>
+                  
+                  <div class="row mt-4">
+                    <div class="col-6">
+                      <a href="https://propsiss.com" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-house"></i> Go Home
+                      </a>
+                    </div>
+                    <div class="col-6">
+                      <a href="https://propsiss.com/rentals" class="btn btn-primary w-100">
+                        <i class="bi bi-calendar-check"></i> View Rentals
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            </body>
+            </html>
+          `);
         }
       } catch (dbError) {
         console.error('Database update error:', dbError);
@@ -202,11 +390,115 @@ router.get('/callback', async (req, res) => {
         console.error('Database update error for failed payment:', dbError);
       }
       
-      res.json({
-        success: false,
-        message: 'Payment failed',
-        error: dataMessage
-      });
+      // Return HTML response for better user experience
+      res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Payment Failed - PropSisters</title>
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+          <style>
+            body {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+            .payment-card {
+              background: white;
+              border-radius: 15px;
+              box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+              overflow: hidden;
+              max-width: 500px;
+              width: 100%;
+              text-align: center;
+            }
+            .payment-header {
+              background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+              color: white;
+              padding: 30px;
+            }
+            .payment-body {
+              padding: 40px 30px;
+            }
+            .error-icon {
+              font-size: 4rem;
+              color: #dc3545;
+              margin-bottom: 20px;
+            }
+            .btn-primary {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              border: none;
+              padding: 12px 30px;
+              font-weight: 600;
+              border-radius: 25px;
+            }
+            .btn-primary:hover {
+              background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            }
+            .error-details {
+              background: #f8f9fa;
+              border-radius: 10px;
+              padding: 15px;
+              margin: 20px 0;
+              font-family: monospace;
+              font-size: 0.9rem;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="payment-card">
+            <div class="payment-header">
+              <i class="bi bi-x-circle-fill fs-1 mb-3"></i>
+              <h2 class="mb-0">Payment Failed</h2>
+              <p class="mb-0 mt-2 opacity-75">PropSisters</p>
+            </div>
+            <div class="payment-body">
+              <div class="error-icon">
+                <i class="bi bi-exclamation-triangle"></i>
+              </div>
+              <h4 class="text-danger mb-3">Transaction Not Completed</h4>
+              <p class="text-muted mb-4">
+                Unfortunately, your payment could not be processed at this time. 
+                This may be due to security checks or payment method issues.
+              </p>
+              
+              <div class="error-details">
+                <strong>Error Details:</strong><br>
+                ${dataMessage || 'Transaction did not pass risk checks'}
+              </div>
+              
+              <div class="row mt-4">
+                <div class="col-6">
+                  <a href="https://propsiss.com" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-house"></i> Go Home
+                  </a>
+                </div>
+                <div class="col-6">
+                  <a href="https://propsiss.com/rentals" class="btn btn-primary w-100">
+                    <i class="bi bi-arrow-clockwise"></i> Try Again
+                  </a>
+                </div>
+              </div>
+              
+              <div class="mt-4">
+                <small class="text-muted">
+                  <i class="bi bi-info-circle"></i>
+                  If you continue to experience issues, please contact our support team.
+                </small>
+              </div>
+            </div>
+          </div>
+          
+          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        </body>
+        </html>
+      `);
     }
 
   } catch (error) {
@@ -282,17 +574,205 @@ router.post('/callback', async (req, res) => {
           // TODO: Send confirmation email to customer
           // TODO: Send notification to admin
           
-          res.json({
-            success: true,
-            message: 'Payment processed successfully',
-            bookingId: booking._id
-          });
+          res.send(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Payment Successful - PropSisters</title>
+              <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+              <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+              <style>
+                body {
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  min-height: 100vh;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                .payment-card {
+                  background: white;
+                  border-radius: 15px;
+                  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                  overflow: hidden;
+                  max-width: 500px;
+                  width: 100%;
+                  text-align: center;
+                }
+                .payment-header {
+                  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                  color: white;
+                  padding: 30px;
+                }
+                .payment-body {
+                  padding: 40px 30px;
+                }
+                .success-icon {
+                  font-size: 4rem;
+                  color: #28a745;
+                  margin-bottom: 20px;
+                }
+                .btn-primary {
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  border: none;
+                  padding: 12px 30px;
+                  font-weight: 600;
+                  border-radius: 25px;
+                }
+                .btn-primary:hover {
+                  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+                }
+                .booking-details {
+                  background: #f8f9fa;
+                  border-radius: 10px;
+                  padding: 15px;
+                  margin: 20px 0;
+                  font-family: monospace;
+                  font-size: 0.9rem;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="payment-card">
+                <div class="payment-header">
+                  <i class="bi bi-check-circle-fill fs-1 mb-3"></i>
+                  <h2 class="mb-0">Payment Successful!</h2>
+                  <p class="mb-0 mt-2 opacity-75">PropSisters</p>
+                </div>
+                <div class="payment-body">
+                  <div class="success-icon">
+                    <i class="bi bi-check-circle"></i>
+                  </div>
+                  <h4 class="text-success mb-3">Booking Confirmed</h4>
+                  <p class="text-muted mb-4">
+                    Congratulations! Your payment has been processed successfully 
+                    and your booking is now confirmed.
+                  </p>
+                  
+                  <div class="booking-details">
+                    <strong>Booking ID:</strong> ${booking._id}<br>
+                    <strong>Transaction ID:</strong> ${transactionId}<br>
+                    <strong>Status:</strong> Confirmed
+                  </div>
+                  
+                  <div class="row mt-4">
+                    <div class="col-6">
+                      <a href="https://propsiss.com" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-house"></i> Go Home
+                      </a>
+                    </div>
+                    <div class="col-6">
+                      <a href="https://propsiss.com/rentals" class="btn btn-primary w-100">
+                        <i class="bi bi-calendar-check"></i> View Bookings
+                      </a>
+                    </div>
+                  </div>
+                  
+                  <div class="mt-4">
+                    <small class="text-muted">
+                      <i class="bi bi-envelope"></i>
+                      A confirmation email will be sent to your registered email address.
+                    </small>
+                  </div>
+                </div>
+              </div>
+              
+              <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            </body>
+            </html>
+          `);
         } else {
           console.log(`⚠️ No booking found for order ${order.id}`);
-          res.json({
-            success: true,
-            message: 'Payment processed successfully (booking not found)'
-          });
+          res.send(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Payment Successful - PropSisters</title>
+              <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+              <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+              <style>
+                body {
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  min-height: 100vh;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                .payment-card {
+                  background: white;
+                  border-radius: 15px;
+                  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                  overflow: hidden;
+                  max-width: 500px;
+                  width: 100%;
+                  text-align: center;
+                }
+                .payment-header {
+                  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                  color: white;
+                  padding: 30px;
+                }
+                .payment-body {
+                  padding: 40px 30px;
+                }
+                .success-icon {
+                  font-size: 4rem;
+                  color: #28a745;
+                  margin-bottom: 20px;
+                }
+                .btn-primary {
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  border: none;
+                  padding: 12px 30px;
+                  font-weight: 600;
+                  border-radius: 25px;
+                }
+                .btn-primary:hover {
+                  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+                }
+              </style>
+            </head>
+            <body>
+              <div class="payment-card">
+                <div class="payment-header">
+                  <i class="bi bi-check-circle-fill fs-1 mb-3"></i>
+                  <h2 class="mb-0">Payment Successful!</h2>
+                  <p class="mb-0 mt-2 opacity-75">PropSisters</p>
+                </div>
+                <div class="payment-body">
+                  <div class="success-icon">
+                    <i class="bi bi-check-circle"></i>
+                  </div>
+                  <h4 class="text-success mb-3">Payment Processed</h4>
+                  <p class="text-muted mb-4">
+                    Your payment has been processed successfully. 
+                    Please contact support if you have any questions.
+                  </p>
+                  
+                  <div class="row mt-4">
+                    <div class="col-6">
+                      <a href="https://propsiss.com" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-house"></i> Go Home
+                      </a>
+                    </div>
+                    <div class="col-6">
+                      <a href="https://propsiss.com/rentals" class="btn btn-primary w-100">
+                        <i class="bi bi-calendar-check"></i> View Rentals
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            </body>
+            </html>
+          `);
         }
       } catch (dbError) {
         console.error('Database update error:', dbError);
@@ -320,10 +800,114 @@ router.post('/callback', async (req, res) => {
         console.error('Database update error for failed payment:', dbError);
       }
       
-      res.json({
-        success: false,
-        message: 'Payment failed'
-      });
+      res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Payment Failed - PropSisters</title>
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+          <style>
+            body {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+            .payment-card {
+              background: white;
+              border-radius: 15px;
+              box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+              overflow: hidden;
+              max-width: 500px;
+              width: 100%;
+              text-align: center;
+            }
+            .payment-header {
+              background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+              color: white;
+              padding: 30px;
+            }
+            .payment-body {
+              padding: 40px 30px;
+            }
+            .error-icon {
+              font-size: 4rem;
+              color: #dc3545;
+              margin-bottom: 20px;
+            }
+            .btn-primary {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              border: none;
+              padding: 12px 30px;
+              font-weight: 600;
+              border-radius: 25px;
+            }
+            .btn-primary:hover {
+              background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            }
+            .error-details {
+              background: #f8f9fa;
+              border-radius: 10px;
+              padding: 15px;
+              margin: 20px 0;
+              font-family: monospace;
+              font-size: 0.9rem;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="payment-card">
+            <div class="payment-header">
+              <i class="bi bi-x-circle-fill fs-1 mb-3"></i>
+              <h2 class="mb-0">Payment Failed</h2>
+              <p class="mb-0 mt-2 opacity-75">PropSisters</p>
+            </div>
+            <div class="payment-body">
+              <div class="error-icon">
+                <i class="bi bi-exclamation-triangle"></i>
+              </div>
+              <h4 class="text-danger mb-3">Transaction Not Completed</h4>
+              <p class="text-muted mb-4">
+                Unfortunately, your payment could not be processed at this time. 
+                This may be due to security checks or payment method issues.
+              </p>
+              
+              <div class="error-details">
+                <strong>Error Details:</strong><br>
+                Transaction did not pass risk checks
+              </div>
+              
+              <div class="row mt-4">
+                <div class="col-6">
+                  <a href="https://propsiss.com" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-house"></i> Go Home
+                  </a>
+                </div>
+                <div class="col-6">
+                  <a href="https://propsiss.com/rentals" class="btn btn-primary w-100">
+                    <i class="bi bi-arrow-clockwise"></i> Try Again
+                  </a>
+                </div>
+              </div>
+              
+              <div class="mt-4">
+                <small class="text-muted">
+                  <i class="bi bi-info-circle"></i>
+                  If you continue to experience issues, please contact our support team.
+                </small>
+              </div>
+            </div>
+          </div>
+          
+          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        </body>
+        </html>
+      `);
     }
 
   } catch (error) {
