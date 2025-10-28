@@ -89,8 +89,11 @@ router.post('/create-payment', async (req, res) => {
 router.get('/callback', async (req, res) => {
   try {
     console.log('🔔 Paymob GET callback received!');
+    console.log('🔔 Full URL:', req.originalUrl);
     console.log('🔔 Query parameters:', req.query);
     console.log('🔔 Request headers:', req.headers);
+    console.log('🔔 Request method:', req.method);
+    console.log('🔔 Request IP:', req.ip);
     
     const paymobService = new PaymobService();
     
@@ -163,6 +166,7 @@ router.get('/callback', async (req, res) => {
 
         if (booking) {
           console.log(`✅ Booking ${booking._id} confirmed successfully`);
+          console.log('🔔 Sending HTML success response to user');
           res.send(`
             <!DOCTYPE html>
             <html lang="en">
@@ -391,6 +395,7 @@ router.get('/callback', async (req, res) => {
       }
       
       // Return HTML response for better user experience
+      console.log('🔔 Sending HTML failure response to user');
       res.send(`
         <!DOCTYPE html>
         <html lang="en">
@@ -513,9 +518,12 @@ router.get('/callback', async (req, res) => {
 // Handle Paymob callback (POST with JSON body)
 router.post('/callback', async (req, res) => {
   try {
-    console.log('🔔 Paymob webhook callback received!');
+    console.log('🔔 Paymob POST webhook callback received!');
+    console.log('🔔 Full URL:', req.originalUrl);
     console.log('🔔 Request body:', req.body);
     console.log('🔔 Request headers:', req.headers);
+    console.log('🔔 Request method:', req.method);
+    console.log('🔔 Request IP:', req.ip);
     
     const paymobService = new PaymobService();
     
@@ -776,10 +784,10 @@ router.post('/callback', async (req, res) => {
         }
       } catch (dbError) {
         console.error('Database update error:', dbError);
-        res.json({
-          success: true,
+      res.json({
+        success: true,
           message: 'Payment processed successfully (database update failed)'
-        });
+      });
       }
     } else {
       // Payment failed
@@ -917,6 +925,106 @@ router.post('/callback', async (req, res) => {
       error: error.message || 'Callback processing failed'
     });
   }
+});
+
+// Test webhook response endpoint
+router.get('/test-response', (req, res) => {
+  console.log('🧪 Test webhook response endpoint called');
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Test Webhook Response - PropSisters</title>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+      <style>
+        body {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .payment-card {
+          background: white;
+          border-radius: 15px;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+          overflow: hidden;
+          max-width: 500px;
+          width: 100%;
+          text-align: center;
+        }
+        .payment-header {
+          background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+          color: white;
+          padding: 30px;
+        }
+        .payment-body {
+          padding: 40px 30px;
+        }
+        .test-icon {
+          font-size: 4rem;
+          color: #17a2b8;
+          margin-bottom: 20px;
+        }
+        .btn-primary {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border: none;
+          padding: 12px 30px;
+          font-weight: 600;
+          border-radius: 25px;
+        }
+        .btn-primary:hover {
+          background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+      </style>
+    </head>
+    <body>
+      <div class="payment-card">
+        <div class="payment-header">
+          <i class="bi bi-gear-fill fs-1 mb-3"></i>
+          <h2 class="mb-0">Test Webhook Response</h2>
+          <p class="mb-0 mt-2 opacity-75">PropSisters</p>
+        </div>
+        <div class="payment-body">
+          <div class="test-icon">
+            <i class="bi bi-check-circle"></i>
+          </div>
+          <h4 class="text-info mb-3">Webhook Response Working!</h4>
+          <p class="text-muted mb-4">
+            This is how the webhook response will look to users. 
+            The HTML styling matches your website's design.
+          </p>
+          
+          <div class="row mt-4">
+            <div class="col-6">
+              <a href="https://propsiss.com" class="btn btn-outline-secondary w-100">
+                <i class="bi bi-house"></i> Go Home
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="https://api.propsiss.com/api/paymob/test-response" class="btn btn-primary w-100">
+                <i class="bi bi-arrow-clockwise"></i> Refresh Test
+              </a>
+            </div>
+          </div>
+          
+          <div class="mt-4">
+            <small class="text-muted">
+              <i class="bi bi-info-circle"></i>
+              This is a test endpoint to preview webhook responses.
+            </small>
+          </div>
+        </div>
+      </div>
+      
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+    </html>
+  `);
 });
 
 // Get payment status
