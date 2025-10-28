@@ -88,6 +88,10 @@ router.post('/create-payment', async (req, res) => {
 // Handle Paymob callback
 router.post('/callback', async (req, res) => {
   try {
+    console.log('🔔 Paymob webhook callback received!');
+    console.log('🔔 Request body:', req.body);
+    console.log('🔔 Request headers:', req.headers);
+    
     const paymobService = new PaymobService();
     
     // Verify HMAC

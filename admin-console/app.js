@@ -99,8 +99,16 @@ app.use('/auth', authRoutes);
 app.use('/api/logs', logRoutes);
 app.use('/', adminRoutes);
 
+// Handle Paymob webhook redirects (before 404 handler)
+app.use('/paymob/callback', (req, res) => {
+  console.log('🔔 Paymob webhook redirected to /paymob/callback');
+  console.log('🔔 Redirecting to correct URL: /api/paymob/callback');
+  res.redirect('/api/paymob/callback');
+});
+
 // 404 handler
 app.use((req, res) => {
+  console.log('❌ 404 - Route not found:', req.originalUrl);
   res.status(404).render('auth/login', {
     title: '404 Not Found',
     error: ['Page not found'],
