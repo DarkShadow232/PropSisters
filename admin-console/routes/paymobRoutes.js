@@ -113,9 +113,9 @@ router.post('/callback', async (req, res) => {
 
     // Handle the webhook data structure
     const obj = req.body.obj || req.body;
-    const transactionSuccess = obj.success || success;
-    const transactionId = obj.id || id;
-    const orderData = obj.order || order;
+    const transactionSuccess = obj.success;
+    const transactionId = obj.id;
+    const orderData = obj.order;
     
     console.log('🔔 Processing webhook:');
     console.log('🔔 Transaction success:', transactionSuccess);
