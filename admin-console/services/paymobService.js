@@ -86,7 +86,13 @@ class PaymobService {
    */
   async createPaymentKey(orderId, amount, userData, billingData) {
     try {
+      console.log('🔐 Paymob: Starting payment key creation...');
+      console.log('🔐 Paymob: Order ID:', orderId);
+      console.log('🔐 Paymob: Amount:', amount);
+      console.log('🔐 Paymob: Billing data:', billingData);
+      
       const authToken = await this.authenticate();
+      console.log('✅ Paymob: Authentication successful, token received');
       
       const paymentKeyData = {
         auth_token: authToken.token,
@@ -112,6 +118,9 @@ class PaymobService {
         integration_id: this.integrationId
       };
 
+      console.log('🔗 Paymob: Creating payment key with data:', JSON.stringify(paymentKeyData, null, 2));
+      console.log('🔗 Paymob: Request URL:', `${this.baseUrl}/accept/payment_keys`);
+      
       const response = await fetch(`${this.baseUrl}/accept/payment_keys`, {
         method: 'POST',
         headers: {
@@ -120,8 +129,13 @@ class PaymobService {
         body: JSON.stringify(paymentKeyData)
       });
 
+      console.log('📡 Paymob: Response status:', response.status);
+      console.log('📡 Paymob: Response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        throw new Error(`Payment key creation failed: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('❌ Paymob: Error response body:', errorText);
+        throw new Error(`Payment key creation failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
       const data = await response.json();
