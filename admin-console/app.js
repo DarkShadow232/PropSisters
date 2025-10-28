@@ -57,14 +57,35 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Session configuration
+const sessionStore = MongoStore.create({
+  mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost:27017/rental-admin',
+  touchAfter: 0, // Save session immediately on every touch
+  ttl: 7 * 24 * 60 * 60 // 7 days in seconds
+});
+
+// Add session store event listeners for debugging
+sessionStore.on('create', (sessionId) => {
+  console.log('🔴 Session created in store:', sessionId);
+});
+
+sessionStore.on('update', (sessionId) => {
+  console.log('🔴 Session updated in store:', sessionId);
+});
+
+sessionStore.on('destroy', (sessionId) => {
+  console.log('🔴 Session destroyed in store:', sessionId);
+});
+
+sessionStore.on('error', (error) => {
+  console.log('🔴 Session store error:', error);
+});
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: true, // Force session save on every request
   saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost:27017/rental-admin',
-    touchAfter: 0 // Save session immediately on every touch
-  }),
+  // Temporarily disable store to test if MongoDB is the issue
+  // store: sessionStore,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
     httpOnly: true,

@@ -39,6 +39,7 @@ exports.postLogin = async (req, res) => {
     }
 
     console.log('🔴 Creating session');
+    console.log('🔴 Session ID before:', req.sessionID);
     // Create session
     req.session.adminId = admin._id;
     req.session.adminEmail = admin.email;
@@ -46,11 +47,22 @@ exports.postLogin = async (req, res) => {
 
     req.flash('success', 'Welcome back, ' + admin.name + '!');
     console.log('🔴 Session created:', req.session);
-    // Redirect to return URL or dashboard
-    const returnTo = req.session.returnTo || '/';
-    delete req.session.returnTo;
-    console.log('🔴 Redirecting to:', returnTo);
-    res.redirect(returnTo);
+    console.log('🔴 Session ID after:', req.sessionID);
+    
+    // Force session save before redirect
+    req.session.save((err) => {
+      if (err) {
+        console.log('🔴 Session save error:', err);
+        return res.redirect('/auth/login');
+      }
+      
+      console.log('🔴 Session saved successfully');
+      // Redirect to return URL or dashboard
+      const returnTo = req.session.returnTo || '/';
+      delete req.session.returnTo;
+      console.log('🔴 Redirecting to:', returnTo);
+      res.redirect(returnTo);
+    });
     
   } catch (error) {
     console.error('Login error:', error);
