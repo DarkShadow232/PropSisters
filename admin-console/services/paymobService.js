@@ -7,6 +7,13 @@ class PaymobService {
     this.iframeId = process.env.PAYMOB_IFRAME_ID;
     this.hmacSecret = process.env.PAYMOB_HMAC_SECRET;
     this.baseUrl = 'https://accept.paymob.com/api';
+    
+    console.log('🔧 Paymob: Configuration loaded:');
+    console.log('🔧 Paymob: API Key:', this.apiKey ? 'Present' : 'Missing');
+    console.log('🔧 Paymob: Integration ID:', this.integrationId);
+    console.log('🔧 Paymob: Iframe ID:', this.iframeId);
+    console.log('🔧 Paymob: HMAC Secret:', this.hmacSecret ? 'Present' : 'Missing');
+    console.log('🔧 Paymob: Base URL:', this.baseUrl);
   }
 
   /**
