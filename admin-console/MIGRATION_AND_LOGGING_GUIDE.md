@@ -177,7 +177,7 @@ npm start
 ### 4. Access Admin Interface
 - **Main Dashboard**: `http://localhost:3000/admin`
 - **Request Logs**: `http://localhost:3000/admin/logs`
-- **API Documentation**: `http://localhost:3000/api/docs`
+- **API Documentation**: `https://api.propsiss.com/api/docs`
 
 ## 📈 Monitoring and Analytics
 

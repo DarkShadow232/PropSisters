@@ -111,7 +111,7 @@ class BookingService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+    this.baseUrl = import.meta.env.VITE_API_URL || 'https://api.propsiss.com/api';
     console.log('🔗 BookingService: Initializing with base URL:', this.baseUrl);
   }
 

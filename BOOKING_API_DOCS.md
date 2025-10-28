@@ -7,7 +7,7 @@ This document provides comprehensive API documentation for the PropSisters booki
 ## Base URL
 
 ```
-http://localhost:3000/api/bookings
+https://api.propsiss.com/api/bookings
 ```
 
 ## Authentication

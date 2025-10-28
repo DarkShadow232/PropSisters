@@ -52,7 +52,7 @@
 ## 🧪 اختبار سريع:
 
 1. **اختبر API مباشرة:**
-   افتح: http://localhost:3000/api/properties
+   افتح: https://api.propsiss.com/api/properties
    
    **المتوقع:** تشوف JSON data بـ 10 عقارات
 
