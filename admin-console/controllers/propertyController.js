@@ -133,7 +133,7 @@ exports.postCreateProperty = async (req, res) => {
     if (req.files && req.files.length > 0) {
       req.files.forEach(file => {
         // Store relative path from public directory
-        imageUrls.push(`/uploads/rentals/${file.filename}`);
+        imageUrls.push(`/image/Apartments/${file.filename}`);
       });
     }
 
@@ -266,7 +266,7 @@ exports.postEditProperty = async (req, res) => {
     // Handle new image uploads
     if (req.files && req.files.length > 0) {
       req.files.forEach(file => {
-        imageUrls.push(`/uploads/rentals/${file.filename}`);
+        imageUrls.push(`/image/Apartments/${file.filename}`);
       });
     }
 

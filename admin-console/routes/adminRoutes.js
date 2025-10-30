@@ -9,7 +9,8 @@ const { isAuthenticated } = require('../middleware/authMiddleware');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     try {
-      const uploadPath = path.join(__dirname, '..', 'public', 'uploads', 'rentals');
+      // Store in shared public/image/Apartments directory
+      const uploadPath = path.join(__dirname, '..', 'public', 'image', 'Apartments');
       if (!fsSync.existsSync(uploadPath)) {
         fsSync.mkdirSync(uploadPath, { recursive: true });
       }
