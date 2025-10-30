@@ -51,14 +51,16 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, alt }) => {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Enhanced Booking Platform Style Image Layout */}
-      <div className="grid grid-cols-4 gap-3 h-[420px]">
-        {/* Main large image - takes 2x2 grid with proper aspect ratio */}
-        <div className="col-span-2 row-span-2">
+    <div className="space-y-6">
+      {/* Unified boxed image layout */}
+      <div className="rounded-xl overflow-hidden border border-gray-200">
+        {/* Booking.com-style mosaic: 1 big left, 4 varied on right */}
+        <div className="grid grid-cols-6 grid-rows-2 gap-1 md:h-[420px] bg-white">
+        {/* Main large image - left side spans 3x2 */}
+        <div className="col-span-6 md:col-span-3 md:row-span-2">
           <button
             onClick={openGallery}
-            className="relative w-full h-full rounded-xl overflow-hidden bg-gray-100 hover:brightness-95 transition-all duration-300 group shadow-sm"
+            className="relative w-full h-full overflow-hidden bg-gray-100 hover:brightness-95 transition-all duration-300 group"
             aria-label="Open photo gallery"
           >
             <img
@@ -77,15 +79,106 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, alt }) => {
           </button>
         </div>
 
-        {/* Small images on the right - consistent aspect ratios */}
-        {validImages.slice(1, 5).map((src, idx) => (
-          <div key={idx + 1} className="relative aspect-[4/3]">
+        {/* Right side images with varied sizes (Booking-style) */}
+        {/* Top-right wide (2 cols) */}
+        {validImages[1] && (
+          <div className="hidden md:block col-start-4 col-span-2 row-start-1 row-span-1">
             <button
-              onClick={() => {
-                setSelected(idx + 1);
-                openGallery();
-              }}
-              className="relative w-full h-full rounded-lg overflow-hidden bg-gray-100 hover:brightness-95 transition-all duration-300 group shadow-sm"
+              onClick={() => { setSelected(1); openGallery(); }}
+              className="relative w-full h-full overflow-hidden bg-gray-100 hover:brightness-95 transition-all duration-300 group"
+              aria-label={`Open image 2`}
+            >
+              <img
+                src={validImages[1]}
+                alt={`${alt} 2`}
+                loading="lazy"
+                decoding="async"
+                onError={handleError}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300"></div>
+            </button>
+          </div>
+        )}
+
+        {/* Top-right narrow (1 col) */}
+        {validImages[2] && (
+          <div className="hidden md:block col-start-6 col-span-1 row-start-1 row-span-1">
+            <button
+              onClick={() => { setSelected(2); openGallery(); }}
+              className="relative w-full h-full overflow-hidden bg-gray-100 hover:brightness-95 transition-all duration-300 group"
+              aria-label={`Open image 3`}
+            >
+              <img
+                src={validImages[2]}
+                alt={`${alt} 3`}
+                loading="lazy"
+                decoding="async"
+                onError={handleError}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300"></div>
+            </button>
+          </div>
+        )}
+
+        {/* Bottom-right narrow (1 col) */}
+        {validImages[3] && (
+          <div className="hidden md:block col-start-4 col-span-1 row-start-2 row-span-1">
+            <button
+              onClick={() => { setSelected(3); openGallery(); }}
+              className="relative w-full h-full overflow-hidden bg-gray-100 hover:brightness-95 transition-all duration-300 group"
+              aria-label={`Open image 4`}
+            >
+              <img
+                src={validImages[3]}
+                alt={`${alt} 4`}
+                loading="lazy"
+                decoding="async"
+                onError={handleError}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300"></div>
+            </button>
+          </div>
+        )}
+
+        {/* Bottom-right wide (2 cols) with +count overlay if more */}
+        {validImages[4] && (
+          <div className="hidden md:block col-start-5 col-span-2 row-start-2 row-span-1">
+            <button
+              onClick={() => { setSelected(4); openGallery(); }}
+              className="relative w-full h-full overflow-hidden bg-gray-100 hover:brightness-95 transition-all duration-300 group"
+              aria-label={`Open image 5`}
+            >
+              <img
+                src={validImages[4]}
+                alt={`${alt} 5`}
+                loading="lazy"
+                decoding="async"
+                onError={handleError}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300"></div>
+              {validImages.length > 5 && (
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center text-white font-medium">
+                  <div className="text-center">
+                    <div className="text-lg font-semibold">+{validImages.length - 5}</div>
+                    <div className="text-xs opacity-90">more photos</div>
+                  </div>
+                </div>
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* Mobile fallback: display the first 5 as a simple 2-col grid below the big */}
+        <div className="md:hidden col-span-6 grid grid-cols-2 gap-1">
+          {validImages.slice(1, 5).map((src, idx) => (
+            <button
+              key={`m-${idx+1}`}
+              onClick={() => { setSelected(idx + 1); openGallery(); }}
+              className="relative w-full h-36 overflow-hidden bg-gray-100 hover:brightness-95 transition-all duration-300 group"
               aria-label={`Open image ${idx + 2}`}
             >
               <img
@@ -96,18 +189,10 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, alt }) => {
                 onError={handleError}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300"></div>
-              {idx === 3 && validImages.length > 5 && (
-                <div className="absolute inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white font-medium rounded-lg">
-                  <div className="text-center">
-                    <div className="text-lg font-semibold">+{validImages.length - 5}</div>
-                    <div className="text-xs opacity-90">more photos</div>
-                  </div>
-                </div>
-              )}
             </button>
-          </div>
-        ))}
+          ))}
+        </div>
+        </div>
       </div>
 
       {/* View All Photos Button */}

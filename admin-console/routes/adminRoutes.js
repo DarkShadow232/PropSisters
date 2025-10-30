@@ -2,12 +2,21 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const fsSync = require('fs');
 const { isAuthenticated } = require('../middleware/authMiddleware');
 
 // Configure multer for local disk storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/uploads/rentals/');
+    try {
+      const uploadPath = path.join(__dirname, '..', 'public', 'uploads', 'rentals');
+      if (!fsSync.existsSync(uploadPath)) {
+        fsSync.mkdirSync(uploadPath, { recursive: true });
+      }
+      cb(null, uploadPath);
+    } catch (err) {
+      cb(err);
+    }
   },
   filename: function (req, file, cb) {
     // Generate unique filename: timestamp + random string + extension
