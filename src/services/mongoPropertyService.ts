@@ -56,15 +56,25 @@ export interface PropertyResponse {
  * - Uploaded images (property-*.jpg) are served from admin backend
  */
 export const getImageUrl = (imagePath: string): string => {
-  if (!imagePath) return '/placeholder.svg';
-  if (imagePath.startsWith('http')) return imagePath;
+  if (!imagePath) {
+    console.log('🖼️ Image URL: empty path → placeholder');
+    return '/placeholder.svg';
+  }
+  
+  if (imagePath.startsWith('http')) {
+    console.log('🖼️ Image URL: absolute URL →', imagePath);
+    return imagePath;
+  }
   
   // Check if it's an uploaded property image (property-timestamp-random.ext)
   if (imagePath.includes('/image/Apartments/property-')) {
-    return `${BASE_URL}${imagePath}`;
+    const fullUrl = `${BASE_URL}${imagePath}`;
+    console.log('🖼️ Image URL: uploaded property →', imagePath, '→', fullUrl);
+    return fullUrl;
   }
   
   // Otherwise it's a static bundled image, return as-is (served by frontend)
+  console.log('🖼️ Image URL: static bundled →', imagePath);
   return imagePath;
 };
 
