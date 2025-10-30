@@ -4,10 +4,15 @@
 // IMPORTANT: Make sure admin console is running on port 3000
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.propsiss.com/api';
 const BASE_URL = (import.meta.env.VITE_API_URL || 'https://api.propsiss.com/api').replace('/api', '');
+// Admin server base for static uploads; override via VITE_ADMIN_BASE_URL when different from API
+const ADMIN_BASE_URL =
+  import.meta.env.VITE_ADMIN_BASE_URL
+  || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:3000' : BASE_URL);
 
 // Log the base URLs for debugging
 console.log('🔗 MongoPropertyService: API_BASE_URL:', API_BASE_URL);
 console.log('🔗 MongoPropertyService: BASE_URL:', BASE_URL);
+console.log('🔗 MongoPropertyService: ADMIN_BASE_URL:', ADMIN_BASE_URL);
 
 export interface MongoProperty {
   _id: string;
@@ -58,7 +63,7 @@ export const getImageUrl = (imagePath: string): string => {
   if (imagePath.startsWith('http')) return imagePath;
   // If it starts with /uploads, prepend the backend URL
   if (imagePath.startsWith('/uploads')) {
-    return `${BASE_URL}${imagePath}`;
+    return `${ADMIN_BASE_URL}${imagePath}`;
   }
   return imagePath;
 };
