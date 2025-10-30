@@ -52,16 +52,19 @@ export interface PropertyResponse {
 
 /**
  * Get image URL with proper base path
- * All images now stored in /image/Apartments/ served by admin backend
+ * - Static images (Ap1, Ap2, etc.) are bundled with frontend
+ * - Uploaded images (property-*.jpg) are served from admin backend
  */
 export const getImageUrl = (imagePath: string): string => {
   if (!imagePath) return '/placeholder.svg';
   if (imagePath.startsWith('http')) return imagePath;
-  // All /image paths are served by the admin backend
-  if (imagePath.startsWith('/image')) {
+  
+  // Check if it's an uploaded property image (property-timestamp-random.ext)
+  if (imagePath.includes('/image/Apartments/property-')) {
     return `${BASE_URL}${imagePath}`;
   }
-  // Otherwise return as-is (for other public assets)
+  
+  // Otherwise it's a static bundled image, return as-is (served by frontend)
   return imagePath;
 };
 
