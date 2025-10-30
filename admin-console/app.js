@@ -55,10 +55,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
-// Explicit mounts for static assets
+// Explicit mounts for static assets - must be before auth middleware
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
-// Serve shared project images used by admin previews (e.g., /image/Apartments/...)
-app.use('/image', express.static(path.join(__dirname, '..', 'public', 'image')));
+// Serve uploaded property images from admin's public folder
+app.use('/image', express.static(path.join(__dirname, 'public', 'image')));
 // Prevent noisy favicon 404s
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
