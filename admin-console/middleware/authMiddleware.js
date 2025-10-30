@@ -1,8 +1,7 @@
 // Middleware to check if admin is authenticated
 const isAuthenticated = (req, res, next) => {
+  console.log('🔴 isAuthenticated middleware - URL:', req.originalUrl);
   console.log('🔴 isAuthenticated middleware - Session ID:', req.sessionID);
-  console.log('🔴 isAuthenticated middleware - Request cookies:', req.headers.cookie);
-  console.log('🔴 isAuthenticated middleware - Session:', req.session);
   console.log('🔴 isAuthenticated middleware - adminId:', req.session?.adminId);
   
   if (req.session && req.session.adminId) {
@@ -16,7 +15,7 @@ const isAuthenticated = (req, res, next) => {
     return next();
   }
   
-  console.log('🔴 isAuthenticated - No session, redirecting to login');
+  console.log('🔴 isAuthenticated - No session, redirecting to login for:', req.originalUrl);
   // Store the original URL to redirect back after login
   req.session.returnTo = req.originalUrl;
   req.flash('error', 'Please log in to access this page');

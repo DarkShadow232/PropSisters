@@ -55,6 +55,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Debug middleware for image requests
+app.use('/image', (req, res, next) => {
+  const fullPath = path.join(__dirname, 'public', 'image', req.path);
+  const exists = require('fs').existsSync(fullPath);
+  console.log('🖼️  IMAGE REQUEST:', {
+    url: req.url,
+    path: req.path,
+    fullPath: fullPath,
+    exists: exists,
+    method: req.method
+  });
+  next();
+});
+
 // Explicit mounts for static assets - must be before auth middleware
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 // Serve uploaded property images from admin's public folder
