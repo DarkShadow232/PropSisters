@@ -143,6 +143,15 @@ app.use((req, res, next) => {
 // Admin routes
 app.use('/auth', authRoutes);
 app.use('/api/logs', logRoutes);
+
+// Ensure static image paths are never caught by admin routes
+// This is a safety net in case express.static doesn't match
+app.use('/image/*', (req, res, next) => {
+  // If we reach here, the file wasn't found by express.static
+  // Return 404 instead of redirecting to login
+  res.status(404).send('Image not found');
+});
+
 app.use('/', adminRoutes);
 
 // Handle Paymob webhook redirects (before 404 handler)
