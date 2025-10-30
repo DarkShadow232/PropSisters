@@ -67,7 +67,8 @@ export const getImageUrl = (imagePath: string): string => {
   }
   
   // Check if it's an uploaded property image (property-timestamp-random.ext)
-  if (imagePath.includes('/image/Apartments/property-')) {
+  // Handles both new path (/image/Apartments/property-*) and old path (/uploads/rentals/property-*)
+  if (imagePath.includes('property-') && (imagePath.includes('/uploads/') || imagePath.includes('/image/Apartments/'))) {
     const fullUrl = `${BASE_URL}${imagePath}`;
     console.log('🖼️ Image URL: uploaded property →', imagePath, '→', fullUrl);
     return fullUrl;
