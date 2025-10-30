@@ -3,7 +3,10 @@
 
 // IMPORTANT: Make sure admin console is running on port 3000
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.propsiss.com/api';
-const BASE_URL = (import.meta.env.VITE_API_URL || 'https://api.propsiss.com/api').replace('/api', '');
+// Remove /api from the end, being careful to preserve the protocol slashes
+const BASE_URL = API_BASE_URL.endsWith('/api') 
+  ? API_BASE_URL.slice(0, -4) 
+  : API_BASE_URL;
 
 // Log the base URLs for debugging
 console.log('🔗 MongoPropertyService: API_BASE_URL:', API_BASE_URL);
