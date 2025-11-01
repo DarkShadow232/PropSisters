@@ -6,7 +6,7 @@ const methodOverride = require('method-override');
 const cors = require('cors');
 const path = require('path');
 const cron = require('node-cron');
-require('dotenv').config();
+require('dotenv').config({ path: './.env' });
 
 // Initialize database connection
 const connectDB = require('./config/database');

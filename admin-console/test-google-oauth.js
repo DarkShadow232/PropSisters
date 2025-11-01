@@ -3,7 +3,7 @@
  * Run this to verify your Google OAuth setup
  */
 
-require('dotenv').config({ path: './config.env' });
+require('dotenv').config({ path: './.env' });
 
 console.log('\n' + '='.repeat(60));
 console.log('🔍 GOOGLE OAUTH CONFIGURATION DEBUG');
