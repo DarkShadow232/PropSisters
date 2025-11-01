@@ -165,14 +165,8 @@ router.get('/public/:id', async (req, res) => {
       });
     }
 
-    // Only show available properties to public
-    if (!property.availability) {
-      return res.status(404).json({
-        success: false,
-        error: 'Property not available'
-      });
-    }
-
+    // Allow viewing property regardless of availability
+    // Frontend will show "Unavailable" status if needed
     res.json({
       success: true,
       data: property

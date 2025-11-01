@@ -385,8 +385,8 @@ const RentalDetailsPage = () => {
                           <div className="text-sm text-foreground/70">Bathrooms</div>
                         </div>
                         <div className="text-center p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
-                          <div className="text-lg font-medium text-green-600">
-                            {rental.availability ? "Available" : "Booked"}
+                          <div className={`text-lg font-medium ${rental.availability ? 'text-green-600' : 'text-red-600'}`}>
+                            {rental.availability ? "Available" : "Unavailable"}
                           </div>
                           <div className="text-sm text-foreground/70">Status</div>
                         </div>
@@ -687,25 +687,30 @@ const RentalDetailsPage = () => {
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <label className="font-medium block">Select Dates</label>
-                      <div className="text-xs flex items-center gap-2">
-                        <span className="flex items-center">
-                          <div className="w-3 h-3 bg-[#b94a3b] rounded-full mr-1"></div>
-                          Booked
-                        </span>
-                        <span className="flex items-center">
-                          <div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
-                          Available
-                        </span>
-                      </div>
+                      {rental.availability && (
+                        <div className="text-xs flex items-center gap-2">
+                          <span className="flex items-center">
+                            <div className="w-3 h-3 bg-[#b94a3b] rounded-full mr-1"></div>
+                            Booked
+                          </span>
+                          <span className="flex items-center">
+                            <div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
+                            Available
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
                           className="w-full justify-start text-left font-normal"
+                          disabled={!rental.availability}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {selectedDates.from ? (
+                          {!rental.availability ? (
+                            <span className="text-muted-foreground">Not available for booking</span>
+                          ) : selectedDates.from ? (
                             selectedDates.to ? (
                               <>
                                 {selectedDates.from.toLocaleDateString()} - {selectedDates.to.toLocaleDateString()}
@@ -772,21 +777,37 @@ const RentalDetailsPage = () => {
                   <Button 
                     className="w-full bg-[#b94a3b] hover:bg-[#9a3f33] text-white py-6"
                     onClick={() => navigate(`/booking/${rental.id}`)}
+                    disabled={!rental.availability}
                   >
-                    Book Now
+                    {rental.availability ? 'Book Now' : 'Currently Unavailable'}
                   </Button>
                   
-                  <div className="text-center text-sm text-foreground/70">
-                    You won't be charged yet
-                  </div>
+                  {rental.availability ? (
+                    <div className="text-center text-sm text-foreground/70">
+                      You won't be charged yet
+                    </div>
+                  ) : (
+                    <div className="text-center text-sm text-red-600">
+                      This property is currently unavailable for booking
+                    </div>
+                  )}
                 </div>
                 
-                <div className="mt-6 p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-800 flex items-start">
-                    <Info className="h-4 w-4 mr-2 mt-0.5 text-green-600" />
-                    Free cancellation up to 48 hours before check-in
-                  </p>
-                </div>
+                {rental.availability ? (
+                  <div className="mt-6 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800 flex items-start">
+                      <Info className="h-4 w-4 mr-2 mt-0.5 text-green-600" />
+                      Free cancellation up to 48 hours before check-in
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mt-6 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-800 flex items-start">
+                      <Info className="h-4 w-4 mr-2 mt-0.5 text-red-600" />
+                      This property is temporarily unavailable. Please check back later or contact the host for more information.
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
