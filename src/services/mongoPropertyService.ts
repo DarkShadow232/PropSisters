@@ -40,6 +40,7 @@ export interface PropertyFilters {
   bedrooms?: number;
   page?: number;
   limit?: number;
+  status?: string;
 }
 
 export interface PropertyResponse {
@@ -89,9 +90,18 @@ export const fetchPropertiesFromMongo = async (
   filters?: PropertyFilters
 ): Promise<PropertyResponse> => {
   try {
-    // Simple endpoint - just get all properties
-    const url = `${API_BASE_URL}/properties`;
+    // Build query parameters from filters
+    const queryParams = new URLSearchParams();
+    if (filters?.status) queryParams.append('status', filters.status);
+    if (filters?.location) queryParams.append('location', filters.location);
+    if (filters?.minPrice) queryParams.append('minPrice', filters.minPrice.toString());
+    if (filters?.maxPrice) queryParams.append('maxPrice', filters.maxPrice.toString());
+    if (filters?.bedrooms) queryParams.append('bedrooms', filters.bedrooms.toString());
+    if (filters?.limit) queryParams.append('limit', filters.limit.toString());
+    
+    const url = `${API_BASE_URL}/properties${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
     console.log('Fetching properties from:', url);
+    console.log('Filters applied:', filters);
 
     const response = await fetch(url);
     

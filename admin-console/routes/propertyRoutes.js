@@ -47,10 +47,42 @@ const upload = multer({
  */
 router.get('/', async (req, res) => {
   try {
-    const properties = await Rental.find({})
+    const { status, location, minPrice, maxPrice, bedrooms, limit = 100 } = req.query;
+    
+    // Build query object
+    const query = {};
+    
+    // Filter by status (e.g., 'active', 'inactive', 'draft')
+    if (status) {
+      query.status = status;
+      console.log('🔍 Filtering properties by status:', status);
+    }
+    
+    // Filter by location
+    if (location) {
+      query.location = new RegExp(location, 'i');
+    }
+    
+    // Filter by bedrooms
+    if (bedrooms) {
+      query.bedrooms = parseInt(bedrooms);
+    }
+    
+    // Filter by price range
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = parseFloat(minPrice);
+      if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+    }
+    
+    console.log('📋 Property query:', query);
+    
+    const properties = await Rental.find(query)
       .sort({ priority: -1, createdAt: -1 })
+      .limit(parseInt(limit))
       .lean();
     
+    console.log(`✅ Found ${properties.length} properties matching filters`);
     res.json(properties);
   } catch (error) {
     console.error('Properties error:', error);
