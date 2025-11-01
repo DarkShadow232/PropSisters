@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Instagram, Facebook, Twitter, Mail, Phone, MapPin, Heart } from "lucide-react";
+import { Facebook, Mail, Phone, MapPin, Heart } from "lucide-react";
 import Logo from "./Logo";
 import { Button } from "@/components/ui/button";
 
@@ -38,29 +38,6 @@ const Footer = () => {
             <p className="text-sm text-foreground/70 max-w-xs text-center md:text-left">
               Your premium platform for apartment rentals with on-demand interior design services to make any space feel like home.
             </p>
-            <div className="flex space-x-4 justify-center md:justify-start">
-              <a 
-                href="#" 
-                className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors duration-300" 
-                aria-label="Instagram"
-              >
-                <Instagram size={18} />
-              </a>
-              <a 
-                href="https://www.facebook.com/portosokhnachalet?rdid=b19TAYvOwyqRU4Cb&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F19wE3bgeQF%2F#" 
-                className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors duration-300" 
-                aria-label="Facebook"
-              >
-                <Facebook size={18} />
-              </a>
-              <a 
-                href="#" 
-                className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors duration-300" 
-                aria-label="Twitter"
-              >
-                <Twitter size={18} />
-              </a>
-            </div>
           </div>
 
           {/* Quick Links */}
@@ -109,6 +86,17 @@ const Footer = () => {
                 </div>
                 <span className="text-foreground/70">Cairo, Egypt</span>
               </div>
+              <a 
+                href="https://www.facebook.com/portosokhnachalet?rdid=b19TAYvOwyqRU4Cb&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F19wE3bgeQF%2F#"
+                target="_blank"
+                rel="noopener noreferrer" 
+                className="flex items-center space-x-3 justify-center md:justify-start hover:text-primary transition-colors duration-300 group"
+              >
+                <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                  <Facebook size={16} />
+                </div>
+                <span className="text-foreground/70 group-hover:text-primary transition-colors duration-300">Facebook Page</span>
+              </a>
             </div>
           </div>
         </div>
