@@ -96,12 +96,7 @@ const Header = () => {
             </nav>
             {/* Auth buttons and icons */}
             <div className="hidden md:flex items-center gap-3">
-              <button className="p-2 text-foreground/70 hover:text-[#b94a3b] transition-colors" aria-label="Search">
-                <Search size={20} />
-              </button>
-              <button className="p-2 text-foreground/70 hover:text-[#b94a3b] transition-colors" aria-label="Favorites">
-                <Heart size={20} />
-              </button>
+       
               <div className="h-6 w-px bg-border/50 mx-1"></div>
               {/* Show dashboard link in place of sign in/up if logged in */}
               {currentUser ? null : (

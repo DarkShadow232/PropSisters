@@ -180,7 +180,7 @@ router.get('/google/callback', (req, res, next) => {
   }
   next();
 }, passport.authenticate('google-user', { 
-  failureRedirect: process.env.FRONTEND_URL + '/login?error=google_auth_failed',
+  failureRedirect: process.env.FRONTEND_URL + '/?error=google_auth_failed',
   session: true
 }),
   async (req, res) => {
@@ -196,16 +196,16 @@ router.get('/google/callback', (req, res, next) => {
       req.session.save((err) => {
         if (err) {
           console.error('🔴 Session save error:', err);
-          return res.redirect(process.env.FRONTEND_URL + '/login?error=session_error');
+          return res.redirect(process.env.FRONTEND_URL + '/?error=session_error');
         }
         
         console.log('✅ Google OAuth session saved successfully');
-        // Redirect to frontend with success
-        res.redirect(process.env.FRONTEND_URL + '/login?google_auth=success');
+        // Redirect to frontend home page
+        res.redirect(process.env.FRONTEND_URL + '/?google_auth=success');
       });
     } catch (error) {
       console.error('❌ Google OAuth callback error:', error);
-      res.redirect(process.env.FRONTEND_URL + '/login?error=auth_error');
+      res.redirect(process.env.FRONTEND_URL + '/?error=auth_error');
     }
   }
 );

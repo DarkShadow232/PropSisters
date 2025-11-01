@@ -43,6 +43,7 @@ const RentalsPage = () => {
   // Memoize filters to prevent unnecessary re-renders
   const propertyFilters = useMemo(() => ({
     limit: 100, // Fetch all properties
+    status: 'active', // Only show active properties
   }), []);
 
   // Fetch properties from MongoDB (optimized - no polling)

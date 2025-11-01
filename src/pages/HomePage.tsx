@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Paintbrush, Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -6,9 +6,36 @@ import LocationGuide from "@/components/LocationGuide";
 import VisitorTips from "@/components/VisitorTips";
 import ServicesGrid from "@/components/ServicesGrid";
 import SpecialOffers from "@/components/SpecialOffers";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check for Google OAuth callback success
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const googleAuth = params.get('google_auth');
+    const errorParam = params.get('error');
+
+    if (googleAuth === 'success') {
+      toast.success("Successfully signed in with Google!", {
+        description: "Welcome to Sisterhood Style Rentals!"
+      });
+      // Clean up URL
+      window.history.replaceState({}, '', location.pathname);
+    } else if (errorParam) {
+      const errorMessages: Record<string, string> = {
+        google_auth_failed: "Google sign-in failed. Please try again.",
+        session_error: "Session error occurred. Please try again.",
+        auth_error: "Authentication error occurred. Please try again."
+      };
+      toast.error(errorMessages[errorParam] || "An error occurred during sign-in");
+      // Clean up URL
+      window.history.replaceState({}, '', location.pathname);
+    }
+  }, [location]);
   
   return (
     <div className="flex flex-col min-h-screen">
