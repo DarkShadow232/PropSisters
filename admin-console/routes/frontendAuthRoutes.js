@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const passport = require('passport');
 const User = require('../models/User');
 const passwordResetController = require('../controllers/passwordResetController');
 
@@ -146,8 +147,145 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// ==================== GOOGLE OAUTH AUTHENTICATION REMOVED ====================
-// Google OAuth functionality has been removed to eliminate Firebase dependency
+// ==================== GOOGLE OAUTH AUTHENTICATION ====================
+
+/**
+ * GET /api/auth/google
+ * Initiate Google OAuth flow for frontend users
+ */
+router.get('/google',
+  passport.authenticate('google-user', { 
+    scope: ['profile', 'email'] 
+  })
+);
+
+/**
+ * GET /api/auth/google/callback
+ * Handle Google OAuth callback for frontend users
+ */
+router.get('/google/callback',
+  passport.authenticate('google-user', { 
+    failureRedirect: process.env.FRONTEND_URL + '/login?error=google_auth_failed',
+    session: true
+  }),
+  async (req, res) => {
+    try {
+      console.log('🔵 Google OAuth callback - User authenticated:', req.user.email);
+      
+      // Create session
+      req.session.userId = req.user._id;
+      req.session.userEmail = req.user.email;
+      req.session.userName = req.user.displayName;
+      
+      // Force session save before redirect
+      req.session.save((err) => {
+        if (err) {
+          console.error('🔴 Session save error:', err);
+          return res.redirect(process.env.FRONTEND_URL + '/login?error=session_error');
+        }
+        
+        console.log('✅ Google OAuth session saved successfully');
+        // Redirect to frontend with success
+        res.redirect(process.env.FRONTEND_URL + '/login?google_auth=success');
+      });
+    } catch (error) {
+      console.error('❌ Google OAuth callback error:', error);
+      res.redirect(process.env.FRONTEND_URL + '/login?error=auth_error');
+    }
+  }
+);
+
+/**
+ * POST /api/auth/google/token
+ * Authenticate with Google ID token (alternative flow for client-side Google Sign-In)
+ */
+router.post('/google/token', async (req, res) => {
+  try {
+    const { credential } = req.body;
+    
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: 'Google credential token is required'
+      });
+    }
+
+    // Verify the Google ID token
+    const { OAuth2Client } = require('google-auth-library');
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+    
+    const payload = ticket.getPayload();
+    console.log('🔵 Google token verified for:', payload.email);
+    
+    // Check if user exists with this Google ID
+    let user = await User.findOne({ googleId: payload.sub });
+    
+    if (user) {
+      console.log('✅ Existing Google user found:', user.email);
+    } else {
+      // Check if user exists with this email
+      user = await User.findOne({ email: payload.email });
+      
+      if (user) {
+        // Link Google account to existing user
+        console.log('🔗 Linking Google account to existing user:', user.email);
+        user.googleId = payload.sub;
+        user.provider = 'google';
+        if (!user.photoURL && payload.picture) {
+          user.photoURL = payload.picture;
+        }
+        await user.save();
+      } else {
+        // Create new user
+        console.log('🆕 Creating new user with Google token');
+        user = await User.create({
+          email: payload.email,
+          displayName: payload.name,
+          googleId: payload.sub,
+          provider: 'google',
+          photoURL: payload.picture || '',
+          isEmailVerified: payload.email_verified || true,
+          role: 'user'
+        });
+        
+        console.log('✅ New user created:', user.email);
+      }
+    }
+    
+    // Create session
+    req.session.userId = user._id;
+    req.session.userEmail = user.email;
+    req.session.userName = user.displayName;
+    
+    // Return user data
+    const userResponse = {
+      id: user._id,
+      email: user.email,
+      displayName: user.displayName,
+      phoneNumber: user.phoneNumber,
+      photoURL: user.photoURL,
+      role: user.role,
+      isEmailVerified: user.isEmailVerified
+    };
+    
+    res.json({
+      success: true,
+      message: 'Google authentication successful',
+      user: userResponse
+    });
+  } catch (error) {
+    console.error('❌ Google token authentication error:', error);
+    res.status(401).json({
+      success: false,
+      message: 'Google authentication failed: ' + error.message
+    });
+  }
+});
 
 // ==================== SESSION MANAGEMENT ====================
 

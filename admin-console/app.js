@@ -11,6 +11,9 @@ require('dotenv').config();
 // Initialize database connection
 const connectDB = require('./config/database');
 
+// Initialize Passport
+const passport = require('./config/passport');
+
 // Initialize services
 const LoggerService = require('./services/loggerService');
 
@@ -120,6 +123,10 @@ app.use(session({
 
 // Flash messages
 app.use(flash());
+
+// Initialize Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Make flash messages available to all views
 app.use((req, res, next) => {

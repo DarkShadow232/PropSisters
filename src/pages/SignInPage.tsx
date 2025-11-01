@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 
 const SignInPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,10 +20,34 @@ const SignInPage = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, currentUser, loading } = useAuth();
+  const { signIn, signInWithGoogle, currentUser, loading } = useAuth();
 
   // Get the redirect path from location state, or default to dashboard
   const from = location.state?.from?.pathname || '/dashboard';
+
+  // Check for Google OAuth callback success
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const googleAuth = params.get('google_auth');
+    const errorParam = params.get('error');
+
+    if (googleAuth === 'success') {
+      toast.success("Successfully signed in with Google!", {
+        description: "Welcome back to Sisterhood Style Rentals!"
+      });
+      // Clean up URL
+      window.history.replaceState({}, '', location.pathname);
+    } else if (errorParam) {
+      const errorMessages: Record<string, string> = {
+        google_auth_failed: "Google sign-in failed. Please try again.",
+        session_error: "Session error occurred. Please try again.",
+        auth_error: "Authentication error occurred. Please try again."
+      };
+      toast.error(errorMessages[errorParam] || "An error occurred during sign-in");
+      // Clean up URL
+      window.history.replaceState({}, '', location.pathname);
+    }
+  }, [location]);
 
   // Redirect if user is already signed in
   useEffect(() => {
@@ -154,6 +179,23 @@ const SignInPage = () => {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <Separator className="w-full" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+            
+            <div className="mt-6">
+              <GoogleSignInButton disabled={isLoading} />
+            </div>
+          </div>
           
         </CardContent>
         <CardFooter>

@@ -12,10 +12,25 @@ const userSchema = new mongoose.Schema({
     trim: true
   },
   
-  // Password for email/password authentication
+  // Password for email/password authentication (optional for OAuth users)
   password: {
     type: String,
-    required: true
+    required: function() {
+      return !this.googleId; // Password not required if using Google OAuth
+    }
+  },
+  
+  // OAuth provider fields
+  googleId: {
+    type: String,
+    sparse: true,
+    unique: true
+  },
+  
+  provider: {
+    type: String,
+    enum: ['local', 'google'],
+    default: 'local'
   },
   
   displayName: {
@@ -71,8 +86,8 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', async function(next) {
   this.updatedAt = Date.now();
   
-  // Only hash password if it's modified
-  if (this.isModified('password')) {
+  // Only hash password if it's modified and exists (for non-OAuth users)
+  if (this.isModified('password') && this.password) {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
   }

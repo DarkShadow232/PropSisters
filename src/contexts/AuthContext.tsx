@@ -21,6 +21,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, displayName: string, phoneNumber?: string) => Promise<void>;
+  signInWithGoogle: () => void;
   signOut: () => Promise<void>;
   updateProfile: (updates: { displayName?: string; phoneNumber?: string; photoURL?: string }) => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
@@ -85,7 +86,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       if (response.success && response.user) {
         setCurrentUser(response.user as User);
-        setUserRole(response.user.role as UserRole);
         console.log('User set successfully:', response.user);
       } else {
         console.error('Login failed:', response);
@@ -122,6 +122,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Sign in with Google OAuth
+  const signInWithGoogle = () => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'https://api.propsiss.com';
+    window.location.href = `${apiUrl}/api/auth/google`;
   };
 
   // Sign out
@@ -175,6 +181,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading,
     signIn,
     signUp,
+    signInWithGoogle,
     signOut,
     updateProfile,
     changePassword
