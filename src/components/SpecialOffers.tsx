@@ -1,5 +1,5 @@
 import React from "react";
-import { Hospital, Ticket } from "lucide-react";
+import { Hospital, Ticket, UtensilsCrossed, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -11,7 +11,7 @@ const SpecialOffers = () => {
           Special Offers & Partnerships
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 stagger-children">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children">
           {/* Medical Tourism Package */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden hover-lift">
             <div className="p-8">
@@ -140,6 +140,83 @@ const SpecialOffers = () => {
                     VIEW PARTICIPATING PARKS
                   </Button>
                 </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Nilos Restaurant Partnership */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden hover-lift">
+            <div className="relative h-48 overflow-hidden">
+              <img 
+                src="/image/firstImages.jpg" 
+                alt="Nilos Restaurant" 
+                className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+              <div className="absolute bottom-4 left-4 right-4">
+                <h3 className="text-2xl font-serif font-medium text-white">Nilos</h3>
+              </div>
+            </div>
+            
+            <div className="p-8">
+              <div className="flex justify-center mb-5">
+                <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center animate-pulse-soft">
+                  <UtensilsCrossed className="h-8 w-8 text-blue-500" />
+                </div>
+              </div>
+              
+              <h3 className="text-xl font-medium text-center mb-3">Restaurant Partnership</h3>
+              
+              <p className="text-gray-600 text-center mb-6">
+                Enjoy exclusive dining experiences at Nilos, one of Dokki's finest restaurants. Our guests receive special privileges and discounts.
+              </p>
+              
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-start gap-2">
+                  <div className="min-w-5 mt-1">
+                    <svg className="h-5 w-5 text-[#b94a3b]" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" className="fill-[#b94a3b]/10" />
+                      <path d="M8 12l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-700">Exclusive discounts for our guests</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="min-w-5 mt-1">
+                    <svg className="h-5 w-5 text-[#b94a3b]" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" className="fill-[#b94a3b]/10" />
+                      <path d="M8 12l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-700">Priority reservations available</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="min-w-5 mt-1">
+                    <svg className="h-5 w-5 text-[#b94a3b]" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" className="fill-[#b94a3b]/10" />
+                      <path d="M8 12l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-700">Fine dining experience in Dokki</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="min-w-5 mt-1">
+                    <MapPin className="h-5 w-5 text-[#b94a3b]" />
+                  </div>
+                  <span className="text-gray-700 text-sm">Ad Doqi A, Dokki, Giza</span>
+                </li>
+              </ul>
+              
+              <div className="flex justify-center">
+                <a 
+                  href="https://maps.app.goo.gl/qSWYRMXGkySNK3KG7" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="outline" className="border-[#b94a3b] text-[#b94a3b] hover:bg-[#b94a3b]/5 hover-lift">
+                    VIEW LOCATION
+                  </Button>
+                </a>
               </div>
             </div>
           </div>
