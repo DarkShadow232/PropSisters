@@ -41,6 +41,7 @@ export interface PropertyFilters {
   page?: number;
   limit?: number;
   status?: string;
+  sortBy?: string;
 }
 
 export interface PropertyResponse {
@@ -98,6 +99,7 @@ export const fetchPropertiesFromMongo = async (
     if (filters?.maxPrice) queryParams.append('maxPrice', filters.maxPrice.toString());
     if (filters?.bedrooms) queryParams.append('bedrooms', filters.bedrooms.toString());
     if (filters?.limit) queryParams.append('limit', filters.limit.toString());
+    if (filters?.sortBy) queryParams.append('sortBy', filters.sortBy);
     
     const url = `${API_BASE_URL}/properties${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
     console.log('Fetching properties from:', url);

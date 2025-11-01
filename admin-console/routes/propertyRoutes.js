@@ -47,7 +47,7 @@ const upload = multer({
  */
 router.get('/', async (req, res) => {
   try {
-    const { status, location, minPrice, maxPrice, bedrooms, limit = 100 } = req.query;
+    const { status, location, minPrice, maxPrice, bedrooms, limit = 100, sortBy } = req.query;
     
     // Build query object
     const query = {};
@@ -75,10 +75,28 @@ router.get('/', async (req, res) => {
       if (maxPrice) query.price.$lte = parseFloat(maxPrice);
     }
     
+    // Determine sort order
+    let sortOrder = { priority: -1, createdAt: -1 }; // Default: priority (high to low), then newest first
+    
+    if (sortBy) {
+      if (sortBy === 'priority') {
+        sortOrder = { priority: -1, createdAt: -1 }; // High priority first
+      } else if (sortBy === 'price-asc') {
+        sortOrder = { price: 1 };
+      } else if (sortBy === 'price-desc') {
+        sortOrder = { price: -1 };
+      } else if (sortBy === 'newest') {
+        sortOrder = { createdAt: -1 };
+      } else if (sortBy === 'oldest') {
+        sortOrder = { createdAt: 1 };
+      }
+    }
+    
     console.log('📋 Property query:', query);
+    console.log('📊 Sort order:', sortOrder);
     
     const properties = await Rental.find(query)
-      .sort({ priority: -1, createdAt: -1 })
+      .sort(sortOrder)
       .limit(parseInt(limit))
       .lean();
     

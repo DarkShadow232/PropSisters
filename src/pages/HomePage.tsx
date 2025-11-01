@@ -7,11 +7,26 @@ import VisitorTips from "@/components/VisitorTips";
 import ServicesGrid from "@/components/ServicesGrid";
 import SpecialOffers from "@/components/SpecialOffers";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { useProperties } from "@/hooks/useProperties";
+import { MapPin, BedDouble, Bath } from "lucide-react";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Fetch featured properties with high priority and active status
+  const propertyFilters = useMemo(() => ({
+    limit: 3,
+    status: 'active',
+    sortBy: 'priority' // Sort by priority in descending order
+  }), []);
+
+  const { properties: featuredProperties, loading: featuredLoading } = useProperties({
+    pollInterval: 0,
+    filters: propertyFilters,
+    autoFetch: true
+  });
 
   // Check for Google OAuth callback success
   useEffect(() => {
@@ -108,119 +123,77 @@ const HomePage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-children">
-            {/* Property Card 1 */}
-            <div className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-              <div className="relative overflow-hidden rounded-lg img-hover-zoom h-64">
-                <img 
-                  src="/image/Apartments/Ap6/IMG-20250327-WA0070.jpg" 
-                  alt="Luxury Two-Bedroom Apartment with Two Bathrooms" 
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-                  loading="eager"
-                />
-                <div className="absolute top-4 left-4 bg-rustic-600 text-white py-1 px-3 rounded-full text-sm font-medium">
-                  Featured
+            {featuredLoading ? (
+              // Loading skeleton
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 animate-pulse">
+                  <div className="h-64 bg-gray-200"></div>
+                  <div className="p-4 space-y-3">
+                    <div className="h-6 bg-gray-200 rounded"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </div>
                 </div>
-                <div className="absolute top-4 right-4 bg-white py-1 px-3 rounded-full text-sm font-medium shadow-md">
-                  2500 EGP / night
+              ))
+            ) : featuredProperties.length > 0 ? (
+              // Display featured properties from database
+              featuredProperties.slice(0, 3).map((property, index) => (
+                <div key={property.id} className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
+                  <div className="relative overflow-hidden rounded-lg img-hover-zoom h-64">
+                    <img 
+                      src={property.image} 
+                      alt={property.title} 
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                      loading={index === 0 ? "eager" : "lazy"}
+                    />
+                    {index === 0 && (
+                      <div className="absolute top-4 left-4 bg-rustic-600 text-white py-1 px-3 rounded-full text-sm font-medium">
+                        Featured
+                      </div>
+                    )}
+                    <div className="absolute top-4 right-4 bg-white py-1 px-3 rounded-full text-sm font-medium shadow-md">
+                      {property.price} EGP / night
+                    </div>
+                  </div>
+                  <div className="p-4 hover-lift">
+                    <h3 className="font-serif text-lg font-medium mb-2 line-clamp-2">{property.title}</h3>
+                    <p className="text-foreground/70 text-sm mb-3 flex items-center">
+                      <MapPin className="w-4 h-4 mr-1 text-primary" />
+                      {property.location}
+                    </p>
+                    <Separator className="my-3" />
+                    <div className="flex justify-between text-sm">
+                      <span className="text-foreground/70 flex items-center gap-1">
+                        <BedDouble className="w-4 h-4" />
+                        {property.bedrooms} {property.bedrooms === 1 ? 'Bedroom' : 'Bedrooms'}
+                      </span>
+                      <span className="text-foreground/70 flex items-center gap-1">
+                        <Bath className="w-4 h-4" />
+                        {property.bathrooms} {property.bathrooms === 1 ? 'Bath' : 'Baths'}
+                      </span>
+                    </div>
+                    <Separator className="my-3" />
+                    <Button 
+                      className="w-full btn-primary mt-2"
+                      onClick={() => navigate(`/rentals/${property.id}`)}
+                    >
+                      View Details
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              <div className="p-4 hover-lift">
-                <h3 className="font-serif text-lg font-medium mb-2">Luxury Two-Bedroom Apartment with Two Bathrooms</h3>
-                <p className="text-foreground/70 text-sm mb-3 flex items-center">
-                  <svg className="w-4 h-4 mr-1 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 616 0z"></path>
-                  </svg>
-                  Madinaty, Egypt - Building B6, Group 68
-                </p>
-                <Separator className="my-3" />
-                <div className="flex justify-between text-sm">
-                  <span className="text-foreground/70">2 Bedrooms</span>
-                  <span className="text-foreground/70">2 Baths</span>
-                </div>
-                <Separator className="my-3" />
+              ))
+            ) : (
+              // No properties found
+              <div className="col-span-3 text-center py-12">
+                <p className="text-foreground/70">No featured properties available at the moment.</p>
                 <Button 
-                  className="w-full btn-primary mt-2"
-                  onClick={() => navigate('/rentals/6')}
+                  className="mt-4 btn-primary"
+                  onClick={() => navigate('/rentals')}
                 >
-                  View Details
+                  View All Properties
                 </Button>
               </div>
-            </div>
-
-            {/* Property Card 2 */}
-            <div className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-              <div className="relative overflow-hidden rounded-lg img-hover-zoom h-64">
-                <img 
-                  src="/image/Apartments/Ap1/IMG-20250327-WA0009.jpg" 
-                  alt="Premium Two-Bedroom Garden View Apartment - Building B6" 
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-                  loading="eager"
-                />
-                <div className="absolute top-4 right-4 bg-white py-1 px-3 rounded-full text-sm font-medium">
-                  3000 EGP / night
-                </div>
-              </div>
-              <div className="p-4 hover-lift">
-                <h3 className="font-serif text-lg font-medium mb-2">Premium Two-Bedroom Garden View Apartment - Building B6</h3>
-                <p className="text-foreground/70 text-sm mb-3 flex items-center">
-                  <svg className="w-4 h-4 mr-1 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 616 0z"></path>
-                  </svg>
-                  Madinaty, Egypt - Building B6, Group 65
-                </p>
-                <Separator className="my-3" />
-                <div className="flex justify-between text-sm">
-                  <span className="text-foreground/70">2 Bedrooms</span>
-                  <span className="text-foreground/70">1 Bath</span>
-                </div>
-                <Separator className="my-3" />
-                <Button 
-                  className="w-full btn-primary mt-2"
-                  onClick={() => navigate('/rentals/1')}
-                >
-                  View Details
-                </Button>
-              </div>
-            </div>
-
-            {/* Property Card 3 */}
-            <div className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-              <div className="relative overflow-hidden rounded-lg img-hover-zoom h-64">
-                <img 
-                  src="/image/Apartments/Ap2/IMG-20250327-WA0020.jpg" 
-                  alt="Modern Two-Bedroom Apartment, Fifth Floor" 
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-                  loading="eager"
-                />
-                <div className="absolute top-4 right-4 bg-white py-1 px-3 rounded-full text-sm font-medium">
-                  3000 EGP / night
-                </div>
-              </div>
-              <div className="p-4 hover-lift">
-                <h3 className="font-serif text-lg font-medium mb-2">Modern Two-Bedroom Apartment, Fifth Floor</h3>
-                <p className="text-foreground/70 text-sm mb-3 flex items-center">
-                  <svg className="w-4 h-4 mr-1 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 616 0z"></path>
-                  </svg>
-                  Madinaty, Egypt - Building B11, Group 113
-                </p>
-                <Separator className="my-3" />
-                <div className="flex justify-between text-sm">
-                  <span className="text-foreground/70">2 Bedrooms</span>
-                  <span className="text-foreground/70">1 Bath</span>
-                </div>
-                <Separator className="my-3" />
-                <Button 
-                  className="w-full btn-primary mt-2"
-                  onClick={() => navigate('/rentals/2')}
-                >
-                  View Details
-                </Button>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
