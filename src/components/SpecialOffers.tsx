@@ -2,7 +2,6 @@ import React from "react";
 import { Hospital, Ticket, UtensilsCrossed, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import nilosImage from "/image/firstImages.jpg";
 
 const SpecialOffers = () => {
   return (
@@ -149,7 +148,7 @@ const SpecialOffers = () => {
           <div className="bg-white rounded-xl shadow-md overflow-hidden hover-lift">
             <div className="relative h-48 overflow-hidden">
               <img 
-                src={nilosImage} 
+                src="/image/firstImages.jpg" 
                 alt="Nilos Restaurant" 
                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
               />
