@@ -153,24 +153,39 @@ router.post('/login', async (req, res) => {
  * GET /api/auth/google
  * Initiate Google OAuth flow for frontend users
  */
-router.get('/google',
-  passport.authenticate('google-user', { 
-    scope: ['profile', 'email'] 
-  })
-);
+router.get('/google', (req, res, next) => {
+  console.log('\n🔵 Google OAuth Initiation Request');
+  console.log('   Time:', new Date().toISOString());
+  console.log('   Client IP:', req.ip);
+  console.log('   User-Agent:', req.get('user-agent'));
+  console.log('   Referer:', req.get('referer'));
+  console.log('   Redirecting to Google...\n');
+  next();
+}, passport.authenticate('google-user', { 
+  scope: ['profile', 'email'] 
+}));
 
 /**
  * GET /api/auth/google/callback
  * Handle Google OAuth callback for frontend users
  */
-router.get('/google/callback',
-  passport.authenticate('google-user', { 
-    failureRedirect: process.env.FRONTEND_URL + '/login?error=google_auth_failed',
-    session: true
-  }),
+router.get('/google/callback', (req, res, next) => {
+  console.log('\n🔵 Google OAuth Callback Request');
+  console.log('   Time:', new Date().toISOString());
+  console.log('   Query params:', req.query);
+  console.log('   Has code:', !!req.query.code);
+  console.log('   Has error:', !!req.query.error);
+  if (req.query.error) {
+    console.log('   ❌ OAuth Error:', req.query.error);
+  }
+  next();
+}, passport.authenticate('google-user', { 
+  failureRedirect: process.env.FRONTEND_URL + '/login?error=google_auth_failed',
+  session: true
+}),
   async (req, res) => {
     try {
-      console.log('🔵 Google OAuth callback - User authenticated:', req.user.email);
+      console.log('✅ Google OAuth callback - User authenticated:', req.user.email);
       
       // Create session
       req.session.userId = req.user._id;

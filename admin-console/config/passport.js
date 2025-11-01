@@ -23,6 +23,14 @@ passport.deserializeUser(async (sessionData, done) => {
   }
 });
 
+// Debug: Log OAuth configuration on startup
+console.log('\n🔧 Passport Google OAuth Configuration:');
+console.log('   Client ID:', process.env.GOOGLE_CLIENT_ID ? '✅ Loaded' : '❌ Missing');
+console.log('   Client Secret:', process.env.GOOGLE_CLIENT_SECRET ? '✅ Loaded' : '❌ Missing');
+console.log('   Callback URL:', `${process.env.API_URL}/api/auth/google/callback`);
+console.log('   API URL:', process.env.API_URL);
+console.log('');
+
 // Google OAuth Strategy for Users (Frontend only)
 passport.use('google-user', new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
